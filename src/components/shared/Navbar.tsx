@@ -6,7 +6,6 @@ import {
   Info,
   LayoutDashboard,
   LogOut,
-  ChevronDown,
   Search,
   ShoppingCart,
   Heart,
@@ -53,6 +52,7 @@ import { getDefaultDashboardRoute } from "@/lib/authUtils";
 
 import { ThemeToggle } from "./ThemeToggle";
 import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
 
 interface MenuItem {
   title: string;
@@ -116,7 +116,7 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
     <section
       className={cn(
         "sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 transition-all duration-300",
-        className
+        className,
       )}
     >
       <div className="container mx-auto px-4 md:px-8">
@@ -151,22 +151,59 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
           {/* Right: Actions */}
           <div className="flex items-center gap-2">
             <div className="flex items-center border-r pr-4 mr-2 gap-1.5">
-              <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground hover:text-primary transition-colors">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full text-muted-foreground hover:text-primary transition-colors"
+              >
                 <Search className="h-5 w-5" />
               </Button>
-              <Button variant="ghost" size="icon" className="relative rounded-full text-muted-foreground hover:text-primary transition-colors">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative rounded-full text-muted-foreground hover:text-primary transition-colors"
+              >
                 <Heart className="h-5 w-5" />
-                <Badge className="absolute -right-1 -top-1 h-4 w-4 justify-center p-0 text-[10px]">0</Badge>
+                <Badge className="absolute -right-1 -top-1 h-4 w-4 justify-center p-0 text-[10px]">
+                  0
+                </Badge>
               </Button>
-              <Button variant="ghost" size="icon" className="relative rounded-full text-muted-foreground hover:text-primary transition-colors">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative rounded-full text-muted-foreground hover:text-primary transition-colors"
+              >
                 <ShoppingCart className="h-5 w-5" />
-                <Badge className="absolute -right-1 -top-1 h-4 w-4 justify-center p-0 text-[10px]">0</Badge>
+                <Badge className="absolute -right-1 -top-1 h-4 w-4 justify-center p-0 text-[10px]">
+                  0
+                </Badge>
               </Button>
             </div>
 
             <div className="flex items-center gap-3">
+              {(!userInfo || userInfo.role === "USER") && (
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="hidden xl:flex rounded-full border-primary/20 text-primary hover:bg-primary hover:text-white font-bold transition-all"
+                >
+                  <Link href="/become-seller">Become a Seller</Link>
+                </Button>
+              )}
+              {userInfo?.role === "SELLER" && (
+                <Button
+                  asChild
+                  variant="default"
+                  size="sm"
+                  className="hidden xl:flex rounded-full font-bold shadow-lg shadow-primary/20"
+                >
+                  <Link href="/seller/dashboard">My Shop</Link>
+                </Button>
+              )}
+
               <ThemeToggle />
-              
+
               {userInfo ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -175,7 +212,11 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
                       className="group relative h-10 w-10 rounded-full p-0 overflow-hidden ring-2 ring-primary/20 ring-offset-2 ring-offset-background transition-all hover:ring-primary/40"
                     >
                       {userInfo.image ? (
-                        <img src={userInfo.image} alt={userInfo.name} className="h-full w-full object-cover" />
+                        <Image
+                          src={userInfo.image}
+                          alt={userInfo.name}
+                          className="h-full w-full object-cover"
+                        />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary to-primary/60 text-sm font-bold text-primary-foreground">
                           {userInfo.name.charAt(0).toUpperCase()}
@@ -183,7 +224,11 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
                       )}
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-64 mt-2" align="end" forceMount>
+                  <DropdownMenuContent
+                    className="w-64 mt-2"
+                    align="end"
+                    forceMount
+                  >
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex items-center gap-3 px-1 py-1.5">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary font-bold">
@@ -224,10 +269,19 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
                 </DropdownMenu>
               ) : (
                 <div className="flex items-center gap-2">
-                  <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex font-semibold text-muted-foreground hover:text-foreground">
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="hidden sm:inline-flex font-semibold text-muted-foreground hover:text-foreground"
+                  >
                     <Link href="/login">Login</Link>
                   </Button>
-                  <Button asChild size="sm" className="rounded-full px-5 font-bold shadow-md shadow-primary/20 transition-all hover:scale-105 active:scale-95">
+                  <Button
+                    asChild
+                    size="sm"
+                    className="rounded-full px-5 font-bold shadow-md shadow-primary/20 transition-all hover:scale-105 active:scale-95"
+                  >
                     <Link href="/register">Sign up</Link>
                   </Button>
                 </div>
@@ -243,9 +297,11 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
               <ShoppingBag className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="text-lg font-black tracking-tight">Next<span className="text-primary">Bazar</span></span>
+            <span className="text-lg font-black tracking-tight">
+              Next<span className="text-primary">Bazar</span>
+            </span>
           </Link>
-          
+
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" className="rounded-full">
               <Search className="h-5 w-5" />
@@ -257,7 +313,10 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
                   <Menu className="size-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-full sm:w-[400px] border-l-0 p-0">
+              <SheetContent
+                side="right"
+                className="w-full sm:w-[400px] border-l-0 p-0"
+              >
                 <div className="flex flex-col h-full bg-background">
                   <SheetHeader className="p-6 border-b text-left">
                     <div className="flex items-center justify-between">
@@ -276,9 +335,13 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
                       Your premium shopping destination
                     </SheetDescription>
                   </SheetHeader>
-                  
+
                   <div className="flex-1 overflow-y-auto py-6">
-                    <Accordion type="single" collapsible className="w-full px-4">
+                    <Accordion
+                      type="single"
+                      collapsible
+                      className="w-full px-4"
+                    >
                       {menu.map((item) => renderMobileMenuItem(item, pathname))}
                     </Accordion>
                   </div>
@@ -291,10 +354,28 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
                             {userInfo.name.charAt(0).toUpperCase()}
                           </div>
                           <div className="flex flex-col">
-                            <span className="text-sm font-bold">{userInfo.name}</span>
-                            <span className="text-xs text-muted-foreground">{userInfo.email}</span>
+                            <span className="text-sm font-bold">
+                              {userInfo.name}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {userInfo.email}
+                            </span>
                           </div>
                         </div>
+
+                        {userInfo.role === "USER" && (
+                          <Button
+                            asChild
+                            variant="outline"
+                            className="justify-start gap-3 h-12 rounded-xl border-primary/20 text-primary"
+                          >
+                            <Link href="/become-seller">
+                              <Store className="size-5" />
+                              Become a Seller
+                            </Link>
+                          </Button>
+                        )}
+
                         <Button
                           asChild
                           variant="outline"
@@ -305,6 +386,7 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
                             Dashboard
                           </Link>
                         </Button>
+
                         <Button
                           variant="destructive"
                           onClick={handleLogout}
@@ -315,13 +397,32 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
                         </Button>
                       </div>
                     ) : (
-                      <div className="grid grid-cols-2 gap-4">
-                        <Button asChild variant="outline" className="h-12 rounded-xl font-bold">
-                          <Link href="/login">Login</Link>
+                      <div className="flex flex-col gap-3">
+                        <Button
+                          asChild
+                          className="h-12 rounded-xl font-bold shadow-lg shadow-primary/20"
+                        >
+                          <Link href="/become-seller">
+                            <Store className="size-5" />
+                            Become a Seller
+                          </Link>
                         </Button>
-                        <Button asChild className="h-12 rounded-xl font-bold shadow-lg shadow-primary/20">
-                          <Link href="/register">Sign up</Link>
-                        </Button>
+                        <div className="grid grid-cols-2 gap-3">
+                          <Button
+                            asChild
+                            variant="outline"
+                            className="h-12 rounded-xl font-bold"
+                          >
+                            <Link href="/login">Login</Link>
+                          </Button>
+                          <Button
+                            asChild
+                            variant="outline"
+                            className="h-12 rounded-xl font-bold"
+                          >
+                            <Link href="/register">Sign up</Link>
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -341,10 +442,10 @@ const renderMenuItem = (item: MenuItem, currentPath: string) => {
   if (item.items) {
     return (
       <NavigationMenuItem key={item.title}>
-        <NavigationMenuTrigger 
+        <NavigationMenuTrigger
           className={cn(
             "bg-transparent h-10 px-4 font-semibold transition-colors hover:bg-primary/5 hover:text-primary data-[state=open]:bg-primary/5",
-            isActive && "text-primary"
+            isActive && "text-primary",
           )}
         >
           {item.title}
@@ -371,7 +472,7 @@ const renderMenuItem = (item: MenuItem, currentPath: string) => {
           href={item.url}
           className={cn(
             "relative group inline-flex h-10 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-semibold transition-colors hover:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50",
-            isActive ? "text-primary" : "text-foreground/70"
+            isActive ? "text-primary" : "text-foreground/70",
           )}
         >
           {item.title}
@@ -394,15 +495,13 @@ const renderMobileMenuItem = (item: MenuItem, currentPath: string) => {
         value={item.title}
         className="border-none"
       >
-        <AccordionTrigger 
+        <AccordionTrigger
           className={cn(
             "text-base py-4 font-bold hover:no-underline px-4 rounded-xl transition-all",
-            isActive ? "bg-primary/5 text-primary" : "hover:bg-muted/50"
+            isActive ? "bg-primary/5 text-primary" : "hover:bg-muted/50",
           )}
         >
-          <span className="flex items-center gap-3">
-            {item.title}
-          </span>
+          <span className="flex items-center gap-3">{item.title}</span>
         </AccordionTrigger>
         <AccordionContent className="pb-2 px-2 pt-1">
           <div className="flex flex-col gap-1">
@@ -416,7 +515,9 @@ const renderMobileMenuItem = (item: MenuItem, currentPath: string) => {
                   {subItem.icon}
                 </div>
                 <div>
-                  <div className="font-bold text-foreground group-hover:text-primary transition-colors">{subItem.title}</div>
+                  <div className="font-bold text-foreground group-hover:text-primary transition-colors">
+                    {subItem.title}
+                  </div>
                   <div className="text-[11px] font-medium text-muted-foreground line-clamp-1">
                     {subItem.description}
                   </div>
@@ -435,9 +536,9 @@ const renderMobileMenuItem = (item: MenuItem, currentPath: string) => {
       href={item.url}
       className={cn(
         "flex items-center py-4 px-4 text-base font-bold rounded-xl transition-all mb-1",
-        isActive 
-          ? "bg-primary/10 text-primary" 
-          : "text-foreground/80 hover:bg-muted/50 hover:text-primary"
+        isActive
+          ? "bg-primary/10 text-primary"
+          : "text-foreground/80 hover:bg-muted/50 hover:text-primary",
       )}
     >
       {item.title}
@@ -455,7 +556,9 @@ const SubMenuLink = ({ item }: { item: MenuItem }) => {
         {item.icon}
       </div>
       <div className="flex-1">
-        <div className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{item.title}</div>
+        <div className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
+          {item.title}
+        </div>
         {item.description && (
           <p className="mt-1.5 text-[11px] font-medium leading-relaxed text-muted-foreground line-clamp-2">
             {item.description}
