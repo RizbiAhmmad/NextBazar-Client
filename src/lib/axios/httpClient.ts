@@ -6,7 +6,7 @@ import { cookies, headers } from "next/headers";
 import { isTokenExpiringSoon } from "../tokenUtils";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/V1";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1";
 
 if (!API_BASE_URL) {
   throw new Error("API_BASE_URL is not defined in environment variables");

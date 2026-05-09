@@ -4,7 +4,8 @@
 import { setTokenInCookies } from "@/lib/tokenUtils";
 import { cookies } from "next/headers";
 
-const BASE_API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const BASE_API_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1";
 
 if (!BASE_API_URL) {
   throw new Error("NEXT_PUBLIC_API_BASE_URL is not defined");
@@ -14,11 +15,14 @@ export async function getNewTokensWithRefreshToken(
   refreshToken: string,
 ): Promise<boolean> {
   try {
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get("better-auth.session_token")?.value;
+
     const res = await fetch(`${BASE_API_URL}/auth/refresh-token`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Cookie: `refreshToken=${refreshToken}`,
+        Cookie: `refreshToken=${refreshToken}; better-auth.session_token=${sessionToken}`,
       },
     });
 
@@ -71,6 +75,7 @@ export async function getUserInfo() {
         "Content-Type": "application/json",
         Cookie: `accessToken=${accessToken}; better-auth.session_token=${sessionToken}`,
       },
+      cache: "no-store",
     });
 
     if (!res.ok) {
@@ -90,5 +95,65 @@ export async function getUserInfo() {
     }
     console.error("Error fetching user info:", error);
     return null;
+  }
+}
+
+export async function logoutUser() {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get("better-auth.session_token")?.value;
+
+  if (sessionToken) {
+    try {
+      await fetch(`${BASE_API_URL}/auth/logout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: `better-auth.session_token=${sessionToken}`,
+        },
+      });
+    } catch (error) {
+      console.error("Error logging out from server:", error);
+    }
+  }
+
+  cookieStore.delete("accessToken");
+  cookieStore.delete("refreshToken");
+  cookieStore.delete("better-auth.session_token");
+}
+
+export async function updateProfile(payload: any) {
+  try {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("accessToken")?.value;
+    const sessionToken = cookieStore.get("better-auth.session_token")?.value;
+
+    if (!accessToken) {
+      return { success: false, message: "Unauthorized" };
+    }
+
+    const isFormData = payload instanceof FormData;
+
+    const res = await fetch(`${BASE_API_URL}/auth/update-profile`, {
+      method: "PATCH",
+      headers: {
+        ...(isFormData ? {} : { "Content-Type": "application/json" }),
+        Cookie: `accessToken=${accessToken}; better-auth.session_token=${sessionToken}`,
+      },
+      body: isFormData ? payload : JSON.stringify(payload),
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      return {
+        success: false,
+        message: result.message || "Failed to update profile",
+      };
+    }
+
+    return { success: true, data: result.data, message: result.message };
+  } catch (error: unknown) {
+    console.error("Error updating profile:", error);
+    return { success: false, message: "Something went wrong" };
   }
 }

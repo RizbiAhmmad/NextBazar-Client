@@ -18,3 +18,9 @@ export interface BarChartData {
   month: Date | string;
   count: number;
 }
+
+export interface IAdminDashboardData {
+  adminCount: number;
+  superAdminCount: number;
+  userCount: number;
+}
