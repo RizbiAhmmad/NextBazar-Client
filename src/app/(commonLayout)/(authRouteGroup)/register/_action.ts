@@ -9,15 +9,15 @@ import {
 import { httpClient } from "@/lib/axios/httpClient";
 import { setTokenInCookies } from "@/lib/tokenUtils";
 import { ApiErrorResponse } from "@/types/api.types";
-import { ILoginResponse } from "@/types/auth.types";
-import { ILoginPayload, loginZodSchema } from "@/zod/auth.validation";
+import { IRegisterResponse } from "@/types/auth.types";
+import { IRegisterPayload, registerZodSchema } from "@/zod/auth.validation";
 import { redirect } from "next/navigation";
 
-export const loginAction = async (
-  payload: ILoginPayload,
+export const registerAction = async (
+  payload: IRegisterPayload,
   redirectPath?: string,
-): Promise<ILoginResponse | ApiErrorResponse> => {
-  const parsedPayload = loginZodSchema.safeParse(payload);
+): Promise<IRegisterResponse | ApiErrorResponse> => {
+  const parsedPayload = registerZodSchema.safeParse(payload);
 
   if (!parsedPayload.success) {
     const firstError = parsedPayload.error.issues[0].message || "Invalid input";
@@ -27,26 +27,26 @@ export const loginAction = async (
     };
   }
   try {
-    const response = await httpClient.post<ILoginResponse>(
-      "/auth/login",
+    const response = await httpClient.post<IRegisterResponse>(
+      "/auth/register",
       parsedPayload.data,
     );
 
     const { accessToken, refreshToken, token, user } = response.data;
-    const { role, needPasswordChange, email } = user;
-    await setTokenInCookies("accessToken", accessToken);
-    await setTokenInCookies("refreshToken", refreshToken);
-    await setTokenInCookies("better-auth.session_token", token, 24 * 60 * 60); // 1 day in seconds
 
-    // if(!emailVerified){
-    //     redirect("/verify-email");
-    // }else // in the catch block
+    // Better-auth might not send token directly in register if session isn't automatically created, but if it does:
+    if (accessToken) await setTokenInCookies("accessToken", accessToken);
+    if (refreshToken) await setTokenInCookies("refreshToken", refreshToken);
+    if (token)
+      await setTokenInCookies("better-auth.session_token", token, 24 * 60 * 60);
+
+    const role = user?.role;
+    const email = user?.email;
+    const needPasswordChange = user?.needPasswordChange;
 
     if (needPasswordChange) {
-      //TODO : refactoring
       redirect(`/reset-password?email=${email}`);
     } else {
-      // redirect(redirectPath || "/dashboard");
       const targetPath =
         redirectPath && isValidRedirectForRole(redirectPath, role as UserRole)
           ? redirectPath
@@ -55,6 +55,7 @@ export const loginAction = async (
       redirect(targetPath);
     }
   } catch (error: any) {
+    console.log(error, "error");
     if (
       error &&
       typeof error === "object" &&
@@ -74,7 +75,7 @@ export const loginAction = async (
     }
     return {
       success: false,
-      message: `Login failed: ${error.message}`,
+      message: `Registration failed: ${error.message}`,
     };
   }
 };
