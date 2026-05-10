@@ -53,6 +53,7 @@ import { getDefaultDashboardRoute } from "@/lib/authUtils";
 import { ThemeToggle } from "./ThemeToggle";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
+import { useCart } from "@/providers/CartProvider";
 
 interface MenuItem {
   title: string;
@@ -70,6 +71,7 @@ interface NavbarProps {
 const Navbar = ({ userInfo, className }: NavbarProps) => {
   const pathname = usePathname();
   const router = useRouter();
+  const { cartCount } = useCart();
 
   const menu: MenuItem[] = [
     { title: "Home", url: "/" },
@@ -168,16 +170,20 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
                   0
                 </Badge>
               </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative rounded-full text-muted-foreground hover:text-primary transition-colors"
-              >
-                <ShoppingCart className="h-5 w-5" />
-                <Badge className="absolute -right-1 -top-1 h-4 w-4 justify-center p-0 text-[10px]">
-                  0
-                </Badge>
-              </Button>
+              <Link href="/cart">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative rounded-full text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <ShoppingCart className="h-5 w-5" />
+                  {cartCount > 0 && (
+                    <Badge className="absolute -right-1 -top-1 h-4 min-w-4 justify-center p-0 text-[10px]">
+                      {cartCount}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>
             </div>
 
             <div className="flex items-center gap-3">

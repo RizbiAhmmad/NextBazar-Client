@@ -140,3 +140,21 @@ export async function deleteProduct(id: string) {
     return { success: false, message: "Something went wrong" };
   }
 }
+
+export async function getProductById(id: string) {
+  try {
+    const res = await fetch(`${BASE_API_URL}/products/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    const result = await res.json();
+    return result;
+  } catch (error) {
+    console.error(`Error fetching product by id (${id}):`, error);
+    throw error;
+  }
+}
