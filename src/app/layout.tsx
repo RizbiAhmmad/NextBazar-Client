@@ -5,6 +5,7 @@ import QueryProviders from "@/providers/QueryProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { CartProvider } from "@/providers/CartProvider";
 import { Toaster } from "@/components/ui/sonner";
+import FloatingChatbot from "@/components/modules/Chatbot/FloatingChatbot";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,7 +41,7 @@ export default function RootLayout({
           <QueryProviders>
             <CartProvider>
               {children}
-  
+              <FloatingChatbot />
               <Toaster richColors position="top-right" />
             </CartProvider>
           </QueryProviders>
