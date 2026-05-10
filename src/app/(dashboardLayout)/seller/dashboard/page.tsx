@@ -1,5 +1,7 @@
+import SellerDashboard from "@/components/modules/Seller/Dashboard/SellerDashboard";
+
 const SellerDashboardPage = () => {
-  return <div>SellerDashboardPage</div>;
+  return <SellerDashboard />;
 };
 
 export default SellerDashboardPage;
