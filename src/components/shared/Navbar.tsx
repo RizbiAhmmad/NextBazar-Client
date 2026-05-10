@@ -19,6 +19,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { logoutUser } from "@/services/auth.services";
 import { useRouter, usePathname } from "next/navigation";
@@ -84,19 +85,19 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
           title: "Electronics",
           description: "Latest gadgets and gear for tech enthusiasts",
           icon: <Zap className="size-5 shrink-0 text-yellow-500" />,
-          url: "/products?category=electronics",
+          url: "/products?categoryId=electronics",
         },
         {
           title: "Fashion",
           description: "Trendy apparel and accessories for everyone",
           icon: <ShoppingBag className="size-5 shrink-0 text-pink-500" />,
-          url: "/products?category=fashion",
+          url: "/products?categoryId=fashion",
         },
         {
           title: "Home & Garden",
           description: "Everything you need for a beautiful home",
           icon: <Store className="size-5 shrink-0 text-green-500" />,
-          url: "/products?category=home-garden",
+          url: "/products?categoryId=home-garden",
         },
       ],
     },
@@ -153,13 +154,19 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
           {/* Right: Actions */}
           <div className="flex items-center gap-2">
             <div className="flex items-center border-r pr-4 mr-2 gap-1.5">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="rounded-full text-muted-foreground hover:text-primary transition-colors"
-              >
-                <Search className="h-5 w-5" />
-              </Button>
+              <div className="relative group hidden sm:block">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                <Input
+                  placeholder="Search products..."
+                  className="pl-10 h-10 w-[200px] xl:w-[300px] rounded-full bg-muted/50 border-none focus-visible:ring-primary transition-all"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      const val = (e.target as HTMLInputElement).value;
+                      if (val) router.push(`/products?searchTerm=${val}`);
+                    }
+                  }}
+                />
+              </div>
               <Button
                 variant="ghost"
                 size="icon"
@@ -309,7 +316,7 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
           </Link>
 
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="rounded-full">
+            <Button variant="ghost" size="icon" className="rounded-full" onClick={() => router.push("/products")}>
               <Search className="h-5 w-5" />
             </Button>
             <ThemeToggle />
