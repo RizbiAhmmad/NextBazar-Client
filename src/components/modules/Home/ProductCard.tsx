@@ -75,10 +75,10 @@ export default function ProductCard({ product }: ProductCardProps) {
             </div>
           </div>
 
-          <div className="mt-4 pt-4 border-t border-muted/50 w-full opacity-80 transition-opacity group-hover:opacity-100">
+          <div className="mt-4 pt-4 border-t border-muted/50 w-full">
             <Button
-              variant="secondary"
-              className="w-full text-xs font-bold rounded-xl h-9 hover:bg-primary hover:text-white transition-colors"
+              variant="default"
+              className="w-full text-xs font-bold rounded-xl h-9 transition-all duration-300 shadow-sm group-hover:shadow-md group-hover:bg-primary/90"
             >
               View Details
             </Button>

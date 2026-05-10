@@ -169,9 +169,11 @@ export default function CartPage() {
               </span>
             </div>
 
-            <Button className="w-full h-14 rounded-full text-lg font-bold group">
-              Proceed to Checkout
-              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            <Button asChild className="w-full h-14 rounded-full text-lg font-bold group">
+              <Link href="/checkout">
+                Proceed to Checkout
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </Button>
 
             <div className="mt-6 text-center">

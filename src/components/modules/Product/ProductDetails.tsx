@@ -182,8 +182,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                 className="flex-1 rounded-full text-lg h-14"
                 disabled={product.stock === 0}
                 onClick={() => {
-                  addToCart(product, quantity);
-                  router.push("/cart");
+                  router.push(`/checkout?productId=${product.id}&quantity=${quantity}&name=${encodeURIComponent(product.name)}&price=${product.sellPrice}`);
                 }}
               >
                 <Zap className="mr-2 h-5 w-5" />
