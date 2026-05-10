@@ -12,6 +12,9 @@ import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import ReviewModal from "../../User/Review/ReviewModal";
 
 interface ViewOrderDialogProps {
   open: boolean;
@@ -24,7 +27,19 @@ export default function ViewOrderDialog({
   onOpenChange,
   order,
 }: ViewOrderDialogProps) {
+  const [selectedProduct, setSelectedProduct] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+
   if (!order) return null;
+
+  const handleReviewClick = (productId: string, productName: string) => {
+    setSelectedProduct({ id: productId, name: productName });
+    setIsReviewModalOpen(true);
+  };
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -88,9 +103,19 @@ export default function ViewOrderDialog({
                     <p className="font-bold text-sm truncate">{item.product?.name}</p>
                     <p className="text-xs text-muted-foreground">Quantity: {item.quantity}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right flex flex-col items-end gap-1">
                     <p className="font-black text-sm">৳{(item.price * item.quantity).toFixed(2)}</p>
                     <p className="text-[10px] text-muted-foreground">৳{item.price.toFixed(2)} each</p>
+                    {order.orderStatus === "DELIVERED" && (
+                      <Button
+                        variant="link"
+                        size="sm"
+                        className="h-auto p-0 text-primary font-bold text-xs"
+                        onClick={() => handleReviewClick(item.productId, item.product?.name || "Product")}
+                      >
+                        Write a Review
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -116,6 +141,15 @@ export default function ViewOrderDialog({
           </div>
         </div>
       </DialogContent>
+
+      {selectedProduct && (
+        <ReviewModal
+          open={isReviewModalOpen}
+          onOpenChange={setIsReviewModalOpen}
+          productId={selectedProduct.id}
+          productName={selectedProduct.name}
+        />
+      )}
     </Dialog>
   );
 }

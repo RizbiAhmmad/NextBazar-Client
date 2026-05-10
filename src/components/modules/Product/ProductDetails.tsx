@@ -18,6 +18,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/providers/CartProvider";
 import { useRouter } from "next/navigation";
+import ProductReviews from "./ProductReviews";
 
 interface ProductDetailsProps {
   product: IProduct;
@@ -238,17 +239,18 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
             </div>
 
             {/* Full Description */}
-            <div className="mt-8">
-              <h3 className="text-xl font-bold text-slate-900 mb-4">
+            <div className="mt-8 mb-12">
+              <h3 className="text-xl font-bold text-slate-900 mb-4 uppercase tracking-tight">
                 Product Description
               </h3>
               <div className="prose prose-slate max-w-none">
                 <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">
-                  {/* Since description might be missing from IProduct currently, fallback to shortDescription or use (product as any).description */}
                   {(product as any).description || product.shortDescription}
                 </p>
               </div>
             </div>
+
+            <ProductReviews productId={product.id} />
           </div>
         </div>
       </div>
