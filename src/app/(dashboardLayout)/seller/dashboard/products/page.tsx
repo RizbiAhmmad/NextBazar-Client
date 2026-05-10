@@ -1,3 +1,4 @@
+import ProductTable from "@/components/modules/Seller/Product/ProductTable";
 import { Button } from "@/components/ui/button";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -8,7 +9,25 @@ export const metadata: Metadata = {
   description: "Manage your shop products",
 };
 
-export default async function SellerProductsPage() {
+export default async function SellerProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const queryParams = await searchParams;
+
+  const stringParams: Record<string, string> = {};
+  for (const key in queryParams) {
+    const value = queryParams[key];
+    if (Array.isArray(value)) {
+      stringParams[key] = value[0];
+    } else if (value !== undefined) {
+      stringParams[key] = value as string;
+    }
+  }
+
+  const initialQueryString = new URLSearchParams(stringParams).toString();
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
@@ -25,22 +44,8 @@ export default async function SellerProductsPage() {
         </Button>
       </div>
 
-      <div className="rounded-xl border bg-card text-card-foreground shadow-sm flex flex-col items-center justify-center p-12 text-center h-[400px]">
-        <div className="rounded-full bg-primary/10 p-4 mb-4">
-          <Plus className="h-8 w-8 text-primary" />
-        </div>
-        <h3 className="text-xl font-bold tracking-tight mb-2">
-          No products yet
-        </h3>
-        <p className="text-muted-foreground max-w-sm mb-6">
-          You haven&apos;t added any products to your shop. Add your first
-          product to start selling.
-        </p>
-        <Button asChild>
-          <Link href="/seller/dashboard/products/add">
-            Add Your First Product
-          </Link>
-        </Button>
+      <div className="h-full flex-1 flex-col space-y-8 md:flex mt-6">
+        <ProductTable initialQueryString={initialQueryString} />
       </div>
     </div>
   );
