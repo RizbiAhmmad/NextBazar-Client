@@ -25,6 +25,7 @@ export async function createOrder(payload: {
   address: string;
   district: string;
   notes?: string;
+  items?: { productId: string; quantity: number }[];
 }) {
   try {
     const headers = await getAuthHeaders();
@@ -66,3 +67,117 @@ export async function getMyOrders() {
     return { success: false, message: "Something went wrong" };
   }
 }
+
+export async function getAllOrders(params?: Record<string, string>) {
+  try {
+    const headers = await getAuthHeaders();
+    if (!headers) return { success: false, message: "Unauthorized" };
+
+    const query = new URLSearchParams(params).toString();
+    const res = await fetch(`${BASE_API_URL}/orders${query ? `?${query}` : ""}`, {
+      method: "GET",
+      headers,
+      next: { tags: ["orders"] },
+    });
+
+    return res.json();
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+}
+
+export async function getOrderById(id: string) {
+  try {
+    const headers = await getAuthHeaders();
+    if (!headers) return { success: false, message: "Unauthorized" };
+
+    const res = await fetch(`${BASE_API_URL}/orders/${id}`, {
+      method: "GET",
+      headers,
+    });
+
+    return res.json();
+  } catch (error) {
+    console.error("Error fetching order details:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+}
+
+export async function updateOrderStatus(id: string, status: string) {
+  try {
+    const headers = await getAuthHeaders();
+    if (!headers) return { success: false, message: "Unauthorized" };
+
+    const res = await fetch(`${BASE_API_URL}/orders/${id}/status`, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({ status }),
+    });
+
+    const result = await res.json();
+    if (res.ok) revalidateTag("orders", "max");
+    return result;
+  } catch (error) {
+    console.error("Error updating order status:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+}
+
+export async function deleteOrder(id: string) {
+  try {
+    const headers = await getAuthHeaders();
+    if (!headers) return { success: false, message: "Unauthorized" };
+
+    const res = await fetch(`${BASE_API_URL}/orders/${id}`, {
+      method: "DELETE",
+      headers,
+    });
+
+    const result = await res.json();
+    if (res.ok) revalidateTag("orders", "max");
+    return result;
+  } catch (error) {
+    console.error("Error deleting order:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+}
+
+export async function getVendorOrders() {
+  try {
+    const headers = await getAuthHeaders();
+    if (!headers) return { success: false, message: "Unauthorized" };
+
+    const res = await fetch(`${BASE_API_URL}/orders/vendor-orders`, {
+      method: "GET",
+      headers,
+      next: { tags: ["orders"] },
+    });
+
+    return res.json();
+  } catch (error) {
+    console.error("Error fetching vendor orders:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+}
+
+export async function updateOrderItemStatus(itemId: string, status: string) {
+  try {
+    const headers = await getAuthHeaders();
+    if (!headers) return { success: false, message: "Unauthorized" };
+
+    const res = await fetch(`${BASE_API_URL}/orders/items/${itemId}/status`, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({ status }),
+    });
+
+    const result = await res.json();
+    if (res.ok) revalidateTag("orders", "max");
+    return result;
+  } catch (error) {
+    console.error("Error updating order item status:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+}
+
