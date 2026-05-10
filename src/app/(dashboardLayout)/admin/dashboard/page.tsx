@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import AdminDashboardContent from "@/components/modules/Dashboard/AdminDashboardContent";
 import { getDashboardData } from "@/services/dashboard.services";
 import { ApiResponse } from "@/types/api.types";
@@ -7,6 +8,8 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
+
+export const dynamic = "force-dynamic";
 
 const AdminDashboardPage = async () => {
   const queryClient = new QueryClient();

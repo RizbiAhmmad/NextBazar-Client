@@ -10,7 +10,6 @@ import {
   ShoppingCart,
   Heart,
   Store,
-  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -77,32 +76,9 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
   const menu: MenuItem[] = [
     { title: "Home", url: "/" },
     { title: "Products", url: "/products" },
-    {
-      title: "Categories",
-      url: "#",
-      items: [
-        {
-          title: "Electronics",
-          description: "Latest gadgets and gear for tech enthusiasts",
-          icon: <Zap className="size-5 shrink-0 text-yellow-500" />,
-          url: "/products?categoryId=electronics",
-        },
-        {
-          title: "Fashion",
-          description: "Trendy apparel and accessories for everyone",
-          icon: <ShoppingBag className="size-5 shrink-0 text-pink-500" />,
-          url: "/products?categoryId=fashion",
-        },
-        {
-          title: "Home & Garden",
-          description: "Everything you need for a beautiful home",
-          icon: <Store className="size-5 shrink-0 text-green-500" />,
-          url: "/products?categoryId=home-garden",
-        },
-      ],
-    },
-    { title: "Flash Sale", url: "/flash-sale" },
+    { title: "Blogs", url: "/blogs" },
     { title: "About", url: "/about" },
+    { title: "Contact", url: "/contact" },
   ];
 
   const dashboardRoute = userInfo
@@ -316,7 +292,12 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
           </Link>
 
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="rounded-full" onClick={() => router.push("/products")}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              onClick={() => router.push("/products")}
+            >
               <Search className="h-5 w-5" />
             </Button>
             <ThemeToggle />

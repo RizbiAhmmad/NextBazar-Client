@@ -1,5 +1,6 @@
 import SellerOrderTable from "@/components/modules/Seller/Order/SellerOrderTable";
 import { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Sales Management | Seller Dashboard",
@@ -16,7 +17,9 @@ export default function SellerOrderManagementPage() {
       </div>
 
       <div className="h-full flex-1 flex-col space-y-8 md:flex">
-        <SellerOrderTable />
+        <Suspense fallback={<div>Loading sales data...</div>}>
+          <SellerOrderTable />
+        </Suspense>
       </div>
     </div>
   );
