@@ -59,7 +59,7 @@ export default function ViewOrderDialog({
           {/* Shipping Address */}
           <div className="space-y-2">
             <h3 className="font-black text-lg">Shipping Address</h3>
-            <p className="text-sm leading-relaxed text-muted-foreground bg-card p-4 rounded-xl border">
+            <div className="text-sm leading-relaxed text-muted-foreground bg-card p-4 rounded-xl border">
               {order.address}, {order.district}
               {order.notes && (
                 <>
@@ -67,7 +67,7 @@ export default function ViewOrderDialog({
                   <span className="block italic">Note: {order.notes}</span>
                 </>
               )}
-            </p>
+            </div>
           </div>
 
           {/* Items */}
