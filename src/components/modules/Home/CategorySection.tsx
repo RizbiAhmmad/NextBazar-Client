@@ -18,8 +18,8 @@ export default function CategorySection() {
   const categories = data?.data || [];
 
   return (
-    <section className="py-12 bg-slate-50/50 rounded-[3rem] px-6 my-8">
-      <div className="flex items-center justify-between mb-8">
+    <section className="py-8 bg-slate-50/50 rounded-[3rem] px-6 my-8">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
             <LayoutGrid className="h-5 w-5 text-primary" />

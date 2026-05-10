@@ -18,7 +18,7 @@ export default function HomeProducts() {
   const products: IProduct[] = data?.data || [];
 
   return (
-    <section className="py-16">
+    <section className="py-8">
       <div className="flex items-end justify-between mb-10">
         <div>
           <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 mb-2">
@@ -29,7 +29,10 @@ export default function HomeProducts() {
           </p>
         </div>
         <Link href="/products" className="hidden sm:block">
-          <Button variant="ghost" className="font-semibold text-primary hover:bg-primary/5">
+          <Button
+            variant="ghost"
+            className="font-semibold text-primary hover:bg-primary/5"
+          >
             View All <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>
