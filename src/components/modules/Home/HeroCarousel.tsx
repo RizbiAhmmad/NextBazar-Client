@@ -7,19 +7,19 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 const slides = [
   {
     id: 1,
-    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200",
+    image: "/Organic.jpg",
   },
   {
     id: 2,
-    image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1200",
+    image: "/Electronics.jpg",
   },
   {
     id: 3,
-    image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=1200",
+    image: "/Fashion.jpg",
   },
   {
     id: 4,
-    image: "https://plus.unsplash.com/premium_photo-1666353535582-9268ce1a981c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8Zm9vZCUyMGJhbm5lcnxlbnwwfHwwfHx8MA%3D%3D?w=1200",
+    image: "/cosmetics.jpg",
   },
 ];
 

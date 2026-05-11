@@ -32,3 +32,20 @@ export const generateAIProductData = async (title: string) => {
     return { success: false, message: "Failed to connect to AI service" };
   }
 };
+
+export const getAIRecommendations = async (productId: string) => {
+  try {
+    const res = await fetch(`${BASE_API_URL}/ai/recommendations`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ productId }),
+      cache: "no-store",
+    });
+
+    const result = await res.json();
+    return result;
+  } catch (error) {
+    console.error("Error fetching AI recommendations:", error);
+    return { success: false, data: [] };
+  }
+};

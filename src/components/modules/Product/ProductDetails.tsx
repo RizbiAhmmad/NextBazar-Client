@@ -6,6 +6,7 @@ import Image from "next/image";
 import { IProduct } from "@/components/modules/Seller/Product/productColumns";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import AIRecommendations from "./AIRecommendations";
 import {
   ShoppingCart,
   Heart,
@@ -31,6 +32,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
     product.images && product.images.length > 0 ? product.images[0] : null,
   );
   const [quantity, setQuantity] = useState(1);
+  const [showDescription, setShowDescription] = useState(true);
 
   const discount =
     product.regularPrice > product.sellPrice
@@ -139,13 +141,15 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
             </p>
 
             <div className="flex items-center gap-6 mb-8">
-              <span className="text-sm font-semibold text-slate-700">Quantity</span>
+              <span className="text-sm font-semibold text-slate-700">
+                Quantity
+              </span>
               <div className="flex items-center border rounded-full overflow-hidden bg-background">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
+                <Button
+                  variant="ghost"
+                  size="icon"
                   className="rounded-none h-10 w-10 hover:bg-muted/50 hover:text-primary"
-                  onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                   disabled={quantity <= 1 || product.stock === 0}
                 >
                   <span className="text-lg font-bold">-</span>
@@ -153,18 +157,22 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                 <div className="w-12 text-center font-bold text-sm">
                   {quantity}
                 </div>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
+                <Button
+                  variant="ghost"
+                  size="icon"
                   className="rounded-none h-10 w-10 hover:bg-muted/50 hover:text-primary"
-                  onClick={() => setQuantity(q => Math.min(product.stock, q + 1))}
+                  onClick={() =>
+                    setQuantity((q) => Math.min(product.stock, q + 1))
+                  }
                   disabled={quantity >= product.stock || product.stock === 0}
                 >
                   <span className="text-lg font-bold">+</span>
                 </Button>
               </div>
               <span className="text-xs text-muted-foreground">
-                {product.stock > 0 ? `${product.stock} available` : "Out of stock"}
+                {product.stock > 0
+                  ? `${product.stock} available`
+                  : "Out of stock"}
               </span>
             </div>
 
@@ -183,7 +191,9 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                 className="flex-1 rounded-full text-lg h-14"
                 disabled={product.stock === 0}
                 onClick={() => {
-                  router.push(`/checkout?productId=${product.id}&quantity=${quantity}&name=${encodeURIComponent(product.name)}&price=${product.sellPrice}`);
+                  router.push(
+                    `/checkout?productId=${product.id}&quantity=${quantity}&name=${encodeURIComponent(product.name)}&price=${product.sellPrice}`,
+                  );
                 }}
               >
                 <Zap className="mr-2 h-5 w-5" />
@@ -238,21 +248,46 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
               </div>
             </div>
 
-            {/* Full Description */}
-            <div className="mt-8 mb-12">
-              <h3 className="text-xl font-bold text-slate-900 mb-4 uppercase tracking-tight">
-                Product Description
-              </h3>
-              <div
-                className="prose prose-slate max-w-none text-slate-600 leading-relaxed [&>ul]:list-disc [&>ul]:pl-5 [&>ul>li]:mb-1 [&>p]:mb-3 [&>strong]:font-bold"
-                dangerouslySetInnerHTML={{
-                  __html:
-                    (product as any).description || product.shortDescription,
-                }}
-              />
+            {/* Description / Reviews Toggle */}
+            <div className="mb-6">
+              <div className="flex gap-2 mb-4">
+                <button
+                  className={`px-4 py-2 rounded-t-lg focus:outline-none ${showDescription ? "bg-white shadow" : "bg-gray-100"}`}
+                  onClick={() => setShowDescription(true)}
+                >
+                  Description
+                </button>
+                <button
+                  className={`px-4 py-2 rounded-t-lg focus:outline-none ${!showDescription ? "bg-white shadow" : "bg-gray-100"}`}
+                  onClick={() => setShowDescription(false)}
+                >
+                  Reviews
+                </button>
+              </div>
+
+              {/* Description Content */}
+              {showDescription && (
+                <div className="mt-4">
+                  <h3 className="text-xl font-bold text-slate-900 mb-4 uppercase tracking-tight">
+                    Product Description
+                  </h3>
+                  <div
+                    className="prose prose-slate max-w-none text-slate-600 leading-relaxed [&>ul]:list-disc [&>ul]:pl-5 [&>ul>li]:mb-1 [&>p]:mb-3 [&>strong]:font-bold"
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        (product as any).description ||
+                        product.shortDescription,
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
-            <ProductReviews productId={product.id} />
+            {/* Product Reviews */}
+            {!showDescription && <ProductReviews productId={product.id} />}
+
+            {/* AI Recommendations */}
+            <AIRecommendations productId={product.id} />
           </div>
         </div>
       </div>
