@@ -56,7 +56,7 @@ const FilterSidebar = ({
   return (
     <div className="space-y-8">
       <div>
-        <h3 className="text-lg font-black uppercase tracking-tight mb-4">
+        <h3 className="text-lg font-black uppercase tracking-tight mb-4 dark:text-white">
           Categories
         </h3>
         <div className="space-y-3 max-h-[350px] overflow-y-auto pr-2 scrollbar-hide">
@@ -70,7 +70,7 @@ const FilterSidebar = ({
               />
               <Label
                 htmlFor={cat.id}
-                className="text-sm font-bold text-muted-foreground group-hover:text-primary cursor-pointer transition-colors"
+                className="text-sm font-bold text-muted-foreground dark:text-slate-400 group-hover:text-primary cursor-pointer transition-colors"
               >
                 {cat.name}
               </Label>
@@ -80,7 +80,7 @@ const FilterSidebar = ({
       </div>
 
       <div>
-        <h3 className="text-lg font-black uppercase tracking-tight mb-4">
+        <h3 className="text-lg font-black uppercase tracking-tight mb-4 dark:text-white">
           Price Range
         </h3>
         <div className="flex flex-col gap-3">
@@ -94,7 +94,7 @@ const FilterSidebar = ({
                 placeholder="Min"
                 value={minPrice}
                 onChange={(e) => setMinPrice(e.target.value)}
-                className="rounded-xl h-11 pl-7 font-bold border-muted/50 focus-visible:ring-primary"
+                className="rounded-xl h-11 pl-7 font-bold border-muted/50 dark:border-slate-800 dark:bg-slate-900 dark:text-white focus-visible:ring-primary"
               />
             </div>
             <span className="text-muted-foreground font-black">-</span>
@@ -107,7 +107,7 @@ const FilterSidebar = ({
                 placeholder="Max"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
-                className="rounded-xl h-11 pl-7 font-bold border-muted/50 focus-visible:ring-primary"
+                className="rounded-xl h-11 pl-7 font-bold border-muted/50 dark:border-slate-800 dark:bg-slate-900 dark:text-white focus-visible:ring-primary"
               />
             </div>
           </div>
@@ -124,7 +124,7 @@ const FilterSidebar = ({
 
         <Button
           variant="ghost"
-          className="w-full text-xs font-bold text-muted-foreground hover:text-destructive transition-colors"
+          className="w-full text-xs font-bold text-muted-foreground dark:text-slate-500 hover:text-destructive transition-colors"
           onClick={clearFilters}
         >
           <X className="mr-2 h-4 w-4" /> Reset All
@@ -225,12 +225,12 @@ function ProductListingContent() {
         {/* Main Content */}
         <div className="flex-1 space-y-6">
           {/* Top Bar */}
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-muted/30 p-4 rounded-3xl border border-muted/50 backdrop-blur-sm">
+          <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-muted/30 dark:bg-slate-900/50 p-4 rounded-3xl border border-muted/50 dark:border-slate-800 backdrop-blur-sm">
             <div className="relative w-full md:w-[400px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search products..."
-                className="pl-10 h-12 rounded-2xl bg-background border-none shadow-sm focus-visible:ring-primary transition-all"
+                className="pl-10 h-12 rounded-2xl bg-background dark:bg-slate-900 border-none shadow-sm focus-visible:ring-primary transition-all dark:text-white"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleFilterChange()}
@@ -242,12 +242,12 @@ function ProductListingContent() {
                 <SheetTrigger asChild>
                   <Button
                     variant="outline"
-                    className="lg:hidden h-12 rounded-2xl shrink-0 font-bold border-muted/50"
+                    className="lg:hidden h-12 rounded-2xl shrink-0 font-bold border-muted/50 dark:border-slate-800 dark:text-white"
                   >
                     <SlidersHorizontal className="mr-2 h-4 w-4" /> Filters
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+                <SheetContent side="left" className="w-[300px] sm:w-[400px] dark:bg-slate-950 dark:border-slate-800">
                   <div className="py-6">
                     <FilterSidebar {...filterProps} />
                   </div>
@@ -261,7 +261,7 @@ function ProductListingContent() {
                   handleFilterChange(val);
                 }}
               >
-                <SelectTrigger className="h-12 rounded-2xl w-full md:w-[200px] bg-background shadow-sm border-none font-bold">
+                <SelectTrigger className="h-12 rounded-2xl w-full md:w-[200px] bg-background dark:bg-slate-900 shadow-sm border-none font-bold dark:text-white">
                   <SelectValue placeholder="Sort By" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
@@ -284,7 +284,7 @@ function ProductListingContent() {
 
           {/* Results Info */}
           <div className="flex items-center justify-between px-2">
-            <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
+            <p className="text-sm font-bold text-muted-foreground dark:text-slate-400 uppercase tracking-widest">
               {isLoading ? "Searching..." : `Found ${products.length} products`}
             </p>
           </div>
@@ -305,10 +305,10 @@ function ProductListingContent() {
             </div>
           ) : products.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center bg-muted/10 rounded-[3rem] border-2 border-dashed border-muted/30">
-              <div className="h-20 w-20 bg-muted/20 rounded-full flex items-center justify-center mb-6">
+              <div className="h-20 w-20 bg-muted/20 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
                 <Search className="h-10 w-10 text-muted-foreground/40" />
               </div>
-              <h3 className="text-2xl font-black text-slate-900 mb-2">
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">
                 No products found
               </h3>
               <p className="text-muted-foreground max-w-xs mx-auto">

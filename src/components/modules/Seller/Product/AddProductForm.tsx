@@ -30,11 +30,14 @@ import { getAllCategories } from "@/services/category.services";
 import { getMyShop } from "@/services/shop.services";
 import { createProductSchema } from "@/zod/product.validation";
 import AppField from "@/components/shared/form/AppField";
+import { Sparkles } from "lucide-react";
+import { generateAIProductData } from "@/services/ai.services";
 
 export default function AddProductForm() {
   const router = useRouter();
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // Fetch shop details to get shopId
   const { data: myShop } = useQuery({
@@ -143,6 +146,30 @@ export default function AddProductForm() {
       return updated;
     });
   };
+  const handleAIGenerate = async () => {
+    const title = form.getFieldValue("name");
+    if (!title) {
+      toast.error("Please enter a product name first");
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const res = await generateAIProductData(title);
+      if (res.success) {
+        form.setFieldValue("description", res.data.description);
+        form.setFieldValue("shortDescription", res.data.shortDescription);
+        form.setFieldValue("tags", res.data.tags.join(", "));
+        toast.success("AI Content generated successfully!");
+      } else {
+        toast.error(res.message || "Failed to generate AI content");
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred during AI generation");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   return (
     <Card className="max-w-4xl mx-auto border-none shadow-xl bg-card/50 backdrop-blur-sm">
@@ -162,15 +189,34 @@ export default function AddProductForm() {
           className="space-y-8"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <form.Field name="name">
-              {(field) => (
-                <AppField
-                  field={field}
-                  label="Product Name *"
-                  placeholder="Enter product name"
-                />
-              )}
-            </form.Field>
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <Label>Product Name *</Label>
+                <button
+                  type="button"
+                  onClick={handleAIGenerate}
+                  disabled={isGenerating}
+                  className="flex items-center gap-1.5 px-3 py-1 h-6 rounded-full text-[9px] uppercase tracking-tight font-black bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white hover:opacity-90 transition-all shadow-[0_0_12px_rgba(99,102,241,0.35)] overflow-hidden relative disabled:opacity-70"
+                >
+                  <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.3)_50%,transparent_75%)] bg-[length:250%_250%] animate-[shine_3s_infinite]" />
+                  {isGenerating ? (
+                    <Loader2 className="size-2.5 animate-spin" />
+                  ) : (
+                    <Sparkles className="size-2.5 fill-current" />
+                  )}
+                  {isGenerating ? "Generating..." : "Generate With AI"}
+                </button>
+              </div>
+              <form.Field name="name">
+                {(field) => (
+                  <AppField
+                    field={field}
+                    label=""
+                    placeholder="Enter product name"
+                  />
+                )}
+              </form.Field>
+            </div>
 
             <form.Field name="categoryId">
               {(field) => (

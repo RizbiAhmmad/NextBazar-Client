@@ -3,11 +3,11 @@ import { getUserInfo } from "@/services/auth.services";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "My Profile | Admin Dashboard",
-  description: "Manage your admin profile settings on NextBazar.",
+  title: "My Profile | Seller Dashboard",
+  description: "Manage your seller profile and account information.",
 };
 
-export default async function AdminMyProfilePage() {
+export default async function SellerMyProfilePage() {
   const user = await getUserInfo();
 
   if (!user) {

@@ -54,22 +54,24 @@ export default function CategorySection() {
             >
               <Card className="border-none bg-white shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 rounded-3xl overflow-hidden h-full">
                 <CardContent className="p-0">
-                  <div className="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden">
-                    <Image
-                      src={category.image || "/placeholder.png"}
-                      alt={category.name}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="relative aspect-square w-full p-2">
+                    <div className="relative h-full w-full rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-800">
+                      <Image
+                        src={category.image || "/placeholder.png"}
+                        alt={category.name}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    </div>
                   </div>
-                  <div className="p-4 text-center">
-                    <h3 className="text-sm font-bold text-slate-800 group-hover:text-primary transition-colors line-clamp-1">
+                  <div className="p-3 pt-0 pb-4 text-center">
+                    <h3 className="text-sm font-black text-slate-800 dark:text-slate-200 group-hover:text-primary transition-colors line-clamp-1">
                       {category.name}
                     </h3>
-                    <p className="text-[10px] text-muted-foreground uppercase font-black tracking-wider mt-1 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
-                      View Products
+                    <p className="text-[10px] text-muted-foreground dark:text-slate-500 uppercase font-black tracking-widest mt-0.5 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
+                      Explore
                     </p>
                   </div>
                 </CardContent>

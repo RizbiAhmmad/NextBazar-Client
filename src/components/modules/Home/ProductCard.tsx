@@ -25,20 +25,22 @@ export default function ProductCard({ product }: ProductCardProps) {
     <Link href={`/products/${product.id}`} className="block h-full">
       <Card className="group relative overflow-hidden rounded-2xl border-none bg-card shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full flex flex-col">
         {/* Image Container */}
-        <div className="relative aspect-square w-full overflow-hidden bg-muted">
-          {product.images && product.images.length > 0 ? (
-            <Image
-              src={product.images[0]}
-              alt={product.name}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-110"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center">
-              <Package className="h-12 w-12 text-muted-foreground" />
-            </div>
-          )}
+        <div className="relative aspect-square w-full p-2 overflow-hidden">
+          <div className="relative h-full w-full rounded-2xl overflow-hidden bg-muted/50 dark:bg-slate-800">
+            {product.images && product.images.length > 0 ? (
+              <Image
+                src={product.images[0]}
+                alt={product.name}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center">
+                <Package className="h-12 w-12 text-muted-foreground" />
+              </div>
+            )}
+          </div>
 
           {/* Badges */}
           <div className="absolute left-3 top-3 flex flex-col gap-2">

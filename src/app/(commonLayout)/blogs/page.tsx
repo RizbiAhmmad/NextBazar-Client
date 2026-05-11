@@ -88,23 +88,23 @@ const categories = [
 
 export default function BlogsPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300">
       {/* Hero Header */}
-      <section className="bg-slate-50 pt-24 pb-20 border-b border-slate-100 relative overflow-hidden">
+      <section className="bg-slate-50 dark:bg-slate-900/50 pt-24 pb-20 border-b border-slate-100 dark:border-slate-800 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
         <div className="container mx-auto px-6 relative z-10">
           <div className="flex flex-col items-center text-center max-w-3xl mx-auto space-y-8">
-            <div className="inline-flex items-center gap-2 bg-white px-5 py-2 rounded-full shadow-sm border border-slate-100">
+            <div className="inline-flex items-center gap-2 bg-white dark:bg-slate-800 px-5 py-2 rounded-full shadow-sm border border-slate-100 dark:border-slate-700">
               <Tag className="h-4 w-4 text-primary" />
               <span className="text-primary font-black text-xs uppercase tracking-widest">
                 NextBazar Journal
               </span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-black text-slate-900 leading-tight">
+            <h1 className="text-5xl md:text-7xl font-black text-slate-900 dark:text-white leading-tight">
               Insights into the{" "}
               <span className="text-primary">Marketplace</span>
             </h1>
-            <p className="text-xl text-slate-500 font-medium leading-relaxed">
+            <p className="text-xl text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
               Explore our latest articles, guides, and stories from the world of
               e-commerce, fashion, and technology.
             </p>
@@ -115,7 +115,7 @@ export default function BlogsPage() {
               <input
                 type="text"
                 placeholder="Search articles..."
-                className="w-full h-16 pl-16 pr-6 rounded-2xl bg-white border border-slate-100 shadow-xl shadow-slate-200/20 focus:border-primary/30 outline-none transition-all font-bold text-slate-800"
+                className="w-full h-16 pl-16 pr-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/20 dark:shadow-none focus:border-primary/30 outline-none transition-all font-bold text-slate-800 dark:text-slate-100"
               />
             </div>
           </div>
@@ -133,7 +133,7 @@ export default function BlogsPage() {
                 className={`px-6 py-3 rounded-xl font-bold whitespace-nowrap transition-all ${
                   i === 0
                     ? "bg-primary text-white shadow-lg shadow-primary/20"
-                    : "bg-slate-50 text-slate-500 hover:bg-slate-100"
+                    : "bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
                 }`}
               >
                 {cat}
@@ -146,7 +146,7 @@ export default function BlogsPage() {
             {blogs.map((blog) => (
               <article
                 key={blog.id}
-                className="group flex flex-col bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-slate-200/50 transition-all duration-300"
+                className="group flex flex-col bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 overflow-hidden hover:shadow-2xl hover:shadow-slate-200/50 dark:hover:shadow-primary/10 transition-all duration-300"
               >
                 <div className="relative aspect-[16/10] overflow-hidden">
                   <Image
@@ -173,11 +173,11 @@ export default function BlogsPage() {
                     </span>
                   </div>
 
-                  <h3 className="text-2xl font-black text-slate-900 mb-4 leading-tight group-hover:text-primary transition-colors">
+                  <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-4 leading-tight group-hover:text-primary transition-colors">
                     {blog.title}
                   </h3>
 
-                  <p className="text-slate-500 font-medium leading-relaxed mb-8 flex-1 line-clamp-3">
+                  <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed mb-8 flex-1 line-clamp-3">
                     {blog.excerpt}
                   </p>
 
@@ -201,7 +201,7 @@ export default function BlogsPage() {
             <Button
               size="lg"
               variant="outline"
-              className="h-14 px-10 rounded-2xl font-black uppercase tracking-widest border-slate-200 hover:bg-slate-50"
+              className="h-14 px-10 rounded-2xl font-black uppercase tracking-widest border-slate-200 dark:border-slate-800 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-900"
             >
               Load More Stories
             </Button>

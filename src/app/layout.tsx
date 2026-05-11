@@ -20,6 +20,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Next Bazar",
   description: "Your one-stop solution for all your grocery needs.",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({

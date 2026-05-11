@@ -1,4 +1,4 @@
-import { Mail, Phone, ArrowRight, Store, Send } from "lucide-react";
+import { Mail, Phone, ArrowRight, Send, ShoppingBag } from "lucide-react";
 import {
   FaFacebook,
   FaTwitter,
@@ -53,7 +53,7 @@ export default function Footer() {
           <div className="lg:col-span-4 space-y-6">
             <Link href="/" className="flex items-center gap-2">
               <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-                <Store className="h-6 w-6 text-white" />
+                <ShoppingBag className="h-6 w-6 text-white" />
               </div>
               <span className="text-xl font-black text-white tracking-tighter">
                 NextBazar

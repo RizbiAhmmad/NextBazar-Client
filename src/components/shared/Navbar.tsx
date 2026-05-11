@@ -3,13 +3,13 @@
 import {
   Menu,
   ShoppingBag,
-  Info,
   LayoutDashboard,
   LogOut,
   Search,
   ShoppingCart,
   Heart,
   Store,
+  User,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -48,7 +48,7 @@ import {
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { UserInfo } from "@/types/user.types";
-import { getDefaultDashboardRoute } from "@/lib/authUtils";
+import { getDefaultDashboardRoute, getProfileRoute } from "@/lib/authUtils";
 
 import { ThemeToggle } from "./ThemeToggle";
 import { Badge } from "@/components/ui/badge";
@@ -84,6 +84,10 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
   const dashboardRoute = userInfo
     ? getDefaultDashboardRoute(userInfo.role)
     : "/dashboard";
+
+  const profileRoute = userInfo
+    ? getProfileRoute(userInfo.role)
+    : "/dashboard/my-profile";
 
   const handleLogout = async () => {
     await logoutUser();
@@ -241,8 +245,8 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild className="cursor-pointer py-2.5">
-                      <Link href="/my-profile" className="flex items-center">
-                        <Info className="mr-3 h-4 w-4 text-primary" />
+                      <Link href={profileRoute} className="flex items-center">
+                        <User className="mr-3 h-4 w-4 text-primary" />
                         <span className="font-medium">My Profile</span>
                       </Link>
                     </DropdownMenuItem>

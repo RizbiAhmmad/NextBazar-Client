@@ -5,7 +5,7 @@ import DataTable from "@/components/shared/table/DataTable";
 import { useRowActionModalState } from "@/hooks/useRowActionModalState";
 import { useServerManagedDataTable } from "@/hooks/useServerManagedDataTable";
 import { useServerManagedDataTableSearch } from "@/hooks/useServerManagedDatatableSearch";
-import { getVendorOrders } from "@/services/order.services";
+import { getMyOrders, getOrderById, getVendorOrders } from "@/services/order.services";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { sellerOrderColumns } from "./sellerOrderColumns";
@@ -47,6 +47,15 @@ const SellerOrderTable = () => {
 
   const orderItemList = orderResponse?.data ?? [];
 
+  // Fetch full order details when viewing
+  const { data: fullOrderResponse, isLoading: isFullOrderLoading } = useQuery({
+    queryKey: ["order", viewingItem?.orderId],
+    queryFn: () => getOrderById(viewingItem?.orderId),
+    enabled: !!viewingItem?.orderId && isViewDialogOpen,
+  });
+
+  const fullOrder = fullOrderResponse?.data;
+
   return (
     <>
       <DataTable
@@ -66,7 +75,7 @@ const SellerOrderTable = () => {
       <ViewOrderDialog
         open={isViewDialogOpen}
         onOpenChange={onViewOpenChange}
-        order={viewingItem?.order || null}
+        order={fullOrder || viewingItem?.order || null}
       />
 
       <UpdateItemStatusModal

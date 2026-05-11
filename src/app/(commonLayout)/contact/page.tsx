@@ -11,15 +11,15 @@ import { Button } from "@/components/ui/button";
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
       {/* Header */}
-      <section className="bg-white pt-24 pb-16 border-b border-slate-100">
+      <section className="bg-white dark:bg-slate-900/50 pt-24 pb-16 border-b border-slate-100 dark:border-slate-800">
         <div className="container mx-auto px-6">
           <div className="max-w-3xl">
-            <h1 className="text-5xl md:text-6xl font-black text-slate-900 leading-tight mb-6">
+            <h1 className="text-5xl md:text-6xl font-black text-slate-900 dark:text-white leading-tight mb-6">
               Let&apos;s Start a <span className="text-primary">Conversation</span>
             </h1>
-            <p className="text-xl text-slate-500 font-medium leading-relaxed">
+            <p className="text-xl text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
               Have a question about our marketplace? Whether you&apos;re a shopper or a potential vendor, our team is here to help you 24/7.
             </p>
           </div>
@@ -32,8 +32,8 @@ export default function ContactPage() {
             
             {/* Contact Form */}
             <div className="lg:col-span-7">
-              <div className="bg-white p-10 rounded-[3rem] shadow-xl shadow-slate-200/50 border border-slate-100">
-                <h2 className="text-3xl font-black text-slate-900 mb-8">Send us a message</h2>
+              <div className="bg-white dark:bg-slate-900 p-10 rounded-[3rem] shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
+                <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-8">Send us a message</h2>
                 <form className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
@@ -41,7 +41,7 @@ export default function ContactPage() {
                       <input 
                         type="text" 
                         placeholder="John Doe" 
-                        className="w-full h-14 px-6 rounded-2xl bg-slate-50 border-none outline-none focus:ring-4 focus:ring-primary/5 focus:bg-white transition-all font-bold"
+                        className="w-full h-14 px-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none outline-none focus:ring-4 focus:ring-primary/5 dark:focus:ring-primary/10 focus:bg-white dark:focus:bg-slate-900 transition-all font-bold text-slate-800 dark:text-slate-100"
                       />
                     </div>
                     <div className="space-y-2">
@@ -49,13 +49,13 @@ export default function ContactPage() {
                       <input 
                         type="email" 
                         placeholder="john@example.com" 
-                        className="w-full h-14 px-6 rounded-2xl bg-slate-50 border-none outline-none focus:ring-4 focus:ring-primary/5 focus:bg-white transition-all font-bold"
+                        className="w-full h-14 px-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none outline-none focus:ring-4 focus:ring-primary/5 dark:focus:ring-primary/10 focus:bg-white dark:focus:bg-slate-900 transition-all font-bold text-slate-800 dark:text-slate-100"
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-black uppercase tracking-widest text-slate-400">Subject</label>
-                    <select className="w-full h-14 px-6 rounded-2xl bg-slate-50 border-none outline-none focus:ring-4 focus:ring-primary/5 focus:bg-white transition-all font-bold appearance-none">
+                    <select className="w-full h-14 px-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none outline-none focus:ring-4 focus:ring-primary/5 dark:focus:ring-primary/10 focus:bg-white dark:focus:bg-slate-900 transition-all font-bold appearance-none text-slate-800 dark:text-slate-100">
                       <option>General Inquiry</option>
                       <option>Order Support</option>
                       <option>Vendor Partnership</option>
@@ -67,7 +67,7 @@ export default function ContactPage() {
                     <textarea 
                       rows={5} 
                       placeholder="How can we help you?" 
-                      className="w-full p-6 rounded-2xl bg-slate-50 border-none outline-none focus:ring-4 focus:ring-primary/5 focus:bg-white transition-all font-bold resize-none"
+                      className="w-full p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none outline-none focus:ring-4 focus:ring-primary/5 dark:focus:ring-primary/10 focus:bg-white dark:focus:bg-slate-900 transition-all font-bold resize-none text-slate-800 dark:text-slate-100"
                     />
                   </div>
                   <Button className="h-16 px-10 rounded-2xl bg-primary text-white font-black uppercase tracking-widest shadow-xl shadow-primary/20 w-full sm:w-auto">
@@ -81,24 +81,24 @@ export default function ContactPage() {
             <div className="lg:col-span-5 space-y-8">
               {/* Quick Contact */}
               <div className="space-y-4">
-                <h3 className="text-xl font-black text-slate-900 px-1">Quick Contact</h3>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white px-1">Quick Contact</h3>
                 <div className="grid grid-cols-1 gap-4">
-                  <div className="flex items-center gap-5 p-6 rounded-3xl bg-white border border-slate-100 shadow-sm group hover:border-primary/30 transition-all">
+                  <div className="flex items-center gap-5 p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm group hover:border-primary/30 transition-all">
                     <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                       <Phone className="h-5 w-5 text-primary" />
                     </div>
                     <div>
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Call Support</p>
-                      <p className="font-black text-slate-800 text-lg">+880 1700-000000</p>
+                      <p className="font-black text-slate-800 dark:text-slate-100 text-lg">+880 1700-000000</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-5 p-6 rounded-3xl bg-white border border-slate-100 shadow-sm group hover:border-primary/30 transition-all">
-                    <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <div className="flex items-center gap-5 p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm group hover:border-primary/30 transition-all">
+                    <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                       <Mail className="h-5 w-5 text-blue-500" />
                     </div>
                     <div>
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Email Us</p>
-                      <p className="font-black text-slate-800 text-lg">hello@nextbazar.com</p>
+                      <p className="font-black text-slate-800 dark:text-slate-100 text-lg">hello@nextbazar.com</p>
                     </div>
                   </div>
                 </div>

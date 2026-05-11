@@ -74,11 +74,15 @@ export async function getAllOrders(params?: Record<string, string>) {
     if (!headers) return { success: false, message: "Unauthorized" };
 
     const query = new URLSearchParams(params).toString();
-    const res = await fetch(`${BASE_API_URL}/orders${query ? `?${query}` : ""}`, {
-      method: "GET",
-      headers,
-      next: { tags: ["orders"] },
-    });
+    const res = await fetch(
+      `${BASE_API_URL}/orders${query ? `?${query}` : ""}`,
+      {
+        method: "GET",
+        headers,
+        next: { tags: ["orders"] },
+        cache: "no-store",
+      },
+    );
 
     return res.json();
   } catch (error) {
@@ -95,6 +99,7 @@ export async function getOrderById(id: string) {
     const res = await fetch(`${BASE_API_URL}/orders/${id}`, {
       method: "GET",
       headers,
+      cache: "no-store",
     });
 
     return res.json();
@@ -180,4 +185,3 @@ export async function updateOrderItemStatus(itemId: string, status: string) {
     return { success: false, message: "Something went wrong" };
   }
 }
-

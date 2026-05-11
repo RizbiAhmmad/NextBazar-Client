@@ -47,6 +47,7 @@ const UserOrderTable = () => {
         open={isViewDialogOpen}
         onOpenChange={onViewOpenChange}
         order={viewingItem}
+        showReview={true}
       />
     </>
   );

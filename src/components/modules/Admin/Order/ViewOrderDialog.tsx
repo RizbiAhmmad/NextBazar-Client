@@ -15,17 +15,20 @@ import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import ReviewModal from "../../User/Review/ReviewModal";
+import { Star } from "lucide-react";
 
 interface ViewOrderDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   order: IOrder | null;
+  showReview?: boolean;
 }
 
 export default function ViewOrderDialog({
   open,
   onOpenChange,
   order,
+  showReview = false,
 }: ViewOrderDialogProps) {
   const [selectedProduct, setSelectedProduct] = useState<{
     id: string;
@@ -40,12 +43,13 @@ export default function ViewOrderDialog({
     setIsReviewModalOpen(true);
   };
 
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-black">Order Details</DialogTitle>
+          <DialogTitle className="text-2xl font-black">
+            Order Details
+          </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
             Order ID: {order.id}
           </DialogDescription>
@@ -55,16 +59,26 @@ export default function ViewOrderDialog({
           {/* Customer & Status Info */}
           <div className="grid grid-cols-2 gap-4 bg-muted/50 p-4 rounded-2xl">
             <div className="space-y-1">
-              <p className="text-xs font-bold text-muted-foreground uppercase">Customer</p>
+              <p className="text-xs font-bold text-muted-foreground uppercase">
+                Customer
+              </p>
               <p className="font-bold">{order.fullName}</p>
               <p className="text-sm">{order.phone}</p>
             </div>
             <div className="space-y-1 text-right">
-              <p className="text-xs font-bold text-muted-foreground uppercase">Date</p>
-              <p className="font-bold">{format(new Date(order.createdAt), "MMM d, yyyy h:mm a")}</p>
+              <p className="text-xs font-bold text-muted-foreground uppercase">
+                Date
+              </p>
+              <p className="font-bold">
+                {format(new Date(order.createdAt), "MMM d, yyyy h:mm a")}
+              </p>
               <div className="flex justify-end gap-2 mt-1">
                 <Badge variant="outline">{order.orderStatus}</Badge>
-                <Badge variant={order.paymentStatus === "PAID" ? "default" : "secondary"}>
+                <Badge
+                  variant={
+                    order.paymentStatus === "PAID" ? "default" : "secondary"
+                  }
+                >
                   {order.paymentStatus}
                 </Badge>
               </div>
@@ -87,10 +101,15 @@ export default function ViewOrderDialog({
 
           {/* Items */}
           <div className="space-y-4">
-            <h3 className="font-black text-lg">Order Items ({order.items.length})</h3>
+            <h3 className="font-black text-lg">
+              Order Items ({order.items?.length || 0})
+            </h3>
             <div className="space-y-3">
-              {order.items.map((item) => (
-                <div key={item.id} className="flex gap-4 items-center bg-card p-3 rounded-xl border">
+              {order.items?.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex gap-4 items-center bg-card p-3 rounded-xl border"
+                >
                   <div className="relative h-16 w-16 rounded-lg overflow-hidden flex-shrink-0 border">
                     <Image
                       src={item.product?.images?.[0] || "/placeholder.png"}
@@ -100,20 +119,34 @@ export default function ViewOrderDialog({
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-sm truncate">{item.product?.name}</p>
-                    <p className="text-xs text-muted-foreground">Quantity: {item.quantity}</p>
+                    <p className="font-bold text-sm truncate">
+                      {item.product?.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Quantity: {item.quantity}
+                    </p>
                   </div>
                   <div className="text-right flex flex-col items-end gap-1">
-                    <p className="font-black text-sm">৳{(item.price * item.quantity).toFixed(2)}</p>
-                    <p className="text-[10px] text-muted-foreground">৳{item.price.toFixed(2)} each</p>
-                    {order.orderStatus === "DELIVERED" && (
+                    <p className="font-black text-sm">
+                      ৳{(item.price * item.quantity).toFixed(2)}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">
+                      ৳{item.price.toFixed(2)} each
+                    </p>
+                    {showReview && order.orderStatus === "DELIVERED" && (
                       <Button
-                        variant="link"
+                        variant="secondary"
                         size="sm"
-                        className="h-auto p-0 text-primary font-bold text-xs"
-                        onClick={() => handleReviewClick(item.productId, item.product?.name || "Product")}
+                        className="h-8 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white font-black text-[10px] uppercase tracking-widest gap-2 border-none transition-all shadow-sm"
+                        onClick={() =>
+                          handleReviewClick(
+                            item.productId,
+                            item.product?.name || "Product",
+                          )
+                        }
                       >
-                        Write a Review
+                        <Star className="size-3 fill-current" />
+                        Write Review
                       </Button>
                     )}
                   </div>
@@ -126,17 +159,32 @@ export default function ViewOrderDialog({
 
           {/* Summary */}
           <div className="space-y-2">
-             <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center">
               <span className="text-muted-foreground">Subtotal</span>
-              <span className="font-bold">৳{(order.totalAmount - 60).toFixed(2)}</span>
+              <span className="font-bold">
+                ৳
+                {order.items
+                  ?.reduce((acc, item) => acc + item.price * item.quantity, 0)
+                  .toFixed(2)}
+              </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground">Shipping</span>
               <span className="font-bold">৳60.00</span>
             </div>
-            <div className="flex justify-between items-center pt-2">
-              <span className="text-lg font-black">Total</span>
-              <span className="text-xl font-black text-primary">৳{order.totalAmount.toFixed(2)}</span>
+            <div className="flex justify-between items-center pt-2 border-t border-slate-100 dark:border-slate-800">
+              <span className="text-lg font-black text-slate-900 dark:text-white">
+                Total
+              </span>
+              <span className="text-xl font-black text-primary">
+                ৳
+                {(
+                  (order.items?.reduce(
+                    (acc, item) => acc + item.price * item.quantity,
+                    0,
+                  ) || 0) + 60
+                ).toFixed(2)}
+              </span>
             </div>
           </div>
         </div>

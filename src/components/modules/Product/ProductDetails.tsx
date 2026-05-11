@@ -243,11 +243,13 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
               <h3 className="text-xl font-bold text-slate-900 mb-4 uppercase tracking-tight">
                 Product Description
               </h3>
-              <div className="prose prose-slate max-w-none">
-                <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">
-                  {(product as any).description || product.shortDescription}
-                </p>
-              </div>
+              <div
+                className="prose prose-slate max-w-none text-slate-600 leading-relaxed [&>ul]:list-disc [&>ul]:pl-5 [&>ul>li]:mb-1 [&>p]:mb-3 [&>strong]:font-bold"
+                dangerouslySetInnerHTML={{
+                  __html:
+                    (product as any).description || product.shortDescription,
+                }}
+              />
             </div>
 
             <ProductReviews productId={product.id} />
