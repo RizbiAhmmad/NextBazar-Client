@@ -61,10 +61,13 @@ The platform features a custom **RAG-powered AI assistant chatbot** for customer
 - Order status management & payment tracking
 - Category management (with sub-categories)
 - Revenue analytics with interactive charts
+- **AI-powered business insights analyzer** ✨
 
 ### 🤖 AI Features
 - **AI Content Generator:** Sellers type a product name → AI automatically writes an SEO-optimized product description, short description, and tags using Google Gemini (via OpenRouter)
 - **RAG Chatbot:** Customers can chat with an AI assistant that answers questions based on the actual product catalog using Retrieval-Augmented Generation (RAG)
+- **AI Smart Recommendations:** Analyzes current product category and metadata to suggest the most relevant 4 products to users on details pages ✨
+- **AI Business Data Analyzer:** Admins can generate professional business insights and strategic recommendations based on real-time sales and performance data ✨
 
 ---
 
@@ -152,6 +155,19 @@ The platform includes a RAG (Retrieval-Augmented Generation) chatbot that:
 1. Indexes all product data into a vector database
 2. On user queries, retrieves semantically similar products
 3. Passes relevant context to Gemini to generate accurate, grounded answers
+
+### AI Smart Recommendations
+Integrated into the Product Detail pages, this feature:
+1. Takes the context of the currently viewed product (Category, Tags, Name)
+2. Fetches 20+ candidate products from the same category
+3. Uses Gemini to select the **TOP 4 most relevant** items (complementary or similar)
+4. Displays them in a premium, glassmorphic UI section
+
+### AI Business Data Analyzer
+Located in the Admin Analytics Dashboard:
+1. Aggregates marketplace data (Total Revenue, Category Performance, Seller Sales)
+2. Feeds this context to Gemini with a specialized "Business Strategist" prompt
+3. Generates professional HTML-formatted insights covering Sales Overview, Top Performers, and Actionable Strategic Recommendations
 
 ---
 

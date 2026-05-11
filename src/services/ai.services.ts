@@ -49,3 +49,20 @@ export const getAIRecommendations = async (productId: string) => {
     return { success: false, data: [] };
   }
 };
+
+export const analyzeBusiness = async () => {
+  try {
+    const headers = await getAuthHeaders();
+    const res = await fetch(`${BASE_API_URL}/ai/analyze-business`, {
+      method: "POST",
+      headers,
+      cache: "no-store",
+    });
+
+    const result = await res.json();
+    return result;
+  } catch (error) {
+    console.error("Error analyzing business data:", error);
+    return { success: false, message: "Failed to connect to AI analysis service" };
+  }
+};

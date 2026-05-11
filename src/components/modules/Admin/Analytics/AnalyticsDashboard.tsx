@@ -23,6 +23,7 @@ import {
   TrendingUp,
   Layers,
 } from "lucide-react";
+import AIAnalyticsInsights from "./AIAnalyticsInsights";
 
 const COLORS = [
   "#3b82f6",
@@ -74,13 +75,16 @@ export default function AnalyticsDashboard() {
 
   return (
     <div className="space-y-10 p-6 pb-20">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-4xl font-black text-slate-900 tracking-tight">
-          Advanced Analytics
-        </h1>
-        <p className="text-muted-foreground font-medium">
-          Deep dive into your marketplace performance metrics.
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+            Advanced Analytics
+          </h1>
+          <p className="text-muted-foreground font-medium">
+            Deep dive into your marketplace performance metrics.
+          </p>
+        </div>
+        <AIAnalyticsInsights />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
