@@ -34,17 +34,18 @@ export default function HeroCarousel() {
   }, []);
 
   return (
-    <section className="relative w-full h-[80vh] overflow-hidden rounded-2xl">
+    <section className="relative w-full aspect-[2/1] md:aspect-[3/1] lg:aspect-[3.5/1] overflow-hidden rounded-2xl">
       <div
         className="flex h-full transition-transform duration-700"
         style={{ transform: `translateX(-${current * 100}%)` }}
       >
         {slides.map((slide) => (
-          <div key={slide.id} className="min-w-full relative">
+          <div key={slide.id} className="min-w-full relative h-full">
             <Image
               src={slide.image}
               alt={`Slide ${slide.id}`}
               fill
+              sizes="100vw"
               priority
               className="object-cover"
             />
