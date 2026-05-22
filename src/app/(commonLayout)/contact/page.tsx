@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { 
   Mail, 
   Phone, 
@@ -5,11 +8,62 @@ import {
   Clock, 
   MessageCircle, 
   Send,
+  Loader2
 } from "lucide-react";
 import { FaTwitter, FaInstagram, FaFacebook, FaLinkedin } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function ContactPage() {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("General Inquiry");
+  const [message, setMessage] = useState("");
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const validateForm = () => {
+    const tempErrors: { [key: string]: string } = {};
+    if (!fullName.trim()) tempErrors.fullName = "Full Name is required";
+    
+    if (!email.trim()) {
+      tempErrors.email = "Email address is required";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      tempErrors.email = "Please enter a valid email address";
+    }
+    
+    if (!message.trim()) tempErrors.message = "Message details are required";
+    
+    setErrors(tempErrors);
+    return Object.keys(tempErrors).length === 0;
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) {
+      toast.error("Please correct the errors in the form.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    // Simulate Server Action / API request
+    setTimeout(() => {
+      setIsSubmitting(false);
+      toast.success("Message Sent Successfully!", {
+        description: `Thanks ${fullName}, our team will get back to you shortly.`,
+        duration: 5000,
+      });
+      // Reset form
+      setFullName("");
+      setEmail("");
+      setSubject("General Inquiry");
+      setMessage("");
+      setErrors({});
+    }, 1800);
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
       {/* Header */}
@@ -34,44 +88,87 @@ export default function ContactPage() {
             <div className="lg:col-span-7">
               <div className="bg-white dark:bg-slate-900 p-10 rounded-[3rem] shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
                 <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-8">Send us a message</h2>
-                <form className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-xs font-black uppercase tracking-widest text-slate-400">Full Name</label>
                       <input 
                         type="text" 
                         placeholder="John Doe" 
-                        className="w-full h-14 px-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none outline-none focus:ring-4 focus:ring-primary/5 dark:focus:ring-primary/10 focus:bg-white dark:focus:bg-slate-900 transition-all font-bold text-slate-800 dark:text-slate-100"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        className={`w-full h-14 px-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 outline-none focus:ring-4 focus:ring-primary/5 dark:focus:ring-primary/10 focus:bg-white dark:focus:bg-slate-900 transition-all font-bold text-slate-800 dark:text-slate-100 ${
+                          errors.fullName ? "border-red-500/50 focus:border-red-500" : "border-transparent focus:border-primary/50"
+                        }`}
                       />
+                      {errors.fullName && (
+                        <p className="text-xs font-bold text-red-500 mt-1 pl-1">{errors.fullName}</p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-black uppercase tracking-widest text-slate-400">Email Address</label>
                       <input 
                         type="email" 
                         placeholder="john@example.com" 
-                        className="w-full h-14 px-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none outline-none focus:ring-4 focus:ring-primary/5 dark:focus:ring-primary/10 focus:bg-white dark:focus:bg-slate-900 transition-all font-bold text-slate-800 dark:text-slate-100"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className={`w-full h-14 px-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 outline-none focus:ring-4 focus:ring-primary/5 dark:focus:ring-primary/10 focus:bg-white dark:focus:bg-slate-900 transition-all font-bold text-slate-800 dark:text-slate-100 ${
+                          errors.email ? "border-red-500/50 focus:border-red-500" : "border-transparent focus:border-primary/50"
+                        }`}
                       />
+                      {errors.email && (
+                        <p className="text-xs font-bold text-red-500 mt-1 pl-1">{errors.email}</p>
+                      )}
                     </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-black uppercase tracking-widest text-slate-400">Subject</label>
-                    <select className="w-full h-14 px-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none outline-none focus:ring-4 focus:ring-primary/5 dark:focus:ring-primary/10 focus:bg-white dark:focus:bg-slate-900 transition-all font-bold appearance-none text-slate-800 dark:text-slate-100">
-                      <option>General Inquiry</option>
-                      <option>Order Support</option>
-                      <option>Vendor Partnership</option>
-                      <option>Billing Question</option>
-                    </select>
+                    <div className="relative">
+                      <select 
+                        value={subject}
+                        onChange={(e) => setSubject(e.target.value)}
+                        className="w-full h-14 px-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none outline-none focus:ring-4 focus:ring-primary/5 dark:focus:ring-primary/10 focus:bg-white dark:focus:bg-slate-900 transition-all font-bold text-slate-800 dark:text-slate-100 appearance-none"
+                      >
+                        <option value="General Inquiry">General Inquiry</option>
+                        <option value="Order Support">Order Support</option>
+                        <option value="Vendor Partnership">Vendor Partnership</option>
+                        <option value="Billing Question">Billing Question</option>
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400 font-bold">
+                        ▼
+                      </div>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-black uppercase tracking-widest text-slate-400">Your Message</label>
                     <textarea 
                       rows={5} 
                       placeholder="How can we help you?" 
-                      className="w-full p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none outline-none focus:ring-4 focus:ring-primary/5 dark:focus:ring-primary/10 focus:bg-white dark:focus:bg-slate-900 transition-all font-bold resize-none text-slate-800 dark:text-slate-100"
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      className={`w-full p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 outline-none focus:ring-4 focus:ring-primary/5 dark:focus:ring-primary/10 focus:bg-white dark:focus:bg-slate-900 transition-all font-bold resize-none text-slate-800 dark:text-slate-100 ${
+                        errors.message ? "border-red-500/50 focus:border-red-500" : "border-transparent focus:border-primary/50"
+                      }`}
                     />
+                    {errors.message && (
+                      <p className="text-xs font-bold text-red-500 mt-1 pl-1">{errors.message}</p>
+                    )}
                   </div>
-                  <Button className="h-16 px-10 rounded-2xl bg-primary text-white font-black uppercase tracking-widest shadow-xl shadow-primary/20 w-full sm:w-auto">
-                    Send Message <Send className="ml-2 h-4 w-4" />
+                  <Button 
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="h-16 px-10 rounded-2xl bg-primary text-white font-black uppercase tracking-widest shadow-xl shadow-primary/20 w-full sm:w-auto flex items-center justify-center gap-2"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        Sending...
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      </>
+                    ) : (
+                      <>
+                        Send Message <Send className="h-4 w-4" />
+                      </>
+                    )}
                   </Button>
                 </form>
               </div>
@@ -89,7 +186,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Call Support</p>
-                      <p className="font-black text-slate-800 dark:text-slate-100 text-lg">+880 1700-000000</p>
+                      <a href="tel:+8801700000000" className="font-black text-slate-800 dark:text-slate-100 text-lg hover:text-primary transition-colors">+880 1700-000000</a>
                     </div>
                   </div>
                   <div className="flex items-center gap-5 p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm group hover:border-primary/30 transition-all">
@@ -98,7 +195,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Email Us</p>
-                      <p className="font-black text-slate-800 dark:text-slate-100 text-lg">hello@nextbazar.com</p>
+                      <a href="mailto:hello@nextbazar.com" className="font-black text-slate-800 dark:text-slate-100 text-lg hover:text-primary transition-colors">hello@nextbazar.com</a>
                     </div>
                   </div>
                 </div>
