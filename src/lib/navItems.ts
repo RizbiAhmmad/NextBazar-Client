@@ -73,6 +73,11 @@ export const sellerNavItems: NavSection[] = [
         href: "/seller/dashboard/orders",
         icon: "ShoppingCart",
       },
+      {
+        title: "Attributes",
+        href: "/seller/dashboard/attributes",
+        icon: "Sliders",
+      },
     ],
   },
   {
@@ -110,6 +115,11 @@ export const adminNavItems: NavSection[] = [
         title: "Orders",
         href: "/admin/dashboard/orders",
         icon: "ShoppingCart",
+      },
+      {
+        title: "Attributes",
+        href: "/admin/dashboard/attributes",
+        icon: "Sliders",
       },
     ],
   },
