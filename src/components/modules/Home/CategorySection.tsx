@@ -13,6 +13,7 @@ export default function CategorySection() {
   const { data, isLoading } = useQuery({
     queryKey: ["categories"],
     queryFn: () => getAllCategories(),
+    staleTime: 10 * 60 * 1000, // cache for 10 minutes
   });
 
   const categories = data?.data || [];

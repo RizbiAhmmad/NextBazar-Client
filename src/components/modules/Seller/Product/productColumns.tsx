@@ -16,9 +16,12 @@ export interface IProduct {
   regularPrice: number;
   sellPrice: number;
   status: "ACTIVE" | "DRAFT" | "OUT_OF_STOCK" | "DELETED";
+  type?: "SIMPLE" | "VARIABLE" | string;
   images: string[];
   createdAt: string;
   category: ICategory;
+  attributes?: any[];
+  variants?: any[];
 }
 
 const statusConfig = {

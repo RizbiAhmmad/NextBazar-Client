@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { IProduct } from "@/components/modules/Seller/Product/productColumns";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import AIRecommendations from "./AIRecommendations";
+import CategoryRecommendations from "./CategoryRecommendations";
 import {
   ShoppingCart,
   Heart,
@@ -33,14 +33,45 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
   );
   const [quantity, setQuantity] = useState(1);
   const [showDescription, setShowDescription] = useState(true);
+  
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
+  const [currentVariant, setCurrentVariant] = useState<any>(null);
+
+
+  useEffect(() => {
+    if (product.type === "VARIABLE" && product.attributes && product.variants) {
+      const comboArray = product.attributes.map((attr: any) => selectedOptions[attr.name]);
+      if (comboArray.every((val: any) => val !== undefined)) {
+        const comboString = comboArray.join('-');
+        const variant = product.variants.find((v: any) => v.combination === comboString);
+        setCurrentVariant(variant || null);
+        
+        if (variant && variant.image) {
+          // Prepend backend URL if the image path is relative
+          const imgUrl = variant.image.startsWith('http') 
+            ? variant.image 
+            : `${process.env.NEXT_PUBLIC_API_BASE_URL?.replace('/api/v1', '') || 'http://localhost:5000'}/${variant.image}`;
+          setActiveImage(imgUrl);
+        }
+      } else {
+        setCurrentVariant(null);
+      }
+    }
+  }, [selectedOptions, product]);
+
+  const displaySellPrice = currentVariant ? currentVariant.sellPrice : product.sellPrice;
+  const displayRegularPrice = currentVariant ? currentVariant.regularPrice : product.regularPrice;
+  const displayStock = currentVariant && currentVariant.stock !== undefined ? currentVariant.stock : product.stock;
 
   const discount =
-    product.regularPrice > product.sellPrice
+    displayRegularPrice > displaySellPrice
       ? Math.round(
-          ((product.regularPrice - product.sellPrice) / product.regularPrice) *
+          ((displayRegularPrice - displaySellPrice) / displayRegularPrice) *
             100,
         )
       : 0;
+
+  const isAddToCartDisabled = displayStock === 0 || (product.type === "VARIABLE" && !currentVariant);
 
   return (
     <div className="bg-background pt-8 pb-16">
@@ -109,29 +140,29 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
 
             <div className="flex items-center gap-4 mb-6">
               <Badge
-                variant={product.stock > 0 ? "default" : "secondary"}
+                variant={displayStock > 0 ? "default" : "secondary"}
                 className={
-                  product.stock > 0
+                  displayStock > 0
                     ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20"
                     : ""
                 }
               >
-                {product.stock > 0 ? "In Stock" : "Out of Stock"}
+                {displayStock > 0 ? "In Stock" : "Out of Stock"}
               </Badge>
-              {product.stock > 0 && (
+              {displayStock > 0 && (
                 <span className="text-sm text-muted-foreground font-medium">
-                  {product.stock} items available
+                  {displayStock} items available
                 </span>
               )}
             </div>
 
             <div className="flex items-end gap-3 mb-6">
               <span className="text-4xl font-black text-slate-900">
-                ৳{product.sellPrice.toFixed(2)}
+                ৳{displaySellPrice.toFixed(2)}
               </span>
               {discount > 0 && (
                 <span className="text-xl text-muted-foreground line-through mb-1">
-                  ৳{product.regularPrice.toFixed(2)}
+                  ৳{displayRegularPrice.toFixed(2)}
                 </span>
               )}
             </div>
@@ -139,6 +170,40 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
             <p className="text-lg text-slate-600 mb-8 leading-relaxed">
               {product.shortDescription}
             </p>
+
+            {/* Variable Product Options */}
+            {product.type === "VARIABLE" && product.attributes && (
+              <div className="mb-8 space-y-6 border-y py-6">
+                {product.attributes.map((attr: any) => (
+                  <div key={attr.name} className="space-y-3">
+                    <h4 className="text-sm font-semibold text-slate-900 uppercase tracking-wide">
+                      {attr.name}
+                    </h4>
+                    <div className="flex flex-wrap gap-3">
+                      {attr.values.map((val: string) => {
+                        const isSelected = selectedOptions[attr.name] === val;
+                        return (
+                          <button
+                            key={val}
+                            onClick={() => {
+                              const newOptions = { ...selectedOptions, [attr.name]: val };
+                              setSelectedOptions(newOptions);
+                            }}
+                            className={`px-4 py-2 text-sm font-medium rounded-md border transition-all ${
+                              isSelected
+                                ? "border-primary bg-primary text-primary-foreground shadow-md"
+                                : "border-slate-200 bg-white text-slate-700 hover:border-primary/50 hover:bg-slate-50"
+                            }`}
+                          >
+                            {val}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
 
             <div className="flex items-center gap-6 mb-8">
               <span className="text-sm font-semibold text-slate-700">
@@ -150,7 +215,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                   size="icon"
                   className="rounded-none h-10 w-10 hover:bg-muted/50 hover:text-primary"
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  disabled={quantity <= 1 || product.stock === 0}
+                  disabled={quantity <= 1 || displayStock === 0}
                 >
                   <span className="text-lg font-bold">-</span>
                 </Button>
@@ -162,16 +227,16 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                   size="icon"
                   className="rounded-none h-10 w-10 hover:bg-muted/50 hover:text-primary"
                   onClick={() =>
-                    setQuantity((q) => Math.min(product.stock, q + 1))
+                    setQuantity((q) => Math.min(displayStock, q + 1))
                   }
-                  disabled={quantity >= product.stock || product.stock === 0}
+                  disabled={quantity >= displayStock || displayStock === 0}
                 >
                   <span className="text-lg font-bold">+</span>
                 </Button>
               </div>
               <span className="text-xs text-muted-foreground">
-                {product.stock > 0
-                  ? `${product.stock} available`
+                {displayStock > 0
+                  ? `${displayStock} available`
                   : "Out of stock"}
               </span>
             </div>
@@ -180,7 +245,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
               <Button
                 size="lg"
                 className="flex-1 rounded-full text-lg h-14 bg-slate-900 hover:bg-slate-800"
-                disabled={product.stock === 0}
+                disabled={isAddToCartDisabled}
                 onClick={() => addToCart(product, quantity)}
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
@@ -189,10 +254,10 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
               <Button
                 size="lg"
                 className="flex-1 rounded-full text-lg h-14"
-                disabled={product.stock === 0}
+                disabled={isAddToCartDisabled}
                 onClick={() => {
                   router.push(
-                    `/checkout?productId=${product.id}&quantity=${quantity}&name=${encodeURIComponent(product.name)}&price=${product.sellPrice}`,
+                    `/checkout?productId=${product.id}&quantity=${quantity}&name=${encodeURIComponent(product.name)}&price=${displaySellPrice}`,
                   );
                 }}
               >
@@ -286,8 +351,13 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
             {/* Product Reviews */}
             {!showDescription && <ProductReviews productId={product.id} />}
 
-            {/* AI Recommendations */}
-            <AIRecommendations productId={product.id} />
+            {/* Category Recommendations */}
+            {product.category?.id && (
+              <CategoryRecommendations
+                categoryId={product.category.id}
+                currentProductId={product.id}
+              />
+            )}
           </div>
         </div>
       </div>

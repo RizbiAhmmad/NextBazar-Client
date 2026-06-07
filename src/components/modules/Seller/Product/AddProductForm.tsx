@@ -35,6 +35,7 @@ import { generateAIProductData } from "@/services/ai.services";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { getAllAttributes } from "@/services/attribute.services";
+import { uploadVariantImage } from "@/services/product.services";
 
 const cartesian = (...a: any[]): any[] =>
   a.reduce((a, b) => a.flatMap((d: any) => b.map((e: any) => [d, e].flat())));
@@ -170,6 +171,22 @@ export default function AddProductForm() {
       if (!result.success) {
         toast.error(result.message || "Failed to create product");
         return;
+      }
+
+      // Upload variant images if present
+      if (value.type === "VARIABLE" && result.data && result.data.variants) {
+        const createdVariants = result.data.variants;
+        const uploadPromises = generatedVariants.map(async (v) => {
+          if (v.image && v.image instanceof File) {
+            const matchedVariant = createdVariants.find((cv: any) => cv.combination === v.combination);
+            if (matchedVariant) {
+              const varFormData = new FormData();
+              varFormData.append("image", v.image); // Field name expected by backend multer
+              return uploadVariantImage(result.data.id, matchedVariant.id, varFormData);
+            }
+          }
+        });
+        await Promise.all(uploadPromises);
       }
 
       toast.success("Product created successfully!");
@@ -635,7 +652,9 @@ export default function AddProductForm() {
                                           }} />
                                         </label>
                                         <span className="px-2 text-xs text-muted-foreground truncate w-24">
-                                          {variant.image ? variant.image.name : "No file chosen"}
+                                          {variant.image 
+                                            ? (variant.image instanceof File ? variant.image.name : "Existing Image") 
+                                            : "No file chosen"}
                                         </span>
                                       </div>
                                     </td>
@@ -644,7 +663,7 @@ export default function AddProductForm() {
                                         type="button" 
                                         variant="destructive" 
                                         size="sm" 
-                                        className="h-8 w-full bg-red-500 hover:bg-red-600"
+                                        className="h-8 w-full bg-red-500 hover:bg-red-600 text-white"
                                         onClick={() => {
                                           const copy = [...generatedVariants];
                                           copy.splice(index, 1);

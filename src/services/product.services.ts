@@ -158,3 +158,43 @@ export async function getProductById(id: string) {
     throw error;
   }
 }
+
+export async function uploadVariantImage(
+  productId: string,
+  variantId: string,
+  payload: FormData
+) {
+  try {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("accessToken")?.value;
+    const sessionToken = cookieStore.get("better-auth.session_token")?.value;
+
+    if (!accessToken) {
+      return { success: false, message: "Unauthorized" };
+    }
+
+    const res = await fetch(`${BASE_API_URL}/products/${productId}/variants/${variantId}/image`, {
+      method: "PATCH",
+      headers: {
+        Cookie: `accessToken=${accessToken}; better-auth.session_token=${sessionToken}`,
+      },
+      body: payload,
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      return {
+        success: false,
+        message: result.message || "Failed to upload variant image",
+      };
+    }
+
+    revalidateTag("products", "max");
+
+    return { success: true, data: result.data, message: result.message };
+  } catch (error: unknown) {
+    console.error("Error uploading variant image:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+}

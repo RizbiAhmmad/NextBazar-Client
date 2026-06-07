@@ -13,6 +13,7 @@ export default function HomeProducts() {
   const { data, isLoading } = useQuery({
     queryKey: ["homeProducts"],
     queryFn: () => getAllProducts({ limit: "8" }), // fetch 8 products for home page
+    staleTime: 10 * 60 * 1000, // cache for 10 minutes
   });
 
   const products: IProduct[] = data?.data || [];

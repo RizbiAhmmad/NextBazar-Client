@@ -29,6 +29,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { getAllCategories } from "@/services/category.services";
 import { getAllAttributes } from "@/services/attribute.services";
+import { uploadVariantImage } from "@/services/product.services";
 import { createProductSchema } from "@/zod/product.validation";
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -173,6 +174,23 @@ export default function EditProductFormModal({
       if (!result.success) {
         toast.error(result.message || "Failed to update product");
         return;
+      }
+
+      // Upload variant images if present
+      const resData = (result as any).data;
+      if (value.type === "VARIABLE" && resData && resData.variants) {
+        const updatedVariants = resData.variants;
+        const uploadPromises = generatedVariants.map(async (v) => {
+          if (v.image && v.image instanceof File) {
+            const matchedVariant = updatedVariants.find((cv: any) => cv.combination === v.combination);
+            if (matchedVariant) {
+              const varFormData = new FormData();
+              varFormData.append("image", v.image);
+              return uploadVariantImage(resData.id, matchedVariant.id, varFormData);
+            }
+          }
+        });
+        await Promise.all(uploadPromises);
       }
 
       toast.success(result.message || "Product updated successfully");
@@ -646,7 +664,9 @@ export default function EditProductFormModal({
                                               }} />
                                             </label>
                                             <span className="px-2 text-xs text-muted-foreground truncate w-24">
-                                              {variant.image ? variant.image.name : "No file chosen"}
+                                              {variant.image 
+                                                ? (variant.image instanceof File ? variant.image.name : "Existing Image") 
+                                                : "No file chosen"}
                                             </span>
                                           </div>
                                         </td>
@@ -655,7 +675,7 @@ export default function EditProductFormModal({
                                             type="button" 
                                             variant="destructive" 
                                             size="sm" 
-                                            className="h-8 w-full bg-red-500 hover:bg-red-600"
+                                            className="h-8 w-full bg-red-500 hover:bg-red-600 text-white"
                                             onClick={() => {
                                               const copy = [...generatedVariants];
                                               copy.splice(index, 1);
