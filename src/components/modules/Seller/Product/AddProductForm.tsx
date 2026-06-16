@@ -35,7 +35,36 @@ import { generateAIProductData } from "@/services/ai.services";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { getAllAttributes } from "@/services/attribute.services";
-import { uploadVariantImage } from "@/services/product.services";
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1";
+
+// Upload variant image via Next.js API proxy route.
+// Using a proxy avoids the "secure cookie not sent over HTTP" issue in development:
+// the API route runs server-side, reads the httpOnly cookies, and forwards them to the backend.
+async function uploadVariantImageClient(
+  productId: string,
+  variantId: string,
+  imageFile: File
+): Promise<{ success: boolean; message?: string }> {
+  const formData = new FormData();
+  formData.append("image", imageFile);
+
+  try {
+    // Call the Next.js API route (same-origin → cookies sent automatically)
+    const res = await fetch(`/api/variant-image/${productId}/${variantId}`, {
+      method: "PATCH",
+      body: formData,
+    });
+    const result = await res.json();
+    console.log(`[VariantImageUpload] variant ${variantId}:`, result);
+    if (!res.ok) return { success: false, message: result.message };
+    return { success: true };
+  } catch (err) {
+    console.error(`[VariantImageUpload] Error for variant ${variantId}:`, err);
+    return { success: false, message: "Network error" };
+  }
+}
+
 
 const cartesian = (...a: any[]): any[] =>
   a.reduce((a, b) => a.flatMap((d: any) => b.map((e: any) => [d, e].flat())));
@@ -176,17 +205,31 @@ export default function AddProductForm() {
       // Upload variant images if present
       if (value.type === "VARIABLE" && result.data && result.data.variants) {
         const createdVariants = result.data.variants;
-        const uploadPromises = generatedVariants.map(async (v) => {
+        console.log("[AddProductForm] Created variants:", createdVariants);
+        console.log("[AddProductForm] Local variants with images:", generatedVariants.map((v: any) => ({ combination: v.combination, hasImage: !!v.image })));
+
+        const uploadPromises = generatedVariants.map(async (v: any) => {
           if (v.image && v.image instanceof File) {
-            const matchedVariant = createdVariants.find((cv: any) => cv.combination === v.combination);
+            const matchedVariant = createdVariants.find(
+              (cv: any) => cv.combination.toLowerCase().trim() === v.combination.toLowerCase().trim()
+            );
             if (matchedVariant) {
-              const varFormData = new FormData();
-              varFormData.append("image", v.image); // Field name expected by backend multer
-              return uploadVariantImage(result.data.id, matchedVariant.id, varFormData);
+              console.log(`[AddProductForm] Uploading image for variant: ${v.combination} (id: ${matchedVariant.id})`);
+              const uploadResult = await uploadVariantImageClient(result.data.id, matchedVariant.id, v.image);
+              if (!uploadResult.success) {
+                console.error(`[AddProductForm] Failed to upload image for ${v.combination}:`, uploadResult.message);
+              }
+              return uploadResult;
+            } else {
+              console.warn(`[AddProductForm] No matching created variant found for: ${v.combination}`);
             }
           }
         });
-        await Promise.all(uploadPromises);
+        const uploadResults = await Promise.all(uploadPromises);
+        const failedCount = uploadResults.filter((r: any) => r && !r.success).length;
+        if (failedCount > 0) {
+          toast.warning(`${failedCount} variant image(s) failed to upload. Product saved.`);
+        }
       }
 
       toast.success("Product created successfully!");

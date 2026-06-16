@@ -28,40 +28,74 @@ interface ProductDetailsProps {
 export default function ProductDetails({ product }: ProductDetailsProps) {
   const router = useRouter();
   const { addToCart } = useCart();
-  const [activeImage, setActiveImage] = useState(
-    product.images && product.images.length > 0 ? product.images[0] : null,
+
+  // Normalize all image URLs (handle relative paths from local server)
+  const formatImageUrl = (url: string) => {
+    if (!url) return "";
+    if (url.startsWith("http")) return url;
+    return `${process.env.NEXT_PUBLIC_API_BASE_URL?.replace("/api/v1", "") || "http://localhost:5000"}/${url}`;
+  };
+
+  // Collect product images + variant images (deduplicated)
+  const productImages = (product.images || []).map(formatImageUrl).filter(Boolean);
+  const variantImages = (product.variants || [])
+    .map((v: any) => (v.image ? formatImageUrl(v.image) : null))
+    .filter(Boolean) as string[];
+
+  const allImages = Array.from(new Set([...productImages, ...variantImages]));
+
+  console.log("[ProductDetails] product.variants:", product.variants);
+  console.log("[ProductDetails] allImages:", allImages);
+
+  const [activeImage, setActiveImage] = useState<string | null>(
+    allImages.length > 0 ? allImages[0] : null
   );
   const [quantity, setQuantity] = useState(1);
   const [showDescription, setShowDescription] = useState(true);
-  
+
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [currentVariant, setCurrentVariant] = useState<any>(null);
 
-
   useEffect(() => {
-    if (product.type === "VARIABLE" && product.attributes && product.variants) {
-      const comboArray = product.attributes.map((attr: any) => selectedOptions[attr.name]);
-      if (comboArray.every((val: any) => val !== undefined)) {
-        const comboString = comboArray.join('-');
-        const variant = product.variants.find((v: any) => v.combination === comboString);
-        setCurrentVariant(variant || null);
-        
-        if (variant && variant.image) {
-          // Prepend backend URL if the image path is relative
-          const imgUrl = variant.image.startsWith('http') 
-            ? variant.image 
-            : `${process.env.NEXT_PUBLIC_API_BASE_URL?.replace('/api/v1', '') || 'http://localhost:5000'}/${variant.image}`;
-          setActiveImage(imgUrl);
-        }
+    if (product.type !== "VARIABLE" || !product.attributes || !product.variants) return;
+
+    const attrs = product.attributes as any[];
+    const comboArray = attrs.map((attr: any) => selectedOptions[attr.name]);
+    const allSelected = comboArray.every((val) => val !== undefined && val !== "");
+
+    if (!allSelected) {
+      setCurrentVariant(null);
+      return;
+    }
+
+    const comboString = comboArray.join("-");
+    console.log("[ProductDetails] Looking for combination:", comboString);
+    console.log("[ProductDetails] Available variants:", product.variants.map((v: any) => v.combination));
+
+    const matched = (product.variants as any[]).find(
+      (v) => v.combination.toLowerCase().trim() === comboString.toLowerCase().trim()
+    );
+
+    setCurrentVariant(matched || null);
+
+    if (matched) {
+      if (matched.image) {
+        setActiveImage(formatImageUrl(matched.image));
       } else {
-        setCurrentVariant(null);
+        // No variant image — fall back to first product image
+        setActiveImage(allImages[0] ?? null);
       }
     }
-  }, [selectedOptions, product]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedOptions]);
 
   const displaySellPrice = currentVariant ? currentVariant.sellPrice : product.sellPrice;
   const displayRegularPrice = currentVariant ? currentVariant.regularPrice : product.regularPrice;
-  const displayStock = currentVariant && currentVariant.stock !== undefined ? currentVariant.stock : product.stock;
+  // NOTE: ProductVariant uses 'quantity' field (not 'stock')
+  const displayStock =
+    currentVariant != null
+      ? (currentVariant.quantity ?? currentVariant.stock ?? 0)
+      : product.stock;
 
   const discount =
     displayRegularPrice > displaySellPrice
@@ -101,9 +135,9 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
               )}
             </div>
 
-            {product.images && product.images.length > 1 && (
+            {allImages.length > 0 && (
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-                {product.images.map((img, idx) => (
+                {allImages.map((img, idx) => (
                   <button
                     key={idx}
                     onClick={() => setActiveImage(img)}
