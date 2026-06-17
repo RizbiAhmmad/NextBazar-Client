@@ -280,7 +280,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                 size="lg"
                 className="flex-1 rounded-full text-lg h-14 bg-slate-900 hover:bg-slate-800"
                 disabled={isAddToCartDisabled}
-                onClick={() => addToCart(product, quantity)}
+                onClick={() => addToCart(product, quantity, currentVariant?.id)}
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 Add to Cart
@@ -291,7 +291,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                 disabled={isAddToCartDisabled}
                 onClick={() => {
                   router.push(
-                    `/checkout?productId=${product.id}&quantity=${quantity}&name=${encodeURIComponent(product.name)}&price=${displaySellPrice}`,
+                    `/checkout?productId=${product.id}&quantity=${quantity}&name=${encodeURIComponent(product.name)}&price=${displaySellPrice}&variantId=${currentVariant?.id || ""}&variantName=${currentVariant ? encodeURIComponent(currentVariant.combination) : ""}`,
                   );
                 }}
               >

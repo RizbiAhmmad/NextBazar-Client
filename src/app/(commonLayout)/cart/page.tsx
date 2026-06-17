@@ -74,16 +74,23 @@ export default function CartPage() {
                         </div>
                       )}
                     </div>
-                    <div className="flex flex-col gap-1">
+                      <div className="flex flex-col gap-1">
                       <Link
                         href={`/products/${item.id}`}
                         className="font-bold text-lg hover:text-primary transition-colors line-clamp-2"
                       >
                         {item.name}
                       </Link>
-                      <span className="text-xs text-muted-foreground bg-muted w-max px-2 py-1 rounded-md">
-                        {item.category?.name || "Uncategorized"}
-                      </span>
+                      <div className="flex flex-wrap gap-2 items-center">
+                        <span className="text-xs text-muted-foreground bg-muted w-max px-2 py-1 rounded-md">
+                          {item.category?.name || "Uncategorized"}
+                        </span>
+                        {item.variant?.combination && (
+                          <span className="text-xs text-primary bg-primary/10 w-max px-2 py-1 rounded-md font-semibold">
+                            {item.variant.combination}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -99,9 +106,9 @@ export default function CartPage() {
                         className="h-9 w-9 rounded-none hover:bg-muted/50 hover:text-primary"
                         onClick={() => {
                           if (item.cartQuantity > 1) {
-                            updateQuantity(item.id, item.cartQuantity - 1);
+                            updateQuantity(item.id, item.cartQuantity - 1, item.productVariantId);
                           } else {
-                            removeFromCart(item.id);
+                            removeFromCart(item.id, item.productVariantId);
                           }
                         }}
                       >
@@ -116,7 +123,7 @@ export default function CartPage() {
                         className="h-9 w-9 rounded-none hover:bg-muted/50 hover:text-primary"
                         disabled={item.cartQuantity >= item.stock}
                         onClick={() =>
-                          updateQuantity(item.id, item.cartQuantity + 1)
+                          updateQuantity(item.id, item.cartQuantity + 1, item.productVariantId)
                         }
                       >
                         <Plus className="h-4 w-4" />
@@ -129,7 +136,7 @@ export default function CartPage() {
                       variant="ghost"
                       size="icon"
                       className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full"
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => removeFromCart(item.id, item.productVariantId)}
                     >
                       <Trash2 className="h-5 w-5" />
                     </Button>

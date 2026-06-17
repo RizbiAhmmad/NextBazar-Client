@@ -38,7 +38,11 @@ export async function getCart() {
   }
 }
 
-export async function addToCart(productId: string, quantity: number = 1) {
+export async function addToCart(
+  productId: string,
+  quantity: number = 1,
+  productVariantId?: string | null,
+) {
   try {
     const headers = await getAuthHeaders();
     if (!headers)
@@ -47,7 +51,7 @@ export async function addToCart(productId: string, quantity: number = 1) {
     const res = await fetch(`${BASE_API_URL}/cart/add`, {
       method: "POST",
       headers,
-      body: JSON.stringify({ productId, quantity }),
+      body: JSON.stringify({ productId, quantity, productVariantId }),
     });
 
     const result = await res.json();
@@ -62,6 +66,7 @@ export async function addToCart(productId: string, quantity: number = 1) {
 export async function updateCartItemQuantity(
   productId: string,
   quantity: number,
+  productVariantId?: string | null,
 ) {
   try {
     const headers = await getAuthHeaders();
@@ -71,7 +76,7 @@ export async function updateCartItemQuantity(
     const res = await fetch(`${BASE_API_URL}/cart/update`, {
       method: "PATCH",
       headers,
-      body: JSON.stringify({ productId, quantity }),
+      body: JSON.stringify({ productId, quantity, productVariantId }),
     });
 
     const result = await res.json();
@@ -83,15 +88,21 @@ export async function updateCartItemQuantity(
   }
 }
 
-export async function removeFromCart(productId: string) {
+export async function removeFromCart(
+  productId: string,
+  productVariantId?: string | null,
+) {
   try {
     const headers = await getAuthHeaders();
     if (!headers)
       return { success: false, message: "Unauthorized", code: "UNAUTHORIZED" };
 
+    const body = productVariantId ? { productVariantId } : {};
+
     const res = await fetch(`${BASE_API_URL}/cart/remove/${productId}`, {
       method: "DELETE",
       headers,
+      body: Object.keys(body).length ? JSON.stringify(body) : undefined,
     });
 
     const result = await res.json();

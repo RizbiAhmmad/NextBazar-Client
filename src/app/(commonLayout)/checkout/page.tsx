@@ -27,6 +27,8 @@ function CheckoutContent() {
     name: string;
     price: number;
     quantity: number;
+    variantId?: string;
+    variantName?: string;
   } | null>(null);
 
   useEffect(() => {
@@ -34,6 +36,8 @@ function CheckoutContent() {
     const quantity = searchParams.get("quantity");
     const name = searchParams.get("name");
     const price = searchParams.get("price");
+    const variantId = searchParams.get("variantId") || undefined;
+    const variantName = searchParams.get("variantName") || undefined;
 
     if (productId && quantity && name && price) {
       const timer = setTimeout(() => {
@@ -42,6 +46,8 @@ function CheckoutContent() {
           name: name,
           price: Number(price),
           quantity: Number(quantity),
+          variantId,
+          variantName,
         });
       }, 0);
       return () => clearTimeout(timer);
@@ -82,6 +88,7 @@ function CheckoutContent() {
         {
           productId: directItem.id,
           quantity: directItem.quantity,
+          productVariantId: directItem.variantId || undefined,
         },
       ];
     }
@@ -219,8 +226,13 @@ function CheckoutContent() {
               {directItem ? (
                 <div className="flex justify-between items-center text-sm">
                   <div className="flex-1 pr-4">
-                    <p className="font-medium line-clamp-1">
+                    <p className="font-medium line-clamp-1 flex flex-wrap gap-2 items-center">
                       {directItem.name}
+                      {directItem.variantName && (
+                        <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-md">
+                          {directItem.variantName}
+                        </span>
+                      )}
                     </p>
                     <p className="text-muted-foreground">
                       Qty: {directItem.quantity}
@@ -233,11 +245,18 @@ function CheckoutContent() {
               ) : (
                 cartItems.map((item) => (
                   <div
-                    key={item.id}
+                    key={`${item.id}-${item.productVariantId || "base"}`}
                     className="flex justify-between items-center text-sm"
                   >
                     <div className="flex-1 pr-4">
-                      <p className="font-medium line-clamp-1">{item.name}</p>
+                      <p className="font-medium line-clamp-1 flex flex-wrap gap-2 items-center">
+                        {item.name}
+                        {item.variant?.combination && (
+                          <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-md">
+                            {item.variant.combination}
+                          </span>
+                        )}
+                      </p>
                       <p className="text-muted-foreground">
                         Qty: {item.cartQuantity}
                       </p>

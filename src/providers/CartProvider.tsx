@@ -12,6 +12,7 @@ import {
 } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { getUserInfo } from "@/services/auth.services";
 import {
   getCart,
   addToCart as apiAddToCart,
@@ -22,13 +23,15 @@ import {
 
 interface CartItem extends IProduct {
   cartQuantity: number;
+  productVariantId?: string | null;
+  variant?: any;
 }
 
 interface CartContextType {
   cartItems: CartItem[];
-  addToCart: (product: IProduct, quantity?: number) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
-  removeFromCart: (productId: string) => void;
+  addToCart: (product: IProduct, quantity?: number, variantId?: string | null) => void;
+  updateQuantity: (productId: string, quantity: number, variantId?: string | null) => void;
+  removeFromCart: (productId: string, variantId?: string | null) => void;
   clearCart: () => void;
   cartCount: number;
 }
@@ -38,49 +41,61 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [sessionChecked, setSessionChecked] = useState(false);
+
+  // Check auth status client-side reliably using our custom backend's user info
+  useEffect(() => {
+    getUserInfo()
+      .then((user) => {
+        setIsAuthenticated(!!user);
+      })
+      .catch(() => {
+        setIsAuthenticated(false);
+      })
+      .finally(() => {
+        setSessionChecked(true);
+      });
+  }, []);
 
   const fetchCartFromDb = useCallback(async () => {
     const res = await getCart();
     if (res?.success && res?.data) {
-      setIsAuthenticated(true);
-      // Map DB items to frontend CartItem format
       const dbItems =
         res.data.items?.map((item: any) => ({
           ...item.product,
           cartQuantity: item.quantity,
+          productVariantId: item.productVariantId,
+          variant: item.productVariant,
         })) || [];
       setCartItems(dbItems);
     } else {
-      setIsAuthenticated(false);
-      // Fallback to local storage if not authenticated
+      // Fallback to localStorage for guests
       const storedCart = localStorage.getItem("nextbazar_cart");
       if (storedCart) {
         try {
           setCartItems(JSON.parse(storedCart));
-        } catch (e) {
+        } catch {
           console.error("Failed to parse cart data");
         }
       }
     }
-    setIsLoading(false);
   }, []);
 
+  // Fetch cart once we know the auth state
   useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchCartFromDb();
-    }, 0);
-    return () => clearTimeout(timer);
-  }, [fetchCartFromDb]);
+    if (!sessionChecked) return;
+    fetchCartFromDb();
+  }, [sessionChecked, isAuthenticated, fetchCartFromDb]);
 
+  // Persist cart to localStorage for guest users only
   useEffect(() => {
-    if (!isAuthenticated && !isLoading) {
+    if (sessionChecked && !isAuthenticated) {
       localStorage.setItem("nextbazar_cart", JSON.stringify(cartItems));
     }
-  }, [cartItems, isAuthenticated, isLoading]);
+  }, [cartItems, isAuthenticated, sessionChecked]);
 
-  const addToCart = async (product: IProduct, quantity: number = 1) => {
+  const addToCart = async (product: IProduct, quantity: number = 1, variantId: string | null = null) => {
     if (!isAuthenticated) {
       toast.error("Please login to add items to your cart");
       router.push("/login");
@@ -89,18 +104,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     // Optimistic UI update
     setCartItems((prev) => {
-      const existing = prev.find((item) => item.id === product.id);
+      const existing = prev.find((item) => item.id === product.id && item.productVariantId === variantId);
       if (existing) {
         return prev.map((item) =>
-          item.id === product.id
+          item.id === product.id && item.productVariantId === variantId
             ? { ...item, cartQuantity: item.cartQuantity + quantity }
             : item,
         );
       }
-      return [...prev, { ...product, cartQuantity: quantity }];
+      return [...prev, { ...product, cartQuantity: quantity, productVariantId: variantId }];
     });
 
-    const res = await apiAddToCart(product.id, quantity);
+    const res = await apiAddToCart(product.id, quantity, variantId);
     if (res?.success) {
       toast.success(`${product.name} added to cart`);
     } else {
@@ -109,37 +124,37 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const updateQuantity = async (productId: string, quantity: number) => {
+  const updateQuantity = async (productId: string, quantity: number, variantId: string | null = null) => {
     if (!isAuthenticated) return;
     if (quantity <= 0) {
-      removeFromCart(productId);
+      removeFromCart(productId, variantId);
       return;
     }
 
-    // Optimistic UI update
     setCartItems((prev) =>
       prev.map((item) =>
-        item.id === productId ? { ...item, cartQuantity: quantity } : item
-      )
+        item.id === productId && item.productVariantId === variantId
+          ? { ...item, cartQuantity: quantity }
+          : item,
+      ),
     );
 
-    const res = await apiUpdateCartItemQuantity(productId, quantity);
+    const res = await apiUpdateCartItemQuantity(productId, quantity, variantId);
     if (!res?.success) {
       toast.error(res?.message || "Failed to update quantity");
-      fetchCartFromDb(); // Revert on failure
+      fetchCartFromDb();
     }
   };
 
-  const removeFromCart = async (productId: string) => {
+  const removeFromCart = async (productId: string, variantId: string | null = null) => {
     if (!isAuthenticated) return;
 
-    // Optimistic UI update
-    setCartItems((prev) => prev.filter((item) => item.id !== productId));
+    setCartItems((prev) => prev.filter((item) => !(item.id === productId && item.productVariantId === variantId)));
 
-    const res = await apiRemoveFromCart(productId);
+    const res = await apiRemoveFromCart(productId, variantId);
     if (!res?.success) {
       toast.error("Failed to remove item");
-      fetchCartFromDb(); // Revert on failure
+      fetchCartFromDb();
     }
   };
 
@@ -149,7 +164,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCartItems([]);
     const res = await apiClearCart();
     if (!res?.success) {
-      fetchCartFromDb(); // Revert on failure
+      fetchCartFromDb();
     }
   };
 
