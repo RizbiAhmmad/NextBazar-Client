@@ -24,6 +24,7 @@ export const createCategoryAction = async (
     if (result.success) {
       revalidateTag("categories", "max");
       revalidatePath("/admin/dashboard/categories");
+      revalidatePath("/seller/dashboard/categories");
     }
     return result;
   } catch (error: unknown) {
@@ -43,6 +44,7 @@ export const updateCategoryAction = async (
     if (result.success) {
       revalidateTag("categories", "max");
       revalidatePath("/admin/dashboard/categories");
+      revalidatePath("/seller/dashboard/categories");
     }
     return result;
   } catch (error: unknown) {
@@ -61,6 +63,7 @@ export const deleteCategoryAction = async (
     if (result.success) {
       revalidateTag("categories", "max");
       revalidatePath("/admin/dashboard/categories");
+      revalidatePath("/seller/dashboard/categories");
     }
     return result;
   } catch (error: unknown) {
