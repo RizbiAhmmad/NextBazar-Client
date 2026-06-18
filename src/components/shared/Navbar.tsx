@@ -10,6 +10,7 @@ import {
   Heart,
   Store,
   User,
+  Trash2,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -54,6 +55,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { useCart } from "@/providers/CartProvider";
+import { useWishlist } from "@/providers/WishlistProvider";
 
 interface MenuItem {
   title: string;
@@ -72,6 +74,7 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
   const pathname = usePathname();
   const router = useRouter();
   const { cartCount } = useCart();
+  const { wishlistCount, wishlistItems, removeFromWishlist } = useWishlist();
 
   const menu: MenuItem[] = [
     { title: "Home", url: "/" },
@@ -147,16 +150,73 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
                   }}
                 />
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative rounded-full text-muted-foreground hover:text-primary transition-colors"
-              >
-                <Heart className="h-5 w-5" />
-                <Badge className="absolute -right-1 -top-1 h-4 w-4 justify-center p-0 text-[10px]">
-                  0
-                </Badge>
-              </Button>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="relative rounded-full text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Heart className="h-5 w-5" />
+                    {wishlistCount > 0 && (
+                      <Badge className="absolute -right-1 -top-1 h-4 min-w-4 justify-center p-0 text-[10px]">
+                        {wishlistCount}
+                      </Badge>
+                    )}
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="w-full sm:max-w-md flex flex-col">
+                  <SheetHeader className="border-b pb-4 mb-4">
+                    <SheetTitle className="flex items-center gap-2">
+                      <Heart className="h-5 w-5 text-primary" />
+                      My Wishlist ({wishlistCount})
+                    </SheetTitle>
+                    <SheetDescription>
+                      Products you have saved for later.
+                    </SheetDescription>
+                  </SheetHeader>
+                  <div className="flex-1 overflow-y-auto">
+                    {wishlistItems.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center h-full text-center p-8 text-muted-foreground">
+                        <Heart className="h-12 w-12 mb-4 opacity-20" />
+                        <p className="text-lg font-medium text-foreground">Your wishlist is empty</p>
+                        <p className="text-sm mt-1">Save items you love to find them easily later.</p>
+                        <SheetTrigger asChild>
+                          <Button className="mt-6" variant="outline" onClick={() => router.push("/products")}>
+                            Explore Products
+                          </Button>
+                        </SheetTrigger>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-4 pr-2">
+                        {wishlistItems.map((item) => (
+                          <div key={item.id} className="flex gap-4 p-3 rounded-xl border bg-card hover:border-primary/30 transition-colors">
+                            <div className="relative h-20 w-20 rounded-md overflow-hidden bg-muted flex-shrink-0 cursor-pointer" onClick={() => router.push(`/products/${item.id}`)}>
+                              {item.images?.[0] ? (
+                                <Image src={item.images[0]} alt={item.name} fill className="object-cover" />
+                              ) : (
+                                <ShoppingBag className="h-8 w-8 m-auto opacity-20" />
+                              )}
+                            </div>
+                            <div className="flex-1 flex flex-col justify-between">
+                              <div>
+                                <h4 className="font-semibold text-sm line-clamp-2 cursor-pointer hover:text-primary" onClick={() => router.push(`/products/${item.id}`)}>{item.name}</h4>
+                                <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{item.shortDescription}</p>
+                              </div>
+                              <div className="flex items-center justify-between mt-2">
+                                <span className="font-bold text-primary">${item.sellPrice?.toFixed(2)}</span>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => removeFromWishlist(item.id)}>
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </SheetContent>
+              </Sheet>
               <Link href="/cart">
                 <Button
                   variant="ghost"

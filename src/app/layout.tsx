@@ -4,6 +4,7 @@ import "./globals.css";
 import QueryProviders from "@/providers/QueryProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { CartProvider } from "@/providers/CartProvider";
+import { WishlistProvider } from "@/providers/WishlistProvider";
 import { Toaster } from "@/components/ui/sonner";
 import FloatingChatbot from "@/components/modules/Chatbot/FloatingChatbot";
 import SmoothScroll from "@/components/shared/SmoothScroll";
@@ -44,11 +45,13 @@ export default function RootLayout({
         >
           <QueryProviders>
             <CartProvider>
-              <SmoothScroll>
-                {children}
-                <FloatingChatbot />
-                <Toaster richColors position="top-right" />
-              </SmoothScroll>
+              <WishlistProvider>
+                <SmoothScroll>
+                  {children}
+                  <FloatingChatbot />
+                  <Toaster richColors position="top-right" />
+                </SmoothScroll>
+              </WishlistProvider>
             </CartProvider>
           </QueryProviders>
         </ThemeProvider>

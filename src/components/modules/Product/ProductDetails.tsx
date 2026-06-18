@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/providers/CartProvider";
+import { useWishlist } from "@/providers/WishlistProvider";
 import { useRouter } from "next/navigation";
 import ProductReviews from "./ProductReviews";
 
@@ -28,6 +29,8 @@ interface ProductDetailsProps {
 export default function ProductDetails({ product }: ProductDetailsProps) {
   const router = useRouter();
   const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const inWishlist = isInWishlist(product.id);
 
   // Normalize all image URLs (handle relative paths from local server)
   const formatImageUrl = (url: string) => {
@@ -301,10 +304,17 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
               <Button
                 size="lg"
                 variant="outline"
-                className="rounded-full h-14 w-full sm:w-14 px-0"
+                className={`rounded-full h-14 w-full sm:w-14 px-0 ${inWishlist ? "text-primary border-primary bg-primary/5" : ""}`}
+                onClick={() => {
+                  if (inWishlist) {
+                    removeFromWishlist(product.id);
+                  } else {
+                    addToWishlist(product);
+                  }
+                }}
               >
-                <Heart className="h-5 w-5" />
-                <span className="sr-only">Add to Wishlist</span>
+                <Heart className="h-5 w-5" fill={inWishlist ? "currentColor" : "none"} />
+                <span className="sr-only">{inWishlist ? "Remove from Wishlist" : "Add to Wishlist"}</span>
               </Button>
             </div>
 
