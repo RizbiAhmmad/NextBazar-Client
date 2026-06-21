@@ -7,12 +7,14 @@ import Testimonials from "@/components/modules/Home/Testimonials";
 import FaqSection from "@/components/modules/Home/FaqSection";
 import BecomeSellerCTA from "@/components/modules/Home/BecomeSellerCTA";
 import Newsletter from "@/components/modules/Home/Newsletter";
+import FlashSale from "@/components/modules/Home/FlashSale";
 
 export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col bg-background overflow-x-hidden">
       <main className="w-full max-w-[1440px] mx-auto p-4 md:p-6 lg:p-8 space-y-12 md:space-y-20 lg:space-y-32">
         <HeroCarousel />
+        <FlashSale />
         <CategorySection />
         <HomeProducts />
         <Features />
