@@ -112,7 +112,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
             : item,
         );
       }
-      return [...prev, { ...product, cartQuantity: quantity, productVariantId: variantId }];
+      
+      const variantObj = variantId && product.variants ? product.variants.find((v: any) => v.id === variantId) : null;
+      
+      return [...prev, { ...product, cartQuantity: quantity, productVariantId: variantId, variant: variantObj }];
     });
 
     const res = await apiAddToCart(product.id, quantity, variantId);

@@ -74,7 +74,7 @@ export default function AIRecommendations({
             return (
               <Link
                 key={product.id}
-                href={`/products/${product.id}`}
+                href={`/products/${product.slug}`}
                 className="group rounded-2xl border bg-card hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden"
               >
                 {/* Image */}

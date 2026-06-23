@@ -22,7 +22,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       : 0;
 
   return (
-    <Link href={`/products/${product.id}`} className="block h-full">
+    <Link href={`/products/${product.slug}`} className="block h-full">
       <Card className="group relative overflow-hidden rounded-2xl border-none bg-card shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full flex flex-col">
         {/* Image Container */}
         <div className="relative aspect-square w-full p-2 overflow-hidden">

@@ -191,7 +191,7 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
                       <div className="flex flex-col gap-4 pr-2">
                         {wishlistItems.map((item) => (
                           <div key={item.id} className="flex gap-4 p-3 rounded-xl border bg-card hover:border-primary/30 transition-colors">
-                            <div className="relative h-20 w-20 rounded-md overflow-hidden bg-muted flex-shrink-0 cursor-pointer" onClick={() => router.push(`/products/${item.id}`)}>
+                            <div className="relative h-20 w-20 rounded-md overflow-hidden bg-muted flex-shrink-0 cursor-pointer" onClick={() => router.push(`/products/${item.slug}`)}>
                               {item.images?.[0] ? (
                                 <Image src={item.images[0]} alt={item.name} fill className="object-cover" />
                               ) : (
@@ -200,7 +200,7 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
                             </div>
                             <div className="flex-1 flex flex-col justify-between">
                               <div>
-                                <h4 className="font-semibold text-sm line-clamp-2 cursor-pointer hover:text-primary" onClick={() => router.push(`/products/${item.id}`)}>{item.name}</h4>
+                                <h4 className="font-semibold text-sm line-clamp-2 cursor-pointer hover:text-primary" onClick={() => router.push(`/products/${item.slug}`)}>{item.name}</h4>
                                 <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{item.shortDescription}</p>
                               </div>
                               <div className="flex items-center justify-between mt-2">

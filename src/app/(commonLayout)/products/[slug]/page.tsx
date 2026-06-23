@@ -1,15 +1,15 @@
 import ProductDetails from "@/components/modules/Product/ProductDetails";
-import { getProductById } from "@/services/product.services";
+import { getProductBySlug } from "@/services/product.services";
 import { Metadata } from "next";
 
 interface Props {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
+  const { slug } = await params;
   try {
-    const response = await getProductById(id);
+    const response = await getProductBySlug(slug);
     const product = response?.data;
 
     if (!product) {
@@ -26,13 +26,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProductDetailsPage({ params }: Props) {
-  const { id } = await params;
+  const { slug } = await params;
 
   let product = null;
   let hasError = false;
 
   try {
-    const response = await getProductById(id);
+    const response = await getProductBySlug(slug);
     product = response?.data;
   } catch (error) {
     hasError = true;

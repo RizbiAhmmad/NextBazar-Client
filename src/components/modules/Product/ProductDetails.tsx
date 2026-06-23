@@ -89,7 +89,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
         setActiveImage(allImages[0] ?? null);
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedOptions]);
 
   const displaySellPrice = currentVariant ? currentVariant.sellPrice : product.sellPrice;
@@ -103,9 +103,9 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
   const discount =
     displayRegularPrice > displaySellPrice
       ? Math.round(
-          ((displayRegularPrice - displaySellPrice) / displayRegularPrice) *
-            100,
-        )
+        ((displayRegularPrice - displaySellPrice) / displayRegularPrice) *
+        100,
+      )
       : 0;
 
   const isAddToCartDisabled = displayStock === 0 || (product.type === "VARIABLE" && !currentVariant);
@@ -144,11 +144,10 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                   <button
                     key={idx}
                     onClick={() => setActiveImage(img)}
-                    className={`relative aspect-square w-24 flex-shrink-0 rounded-xl overflow-hidden border-2 transition-all ${
-                      activeImage === img
-                        ? "border-primary shadow-md"
-                        : "border-transparent opacity-70 hover:opacity-100"
-                    }`}
+                    className={`relative aspect-square w-24 flex-shrink-0 rounded-xl overflow-hidden border-2 transition-all ${activeImage === img
+                      ? "border-primary shadow-md"
+                      : "border-transparent opacity-70 hover:opacity-100"
+                      }`}
                   >
                     <Image
                       src={img}
@@ -165,11 +164,6 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
 
           {/* Product Info */}
           <div className="flex flex-col">
-            <div className="mb-2">
-              <span className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">
-                {product.category?.name || "Uncategorized"}
-              </span>
-            </div>
 
             <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-4 mb-2">
               {product.name}
@@ -226,11 +220,10 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                               const newOptions = { ...selectedOptions, [attr.name]: val };
                               setSelectedOptions(newOptions);
                             }}
-                            className={`px-4 py-2 text-sm font-medium rounded-md border transition-all ${
-                              isSelected
-                                ? "border-primary bg-primary text-primary-foreground shadow-md"
-                                : "border-slate-200 bg-white text-slate-700 hover:border-primary/50 hover:bg-slate-50"
-                            }`}
+                            className={`px-4 py-2 text-sm font-medium rounded-md border transition-all ${isSelected
+                              ? "border-primary bg-primary text-primary-foreground shadow-md"
+                              : "border-slate-200 bg-white text-slate-700 hover:border-primary/50 hover:bg-slate-50"
+                              }`}
                           >
                             {val}
                           </button>
@@ -356,46 +349,55 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                 </p>
               </div>
             </div>
+          </div>
+        </div>
 
-            {/* Description / Reviews Toggle */}
-            <div className="mb-6">
-              <div className="flex gap-2 mb-4">
-                <button
-                  className={`px-4 py-2 rounded-t-lg focus:outline-none ${showDescription ? "bg-white shadow" : "bg-gray-100"}`}
-                  onClick={() => setShowDescription(true)}
-                >
-                  Description
-                </button>
-                <button
-                  className={`px-4 py-2 rounded-t-lg focus:outline-none ${!showDescription ? "bg-white shadow" : "bg-gray-100"}`}
-                  onClick={() => setShowDescription(false)}
-                >
-                  Reviews
-                </button>
-              </div>
-
-              {/* Description Content */}
-              {showDescription && (
-                <div className="mt-4">
-                  <h3 className="text-xl font-bold text-slate-900 mb-4 uppercase tracking-tight">
-                    Product Description
-                  </h3>
-                  <div
-                    className="prose prose-slate max-w-none text-slate-600 leading-relaxed [&>ul]:list-disc [&>ul]:pl-5 [&>ul>li]:mb-1 [&>p]:mb-3 [&>strong]:font-bold"
-                    dangerouslySetInnerHTML={{
-                      __html:
-                        (product as any).description ||
-                        product.shortDescription,
-                    }}
-                  />
-                </div>
-              )}
+        {/* Separated Bottom Section: Description / Reviews & Recommendations */}
+        <div className="mt-16 text-left w-full">
+          {/* Description / Reviews Toggle */}
+          <div className="mb-6">
+            <div className="flex gap-2 mb-6 border-b pb-0">
+              <button
+                className={`px-6 py-3 font-semibold focus:outline-none transition-colors border-b-2 ${showDescription ? "border-slate-900 text-slate-900" : "border-transparent text-slate-500 hover:text-slate-800"}`}
+                onClick={() => setShowDescription(true)}
+              >
+                Description
+              </button>
+              <button
+                className={`px-6 py-3 font-semibold focus:outline-none transition-colors border-b-2 ${!showDescription ? "border-slate-900 text-slate-900" : "border-transparent text-slate-500 hover:text-slate-800"}`}
+                onClick={() => setShowDescription(false)}
+              >
+                Reviews
+              </button>
             </div>
 
-            {/* Product Reviews */}
-            {!showDescription && <ProductReviews productId={product.id} />}
+            {/* Description Content */}
+            {showDescription && (
+              <div className="mt-4 bg-white p-6 sm:p-8 rounded-2xl border border-slate-100 shadow-sm">
+                <h3 className="text-2xl font-bold text-slate-900 mb-6 tracking-tight">
+                  Product Description
+                </h3>
+                <div
+                  className="prose prose-slate max-w-none text-slate-600 leading-relaxed [&>ul]:list-disc [&>ul]:pl-5 [&>ul>li]:mb-1 [&>p]:mb-3 [&>strong]:font-bold"
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      (product as any).description ||
+                      product.shortDescription,
+                  }}
+                />
+              </div>
+            )}
+          </div>
 
-            {/* Category Recommendations */}
+          {/* Product Reviews */}
+          {!showDescription && (
+            <div className="mt-4 bg-white p-6 sm:p-8 rounded-2xl border border-slate-100 shadow-sm">
+              <ProductReviews productId={product.id} />
+            </div>
+          )}
+
+          {/* Category Recommendations */}
+          <div className="mt-16">
             {product.category?.id && (
               <CategoryRecommendations
                 categoryId={product.category.id}

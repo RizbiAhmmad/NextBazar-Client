@@ -159,6 +159,24 @@ export async function getProductById(id: string) {
   }
 }
 
+export async function getProductBySlug(slug: string) {
+  try {
+    const res = await fetch(`${BASE_API_URL}/products/slug/${slug}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    const result = await res.json();
+    return result;
+  } catch (error) {
+    console.error(`Error fetching product by slug (${slug}):`, error);
+    throw error;
+  }
+}
+
 export async function uploadVariantImage(
   productId: string,
   variantId: string,

@@ -57,7 +57,7 @@ function CheckoutContent() {
   const subtotal = directItem
     ? directItem.price * directItem.quantity
     : cartItems.reduce(
-        (total, item) => total + item.sellPrice * item.cartQuantity,
+        (total, item) => total + (item.variant?.sellPrice || item.sellPrice) * item.cartQuantity,
         0,
       );
 
@@ -262,7 +262,7 @@ function CheckoutContent() {
                       </p>
                     </div>
                     <div className="font-bold">
-                      ৳{(item.sellPrice * item.cartQuantity).toFixed(2)}
+                      ৳{((item.variant?.sellPrice || item.sellPrice) * item.cartQuantity).toFixed(2)}
                     </div>
                   </div>
                 ))

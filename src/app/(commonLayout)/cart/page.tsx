@@ -11,7 +11,7 @@ export default function CartPage() {
   const { cartItems, removeFromCart, updateQuantity } = useCart();
 
   const subtotal = cartItems.reduce(
-    (total, item) => total + item.sellPrice * item.cartQuantity,
+    (total, item) => total + (item.variant?.sellPrice || item.sellPrice) * item.cartQuantity,
     0,
   );
 
@@ -76,7 +76,7 @@ export default function CartPage() {
                     </div>
                       <div className="flex flex-col gap-1">
                       <Link
-                        href={`/products/${item.id}`}
+                        href={`/products/${item.slug}`}
                         className="font-bold text-lg hover:text-primary transition-colors line-clamp-2"
                       >
                         {item.name}
@@ -95,7 +95,7 @@ export default function CartPage() {
                   </div>
 
                   <div className="col-span-1 sm:col-span-2 text-center font-bold text-lg">
-                    ৳{item.sellPrice.toFixed(2)}
+                    ৳{((item.variant?.sellPrice || item.sellPrice)).toFixed(2)}
                   </div>
 
                   <div className="col-span-1 sm:col-span-3 flex justify-center">

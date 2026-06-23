@@ -9,6 +9,7 @@ import { ICategory } from "@/types/category.types";
 
 export interface IProduct {
   id: string;
+  slug: string;
   name: string;
   shortDescription: string;
   stock: number;
