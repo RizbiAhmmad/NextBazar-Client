@@ -9,10 +9,27 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { createOrder } from "@/services/order.services";
-import { CheckCircle2, ArrowRight, Loader2 } from "lucide-react";
+import { validateCouponCode } from "@/services/coupon.services";
+import {
+  CheckCircle2,
+  ArrowRight,
+  Loader2,
+  Tag,
+  X,
+  Ticket,
+} from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
+
+interface AppliedCoupon {
+  couponId: string;
+  code: string;
+  discountAmount: number;
+  discountType: string;
+}
 
 function CheckoutContent() {
   const { cartItems, clearCart } = useCart();
@@ -21,12 +38,18 @@ function CheckoutContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  // Coupon state
+  const [couponCode, setCouponCode] = useState("");
+  const [isCouponLoading, setIsCouponLoading] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+
   // Direct Buy State
   const [directItem, setDirectItem] = useState<{
     id: string;
     name: string;
     price: number;
     quantity: number;
+    image?: string;
     variantId?: string;
     variantName?: string;
   } | null>(null);
@@ -38,6 +61,7 @@ function CheckoutContent() {
     const price = searchParams.get("price");
     const variantId = searchParams.get("variantId") || undefined;
     const variantName = searchParams.get("variantName") || undefined;
+    const image = searchParams.get("image") || undefined;
 
     if (productId && quantity && name && price) {
       const timer = setTimeout(() => {
@@ -46,6 +70,7 @@ function CheckoutContent() {
           name: name,
           price: Number(price),
           quantity: Number(quantity),
+          image: image ? decodeURIComponent(image) : undefined,
           variantId,
           variantName,
         });
@@ -63,7 +88,53 @@ function CheckoutContent() {
 
   const itemsCount = directItem ? directItem.quantity : cartItems.length;
   const shipping = itemsCount > 0 ? 60 : 0;
-  const total = subtotal + shipping;
+  const discount = appliedCoupon?.discountAmount ?? 0;
+  const total = Math.max(0, subtotal + shipping - discount);
+
+  // Build items array for coupon validation
+  const getCouponItems = () => {
+    if (directItem) {
+      return [{ productId: directItem.id, price: directItem.price, quantity: directItem.quantity }];
+    }
+    return cartItems.map((item) => ({
+      productId: item.id,
+      price: item.variant?.sellPrice || item.sellPrice,
+      quantity: item.cartQuantity,
+    }));
+  };
+
+  const handleApplyCoupon = async () => {
+    const code = couponCode.trim().toUpperCase();
+    if (!code) {
+      toast.error("Please enter a coupon code");
+      return;
+    }
+
+    setIsCouponLoading(true);
+    try {
+      const result = await validateCouponCode({ code, items: getCouponItems() });
+      if (result.success && result.data) {
+        setAppliedCoupon(result.data);
+        toast.success(
+          `Coupon applied! You save ৳${result.data.discountAmount.toFixed(2)}`
+        );
+        setCouponCode("");
+      } else {
+        toast.error(result.message || "Invalid coupon code");
+      }
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message || error?.message || "Failed to apply coupon";
+      toast.error(message);
+    } finally {
+      setIsCouponLoading(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    toast.info("Coupon removed");
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -82,7 +153,6 @@ function CheckoutContent() {
       notes: formData.get("notes") as string,
     };
 
-    // If it's a direct buy, send the items explicitly
     if (directItem) {
       payload.items = [
         {
@@ -91,6 +161,11 @@ function CheckoutContent() {
           productVariantId: directItem.variantId || undefined,
         },
       ];
+    }
+
+    if (appliedCoupon) {
+      payload.couponId = appliedCoupon.couponId;
+      payload.discountAmount = appliedCoupon.discountAmount;
     }
 
     setIsLoading(true);
@@ -218,84 +293,181 @@ function CheckoutContent() {
         </div>
 
         {/* Order Summary & Payment */}
-        <div className="w-full lg:w-[400px]">
-          <div className="bg-card rounded-3xl p-8 shadow-sm border sticky top-28">
-            <h2 className="text-xl font-black mb-6">Your Order</h2>
+        <div className="w-full lg:w-[420px]">
+          <div className="bg-card rounded-3xl p-8 shadow-sm border sticky top-28 space-y-6">
+            <h2 className="text-xl font-black">Your Order</h2>
 
-            <div className="space-y-4 mb-6 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+            {/* Product List with images */}
+            <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
               {directItem ? (
-                <div className="flex justify-between items-center text-sm">
-                  <div className="flex-1 pr-4">
-                    <p className="font-medium line-clamp-1 flex flex-wrap gap-2 items-center">
-                      {directItem.name}
-                      {directItem.variantName && (
-                        <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-md">
-                          {directItem.variantName}
-                        </span>
-                      )}
-                    </p>
-                    <p className="text-muted-foreground">
-                      Qty: {directItem.quantity}
-                    </p>
+                <div className="flex items-center gap-3 text-sm">
+                  {directItem.image ? (
+                    <div className="relative h-14 w-14 flex-shrink-0 rounded-xl overflow-hidden border bg-muted">
+                      <Image
+                        src={directItem.image}
+                        alt={directItem.name}
+                        fill
+                        sizes="56px"
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="h-14 w-14 flex-shrink-0 rounded-xl bg-muted flex items-center justify-center border text-muted-foreground text-xs">
+                      No img
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold line-clamp-1">{directItem.name}</p>
+                    {directItem.variantName && (
+                      <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-md inline-block mt-0.5">
+                        {directItem.variantName}
+                      </span>
+                    )}
+                    <p className="text-muted-foreground text-xs mt-0.5">Qty: {directItem.quantity}</p>
                   </div>
-                  <div className="font-bold">
+                  <div className="font-bold shrink-0">
                     ৳{(directItem.price * directItem.quantity).toFixed(2)}
                   </div>
                 </div>
               ) : (
-                cartItems.map((item) => (
-                  <div
-                    key={`${item.id}-${item.productVariantId || "base"}`}
-                    className="flex justify-between items-center text-sm"
-                  >
-                    <div className="flex-1 pr-4">
-                      <p className="font-medium line-clamp-1 flex flex-wrap gap-2 items-center">
-                        {item.name}
+                cartItems.map((item) => {
+                  const img = item.images?.[0] ?? (item as any).image ?? null;
+                  const price = (item.variant?.sellPrice || item.sellPrice) * item.cartQuantity;
+                  return (
+                    <div
+                      key={`${item.id}-${item.productVariantId || "base"}`}
+                      className="flex items-center gap-3 text-sm"
+                    >
+                      {img ? (
+                        <div className="relative h-14 w-14 flex-shrink-0 rounded-xl overflow-hidden border bg-muted">
+                          <Image
+                            src={img}
+                            alt={item.name}
+                            fill
+                            sizes="56px"
+                            className="object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="h-14 w-14 flex-shrink-0 rounded-xl bg-muted flex items-center justify-center border text-muted-foreground text-xs">
+                          No img
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold line-clamp-1">{item.name}</p>
                         {item.variant?.combination && (
-                          <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-md">
+                          <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-md inline-block mt-0.5">
                             {item.variant.combination}
                           </span>
                         )}
-                      </p>
-                      <p className="text-muted-foreground">
-                        Qty: {item.cartQuantity}
-                      </p>
+                        <p className="text-muted-foreground text-xs mt-0.5">Qty: {item.cartQuantity}</p>
+                      </div>
+                      <div className="font-bold shrink-0">
+                        ৳{price.toFixed(2)}
+                      </div>
                     </div>
-                    <div className="font-bold">
-                      ৳{((item.variant?.sellPrice || item.sellPrice) * item.cartQuantity).toFixed(2)}
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
 
-            <Separator className="my-6" />
+            <Separator />
 
-            <div className="space-y-4 text-sm mb-6">
+            {/* Coupon Section */}
+            {appliedCoupon ? (
+              <div className="flex items-center justify-between rounded-xl border border-primary/30 bg-primary/5 px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <Ticket className="h-4 w-4 text-primary" />
+                  <div>
+                    <p className="text-sm font-bold text-primary">{appliedCoupon.code}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Save ৳{appliedCoupon.discountAmount.toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRemoveCoupon}
+                  className="text-muted-foreground hover:text-destructive transition-colors p-1"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold flex items-center gap-1.5">
+                  <Tag className="h-4 w-4 text-primary" />
+                  Have a Coupon?
+                </Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    placeholder="Enter coupon code"
+                    className="h-10 rounded-xl uppercase tracking-wider font-mono text-sm"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        void handleApplyCoupon();
+                      }
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-10 px-4 rounded-xl font-semibold shrink-0"
+                    disabled={isCouponLoading || !couponCode.trim()}
+                    onClick={handleApplyCoupon}
+                  >
+                    {isCouponLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      "Apply"
+                    )}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            <Separator />
+
+            {/* Price Summary */}
+            <div className="space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground font-medium">
-                  Subtotal
-                </span>
+                <span className="text-muted-foreground font-medium">Subtotal</span>
                 <span className="font-bold">৳{subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground font-medium">
-                  Shipping Estimate
-                </span>
+                <span className="text-muted-foreground font-medium">Shipping</span>
                 <span className="font-bold">৳{shipping.toFixed(2)}</span>
               </div>
+              {appliedCoupon && (
+                <div className="flex justify-between text-primary">
+                  <span className="font-medium flex items-center gap-1">
+                    <Ticket className="h-3.5 w-3.5" />
+                    Coupon ({appliedCoupon.code})
+                  </span>
+                  <span className="font-bold">-৳{appliedCoupon.discountAmount.toFixed(2)}</span>
+                </div>
+              )}
             </div>
 
-            <Separator className="my-6" />
+            <Separator />
 
-            <div className="flex justify-between mb-8">
+            <div className="flex justify-between">
               <span className="text-lg font-bold">Total</span>
               <span className="text-2xl font-black text-primary">
                 ৳{total.toFixed(2)}
               </span>
             </div>
 
-            <div className="bg-muted p-4 rounded-xl mb-6 text-sm text-center font-medium">
+            {appliedCoupon && (
+              <Badge className="w-full justify-center py-1.5 text-xs bg-primary/10 text-primary hover:bg-primary/10 border-primary/20">
+                🎉 You are saving ৳{appliedCoupon.discountAmount.toFixed(2)} with coupon {appliedCoupon.code}
+              </Badge>
+            )}
+
+            <div className="bg-muted p-4 rounded-xl text-sm text-center font-medium">
               Payment Method: Cash on Delivery
             </div>
 

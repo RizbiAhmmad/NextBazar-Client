@@ -287,7 +287,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                 disabled={isAddToCartDisabled}
                 onClick={() => {
                   router.push(
-                    `/checkout?productId=${product.id}&quantity=${quantity}&name=${encodeURIComponent(product.name)}&price=${displaySellPrice}&variantId=${currentVariant?.id || ""}&variantName=${currentVariant ? encodeURIComponent(currentVariant.combination) : ""}`,
+                    `/checkout?productId=${product.id}&quantity=${quantity}&name=${encodeURIComponent(product.name)}&price=${displaySellPrice}&variantId=${currentVariant?.id || ""}&variantName=${currentVariant ? encodeURIComponent(currentVariant.combination) : ""}&image=${encodeURIComponent(activeImage || "")}`,
                   );
                 }}
               >

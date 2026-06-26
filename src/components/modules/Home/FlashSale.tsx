@@ -44,7 +44,7 @@ export default function FlashSale() {
 
   return (
     <section className="py-8">
-      <div className="bg-rose-500 rounded-3xl p-6 md:p-10 text-white relative overflow-hidden">
+      <div className="bg-purple-500 rounded-3xl p-6 md:p-10 text-white relative overflow-hidden">
         {/* Decorative elements */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-black opacity-5 rounded-full blur-2xl transform -translate-x-1/2 translate-y-1/2"></div>
@@ -62,7 +62,7 @@ export default function FlashSale() {
               Grab these amazing deals before they are gone forever. Exclusive discounts up to 50% off!
             </p>
           </div>
-          
+
           <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/20">
             <Clock className="w-5 h-5 text-rose-200" />
             <div className="flex items-center gap-2 font-mono text-xl md:text-2xl font-bold">

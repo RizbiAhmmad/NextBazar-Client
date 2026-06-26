@@ -28,6 +28,8 @@ export interface IOrder {
   notes?: string;
   orderStatus: OrderStatus;
   paymentStatus: PaymentStatus;
+  discountAmount: number;
+  couponId?: string | null;
   createdAt: string;
   updatedAt: string;
   items: IOrderItem[];

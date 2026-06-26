@@ -172,18 +172,18 @@ export default function ViewOrderDialog({
               <span className="text-muted-foreground">Shipping</span>
               <span className="font-bold">৳60.00</span>
             </div>
+            {order.discountAmount > 0 && (
+              <div className="flex justify-between items-center text-primary">
+                <span className="font-medium text-muted-foreground">Discount</span>
+                <span className="font-bold">-৳{order.discountAmount.toFixed(2)}</span>
+              </div>
+            )}
             <div className="flex justify-between items-center pt-2 border-t border-slate-100 dark:border-slate-800">
               <span className="text-lg font-black text-slate-900 dark:text-white">
                 Total
               </span>
               <span className="text-xl font-black text-primary">
-                ৳
-                {(
-                  (order.items?.reduce(
-                    (acc, item) => acc + item.price * item.quantity,
-                    0,
-                  ) || 0) + 60
-                ).toFixed(2)}
+                ৳{order.totalAmount.toFixed(2)}
               </span>
             </div>
           </div>

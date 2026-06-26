@@ -9,6 +9,7 @@ import { Sparkles } from "lucide-react";
 interface RecommendedProduct {
   id: string;
   name: string;
+  slug: string;
   shortDescription?: string;
   sellPrice: number;
   regularPrice?: number;

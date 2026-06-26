@@ -83,6 +83,11 @@ export const sellerNavItems: NavSection[] = [
         href: "/seller/dashboard/attributes",
         icon: "Sliders",
       },
+      {
+        title: "Coupons",
+        href: "/seller/dashboard/coupons",
+        icon: "Ticket",
+      },
     ],
   },
   {
