@@ -170,7 +170,7 @@ export default function ViewOrderDialog({
             </div>
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground">Shipping</span>
-              <span className="font-bold">৳60.00</span>
+              <span className="font-bold">৳{(order.shippingFee || 0).toFixed(2)}</span>
             </div>
             {order.discountAmount > 0 && (
               <div className="flex justify-between items-center text-primary">

@@ -11,7 +11,7 @@ import {
   useCallback,
 } from "react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { getUserInfo } from "@/services/auth.services";
 import {
   getCart,
@@ -34,15 +34,42 @@ interface CartContextType {
   removeFromCart: (productId: string, variantId?: string | null) => void;
   clearCart: () => void;
   cartCount: number;
+  refreshCart: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const [prevPathname, setPrevPathname] = useState(pathname);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [sessionChecked, setSessionChecked] = useState(false);
+
+  // Keep auth state in sync across client-side page navigations
+  useEffect(() => {
+    if (pathname !== prevPathname) {
+      setPrevPathname(pathname);
+      const isAuthRelevantRoute =
+        pathname === "/cart" ||
+        pathname === "/checkout" ||
+        pathname === "/login" ||
+        pathname === "/register" ||
+        prevPathname === "/login" ||
+        prevPathname === "/register";
+
+      if (isAuthRelevantRoute) {
+        getUserInfo()
+          .then((user) => {
+            setIsAuthenticated(!!user);
+          })
+          .catch(() => {
+            setIsAuthenticated(false);
+          });
+      }
+    }
+  }, [pathname, prevPathname]);
 
   // Check auth status client-side reliably using our custom backend's user info
   useEffect(() => {
@@ -96,7 +123,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [cartItems, isAuthenticated, sessionChecked]);
 
   const addToCart = async (product: IProduct, quantity: number = 1, variantId: string | null = null) => {
-    if (!isAuthenticated) {
+    let currentAuth = isAuthenticated;
+    if (!currentAuth) {
+      const user = await getUserInfo();
+      if (user) {
+        setIsAuthenticated(true);
+        currentAuth = true;
+      }
+    }
+
+    if (!currentAuth) {
       toast.error("Please login to add items to your cart");
       router.push("/login");
       return;
@@ -178,7 +214,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, updateQuantity, removeFromCart, clearCart, cartCount }}
+      value={{ cartItems, addToCart, updateQuantity, removeFromCart, clearCart, cartCount, refreshCart: fetchCartFromDb }}
     >
       {children}
     </CartContext.Provider>

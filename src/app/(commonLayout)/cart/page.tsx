@@ -6,17 +6,47 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Trash2, Plus, Minus, ArrowRight, ShoppingBag } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { useState, useEffect } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useRouter } from "next/navigation";
 
 export default function CartPage() {
   const { cartItems, removeFromCart, updateQuantity } = useCart();
+  const router = useRouter();
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  const subtotal = cartItems.reduce(
+  useEffect(() => {
+    if (cartItems.length > 0 && !isInitialized) {
+      setSelectedKeys(new Set(cartItems.map((item) => `${item.id}-${item.productVariantId || "base"}`)));
+      setIsInitialized(true);
+    }
+  }, [cartItems, isInitialized]);
+
+  useEffect(() => {
+    if (isInitialized) {
+      const currentKeys = new Set(cartItems.map((item) => `${item.id}-${item.productVariantId || "base"}`));
+      setSelectedKeys((prev) => {
+        const next = new Set<string>();
+        prev.forEach((k) => {
+          if (currentKeys.has(k)) next.add(k);
+        });
+        return next;
+      });
+    }
+  }, [cartItems, isInitialized]);
+
+  const selectedItems = cartItems.filter((item) =>
+    selectedKeys.has(`${item.id}-${item.productVariantId || "base"}`)
+  );
+
+  const subtotal = selectedItems.reduce(
     (total, item) => total + (item.variant?.sellPrice || item.sellPrice) * item.cartQuantity,
     0,
   );
 
-  const shipping = cartItems.length > 0 ? 60 : 0; // Flat ৳60 shipping
-  const total = subtotal + shipping;
+  const shipping = 0; // Removed shipping estimate price per request
+  const total = subtotal;
 
   if (cartItems.length === 0) {
     return (
@@ -46,21 +76,50 @@ export default function CartPage() {
         {/* Cart Items List */}
         <div className="flex-1">
           <div className="bg-card rounded-3xl p-6 shadow-sm border">
-            <div className="hidden sm:grid grid-cols-12 gap-4 pb-4 border-b text-sm font-bold text-muted-foreground uppercase tracking-wider">
-              <div className="col-span-6">Product</div>
+            <div className="hidden sm:grid grid-cols-12 gap-4 pb-4 border-b text-sm font-bold text-muted-foreground uppercase tracking-wider items-center">
+              <div className="col-span-6 flex items-center gap-3">
+                <Checkbox
+                  checked={cartItems.length > 0 && selectedKeys.size === cartItems.length}
+                  onCheckedChange={() => {
+                    if (selectedKeys.size === cartItems.length) {
+                      setSelectedKeys(new Set());
+                    } else {
+                      setSelectedKeys(new Set(cartItems.map((item) => `${item.id}-${item.productVariantId || "base"}`)));
+                    }
+                  }}
+                />
+                <span>Product</span>
+              </div>
               <div className="col-span-2 text-center">Price</div>
               <div className="col-span-3 text-center">Quantity</div>
               <div className="col-span-1 text-right"></div>
             </div>
 
             <div className="divide-y divide-border">
-              {cartItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="py-6 grid grid-cols-1 sm:grid-cols-12 gap-6 items-center"
-                >
-                  <div className="col-span-1 sm:col-span-6 flex gap-4 items-center">
-                    <div className="relative h-24 w-24 rounded-2xl overflow-hidden bg-muted flex-shrink-0 border">
+              {cartItems.map((item) => {
+                const itemKey = `${item.id}-${item.productVariantId || "base"}`;
+                const isSelected = selectedKeys.has(itemKey);
+                return (
+                  <div
+                    key={itemKey}
+                    className={`py-6 grid grid-cols-1 sm:grid-cols-12 gap-6 items-center transition-colors duration-200 ${isSelected ? "" : "opacity-60"}`}
+                  >
+                    <div className="col-span-1 sm:col-span-6 flex gap-4 items-center">
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={() => {
+                          setSelectedKeys((prev) => {
+                            const next = new Set(prev);
+                            if (next.has(itemKey)) {
+                              next.delete(itemKey);
+                            } else {
+                              next.add(itemKey);
+                            }
+                            return next;
+                          });
+                        }}
+                      />
+                      <div className="relative h-24 w-24 rounded-2xl overflow-hidden bg-muted flex-shrink-0 border">
                       {item.images && item.images.length > 0 ? (
                         <Image
                           src={item.images[0]}
@@ -142,7 +201,8 @@ export default function CartPage() {
                     </Button>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
@@ -159,12 +219,6 @@ export default function CartPage() {
                 </span>
                 <span className="font-bold">৳{subtotal.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground font-medium">
-                  Shipping Estimate
-                </span>
-                <span className="font-bold">৳{shipping.toFixed(2)}</span>
-              </div>
             </div>
 
             <Separator className="my-6" />
@@ -176,11 +230,24 @@ export default function CartPage() {
               </span>
             </div>
 
-            <Button asChild className="w-full h-14 rounded-full text-lg font-bold group">
-              <Link href="/checkout">
-                Proceed to Checkout
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
+            <Button
+              className="w-full h-14 rounded-full text-lg font-bold group"
+              disabled={selectedItems.length === 0}
+              onClick={() => {
+                const selectedItemsPayload = selectedItems.map((item) => ({
+                  id: item.id,
+                  name: item.name,
+                  sellPrice: item.variant?.sellPrice || item.sellPrice,
+                  cartQuantity: item.cartQuantity,
+                  productVariantId: item.productVariantId || null,
+                  variant: item.variant || null,
+                  images: item.images || [],
+                }));
+                router.push(`/checkout?selectedItems=${encodeURIComponent(JSON.stringify(selectedItemsPayload))}`);
+              }}
+            >
+              Proceed to Checkout ({selectedItems.length})
+              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
 
             <div className="mt-6 text-center">

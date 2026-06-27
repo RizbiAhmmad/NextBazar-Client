@@ -97,12 +97,14 @@ export async function removeFromCart(
     if (!headers)
       return { success: false, message: "Unauthorized", code: "UNAUTHORIZED" };
 
-    const body = productVariantId ? { productVariantId } : {};
+    let url = `${BASE_API_URL}/cart/remove/${productId}`;
+    if (productVariantId) {
+      url += `?productVariantId=${productVariantId}`;
+    }
 
-    const res = await fetch(`${BASE_API_URL}/cart/remove/${productId}`, {
+    const res = await fetch(url, {
       method: "DELETE",
       headers,
-      body: Object.keys(body).length ? JSON.stringify(body) : undefined,
     });
 
     const result = await res.json();

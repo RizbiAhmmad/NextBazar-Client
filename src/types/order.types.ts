@@ -29,6 +29,7 @@ export interface IOrder {
   orderStatus: OrderStatus;
   paymentStatus: PaymentStatus;
   discountAmount: number;
+  shippingFee: number;
   couponId?: string | null;
   createdAt: string;
   updatedAt: string;
