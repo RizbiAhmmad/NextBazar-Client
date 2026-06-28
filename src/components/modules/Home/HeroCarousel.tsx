@@ -4,34 +4,39 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const slides = [
-  {
-    id: 1,
-    image: "/Organic.jpg",
-  },
-  {
-    id: 2,
-    image: "/Electronics.jpg",
-  },
-  {
-    id: 3,
-    image: "/Fashion.jpg",
-  },
-  {
-    id: 4,
-    image: "/cosmetics.jpg",
-  },
-];
+import { getHeroSliders } from "@/services/heroSlider.services";
 
 export default function HeroCarousel() {
+  const [slides, setSlides] = useState<any[]>([]);
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
+    const fetchSliders = async () => {
+      try {
+        const data = await getHeroSliders();
+        if (data && data.length > 0) {
+          setSlides(data);
+        }
+      } catch (error) {
+        console.error("Failed to load hero sliders:", error);
+      }
+    };
+    fetchSliders();
+  }, []);
+
+  useEffect(() => {
+    if (slides.length === 0) return;
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % slides.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [slides]);
+
+  if (slides.length === 0) {
+    return (
+      <div className="relative h-[250px] w-full overflow-hidden rounded-2xl md:h-[400px] lg:h-[500px] bg-muted animate-pulse"></div>
+    );
+  }
 
   return (
     <section className="relative w-full aspect-[2/1] md:aspect-[3/1] lg:aspect-[3.5/1] overflow-hidden rounded-2xl">

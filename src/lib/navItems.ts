@@ -112,6 +112,11 @@ export const adminNavItems: NavSection[] = [
         icon: "Settings",
       },
       {
+        title: "Hero Sliders",
+        href: "/admin/dashboard/hero-sliders",
+        icon: "Images",
+      },
+      {
         title: "Shops",
         href: "/admin/dashboard/shops",
         icon: "Store",

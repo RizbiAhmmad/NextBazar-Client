@@ -4,7 +4,7 @@ import {
   createAttributeAction,
   updateAttributeAction,
   deleteAttributeAction,
-} from "./_action";
+} from "../../../admin/dashboard/attributes/_action";
 
 export const metadata: Metadata = {
   title: "Attribute Management | Seller Dashboard",
