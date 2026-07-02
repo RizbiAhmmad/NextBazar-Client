@@ -13,12 +13,6 @@ import {
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { logoutUser } from "@/services/auth.services";
@@ -31,14 +25,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
 import {
   Sheet,
   SheetContent,
@@ -56,14 +42,7 @@ import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { useCart } from "@/providers/CartProvider";
 import { useWishlist } from "@/providers/WishlistProvider";
-
-interface MenuItem {
-  title: string;
-  url: string;
-  description?: string;
-  icon?: React.ReactNode;
-  items?: MenuItem[];
-}
+import { CategoryMenu } from "./CategoryMenu";
 
 interface NavbarProps {
   className?: string;
@@ -75,14 +54,6 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
   const router = useRouter();
   const { cartCount } = useCart();
   const { wishlistCount, wishlistItems, removeFromWishlist } = useWishlist();
-
-  const menu: MenuItem[] = [
-    { title: "Home", url: "/" },
-    { title: "Products", url: "/products" },
-    { title: "Blogs", url: "/blogs" },
-    { title: "About", url: "/about" },
-    { title: "Contact", url: "/contact" },
-  ];
 
   const dashboardRoute = userInfo
     ? getDefaultDashboardRoute(userInfo.role)
@@ -125,23 +96,14 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
             </Link>
           </div>
 
-          {/* Center: Menu Items */}
-          <div className="flex-1 px-8">
-            <NavigationMenu className="mx-auto">
-              <NavigationMenuList className="gap-1">
-                {menu.map((item) => renderMenuItem(item, pathname))}
-              </NavigationMenuList>
-            </NavigationMenu>
-          </div>
-
-          {/* Right: Actions */}
-          <div className="flex items-center gap-2">
-            <div className="flex items-center border-r pr-4 mr-2 gap-1.5">
-              <div className="relative group hidden sm:block">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+          {/* Center: Search Bar */}
+          <div className="flex-1 px-4 lg:px-8 max-w-2xl mx-auto hidden sm:block">
+            <div className="flex items-center h-10 rounded-full border border-primary/20 bg-background transition-all group overflow-visible shadow-sm hover:border-primary/40 focus-within:border-primary/60">
+              <CategoryMenu />
+              <div className="relative flex-1">
                 <Input
-                  placeholder="Search products..."
-                  className="pl-10 h-10 w-[200px] xl:w-[300px] rounded-full bg-muted/50 border-none focus-visible:ring-primary transition-all"
+                  placeholder="Search Products by Titles or Tags"
+                  className="pl-4 pr-10 h-10 w-full rounded-r-full rounded-l-none bg-transparent border-none focus-visible:ring-0 shadow-none text-sm placeholder:text-muted-foreground/70"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       const val = (e.target as HTMLInputElement).value;
@@ -149,7 +111,14 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
                     }
                   }}
                 />
+                <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
               </div>
+            </div>
+          </div>
+
+          {/* Right: Actions */}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center border-r pr-4 mr-2 gap-2">
               <Sheet>
                 <SheetTrigger asChild>
                   <Button
@@ -395,13 +364,6 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
                   </SheetHeader>
 
                   <div className="flex-1 overflow-y-auto py-6">
-                    <Accordion
-                      type="single"
-                      collapsible
-                      className="w-full px-4"
-                    >
-                      {menu.map((item) => renderMobileMenuItem(item, pathname))}
-                    </Accordion>
                   </div>
 
                   <div className="p-6 border-t bg-muted/30">
@@ -491,139 +453,6 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
         </div>
       </div>
     </section>
-  );
-};
-
-const renderMenuItem = (item: MenuItem, currentPath: string) => {
-  const isActive = currentPath === item.url;
-
-  if (item.items) {
-    return (
-      <NavigationMenuItem key={item.title}>
-        <NavigationMenuTrigger
-          className={cn(
-            "bg-transparent h-10 px-4 font-semibold transition-colors hover:bg-primary/5 hover:text-primary data-[state=open]:bg-primary/5",
-            isActive && "text-primary",
-          )}
-        >
-          {item.title}
-        </NavigationMenuTrigger>
-        <NavigationMenuContent>
-          <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] bg-background border rounded-2xl shadow-2xl">
-            {item.items.map((subItem) => (
-              <li key={subItem.title}>
-                <NavigationMenuLink asChild>
-                  <SubMenuLink item={subItem} />
-                </NavigationMenuLink>
-              </li>
-            ))}
-          </ul>
-        </NavigationMenuContent>
-      </NavigationMenuItem>
-    );
-  }
-
-  return (
-    <NavigationMenuItem key={item.title}>
-      <NavigationMenuLink asChild>
-        <Link
-          href={item.url}
-          className={cn(
-            "relative group inline-flex h-10 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-semibold transition-colors hover:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50",
-            isActive ? "text-primary" : "text-foreground/70",
-          )}
-        >
-          {item.title}
-          {isActive && (
-            <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full" />
-          )}
-        </Link>
-      </NavigationMenuLink>
-    </NavigationMenuItem>
-  );
-};
-
-const renderMobileMenuItem = (item: MenuItem, currentPath: string) => {
-  const isActive = currentPath === item.url;
-
-  if (item.items) {
-    return (
-      <AccordionItem
-        key={item.title}
-        value={item.title}
-        className="border-none"
-      >
-        <AccordionTrigger
-          className={cn(
-            "text-base py-4 font-bold hover:no-underline px-4 rounded-xl transition-all",
-            isActive ? "bg-primary/5 text-primary" : "hover:bg-muted/50",
-          )}
-        >
-          <span className="flex items-center gap-3">{item.title}</span>
-        </AccordionTrigger>
-        <AccordionContent className="pb-2 px-2 pt-1">
-          <div className="flex flex-col gap-1">
-            {item.items.map((subItem) => (
-              <Link
-                key={subItem.title}
-                href={subItem.url}
-                className="flex items-center gap-4 rounded-xl p-3 text-sm transition-all hover:bg-primary/5 group"
-              >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-muted group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                  {subItem.icon}
-                </div>
-                <div>
-                  <div className="font-bold text-foreground group-hover:text-primary transition-colors">
-                    {subItem.title}
-                  </div>
-                  <div className="text-[11px] font-medium text-muted-foreground line-clamp-1">
-                    {subItem.description}
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </AccordionContent>
-      </AccordionItem>
-    );
-  }
-
-  return (
-    <Link
-      key={item.title}
-      href={item.url}
-      className={cn(
-        "flex items-center py-4 px-4 text-base font-bold rounded-xl transition-all mb-1",
-        isActive
-          ? "bg-primary/10 text-primary"
-          : "text-foreground/80 hover:bg-muted/50 hover:text-primary",
-      )}
-    >
-      {item.title}
-    </Link>
-  );
-};
-
-const SubMenuLink = ({ item }: { item: MenuItem }) => {
-  return (
-    <Link
-      className="group flex flex-row items-center gap-4 rounded-xl p-3.5 leading-none no-underline transition-all outline-none select-none hover:bg-primary/5"
-      href={item.url}
-    >
-      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-        {item.icon}
-      </div>
-      <div className="flex-1">
-        <div className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
-          {item.title}
-        </div>
-        {item.description && (
-          <p className="mt-1.5 text-[11px] font-medium leading-relaxed text-muted-foreground line-clamp-2">
-            {item.description}
-          </p>
-        )}
-      </div>
-    </Link>
   );
 };
 
