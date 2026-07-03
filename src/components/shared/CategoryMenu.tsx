@@ -18,12 +18,19 @@ export const CategoryMenu = () => {
       try {
         const res = await getAllCategories();
         if (res && res.data) {
-          const allCats = res.data;
+          const allCats = res.data.filter(c => c.isActive !== false);
           
           const hasNested = allCats.some(c => c.subcategories && c.subcategories.length > 0);
           
           if (hasNested) {
-             setCategories(allCats.filter(c => !c.parentId));
+             setCategories(
+               allCats
+                 .filter(c => !c.parentId)
+                 .map(c => ({
+                   ...c,
+                   subcategories: c.subcategories?.filter(sub => sub.isActive !== false) || []
+                 }))
+             );
           } else {
              const map = new Map<string, ICategory>();
              allCats.forEach(c => map.set(c.id, { ...c, subcategories: [] }));
@@ -66,9 +73,11 @@ export const CategoryMenu = () => {
             {/* Left Panel */}
             <div className="w-[260px] border-r py-2 overflow-y-auto max-h-[500px] bg-muted/20">
               {categories.map((cat, idx) => (
-                <div
+                <Link
                   key={cat.id || idx}
+                  href={`/products?categoryId=${cat.id}`}
                   onMouseEnter={() => setActiveCategory(cat)}
+                  onClick={() => setIsOpen(false)}
                   className={cn(
                     "flex cursor-pointer items-center justify-between px-4 py-3 transition-colors hover:bg-background text-foreground/80 hover:text-foreground",
                     activeCategory?.id === cat.id && "bg-background text-foreground font-medium shadow-sm border-l-2 border-primary"
@@ -94,7 +103,7 @@ export const CategoryMenu = () => {
                   {(cat.subcategories && cat.subcategories.length > 0) && (
                     <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
                   )}
-                </div>
+                </Link>
               ))}
               {categories.length === 0 && (
                 <div className="px-4 py-3 text-sm text-muted-foreground">Loading categories...</div>
@@ -113,7 +122,8 @@ export const CategoryMenu = () => {
                       {activeCategory.subcategories.map((sub, idx) => (
                         <Link
                           key={sub.id || idx}
-                          href={`/products?category=${sub.slug}`}
+                          href={`/products?categoryId=${sub.id}`}
+                          onClick={() => setIsOpen(false)}
                           className="text-sm text-foreground/70 hover:text-primary transition-colors"
                         >
                           {sub.name}

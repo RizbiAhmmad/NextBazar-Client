@@ -43,6 +43,7 @@ interface EditCategoryFormModalProps {
 const getInitialValues = (category: ICategory | null) => ({
   name: category?.name || "",
   parentId: category?.parentId || "none",
+  isActive: category?.isActive !== undefined ? String(category.isActive) : "true",
 });
 
 const EditCategoryFormModal = ({
@@ -77,6 +78,7 @@ const EditCategoryFormModal = ({
       const data = {
         name: value.name,
         parentId: value.parentId === "none" ? null : value.parentId,
+        isActive: value.isActive === "true",
       };
 
       formData.append("data", JSON.stringify(data));
@@ -185,6 +187,26 @@ const EditCategoryFormModal = ({
                                 {c.name}
                               </SelectItem>
                             ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="isActive">
+                  {(field) => (
+                    <div className="space-y-1.5">
+                      <Label>Status</Label>
+                      <Select
+                        value={field.state.value}
+                        onValueChange={field.handleChange}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="true">Active</SelectItem>
+                          <SelectItem value="false">Inactive</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

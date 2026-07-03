@@ -16,7 +16,7 @@ export default function CategorySection() {
     staleTime: 10 * 60 * 1000, // cache for 10 minutes
   });
 
-  const categories = data?.data || [];
+  const categories = data?.data?.filter((c: any) => c.isActive !== false) || [];
 
   return (
     <section className="py-8 bg-slate-50/50 rounded-[3rem] px-6 my-8">
