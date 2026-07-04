@@ -125,6 +125,18 @@ export default function ViewOrderDialog({
                     <p className="text-xs text-muted-foreground">
                       Quantity: {item.quantity}
                     </p>
+                    {item.productVariant?.combination && (
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {item.productVariant.combination.split("-").map((attr, i) => (
+                          <span
+                            key={i}
+                            className="inline-block rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground"
+                          >
+                            {attr}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className="text-right flex flex-col items-end gap-1">
                     <p className="font-black text-sm">

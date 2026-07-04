@@ -7,6 +7,7 @@ export interface IOrderItem {
   id: string;
   orderId: string;
   productId: string;
+  productVariantId?: string | null;
   quantity: number;
   price: number;
   shopId: string;
@@ -15,6 +16,10 @@ export interface IOrderItem {
     name: string;
     images: string[];
   };
+  productVariant?: {
+    id: string;
+    combination: string;
+  } | null;
 }
 
 export interface IOrder {
