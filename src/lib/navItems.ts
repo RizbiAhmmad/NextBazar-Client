@@ -84,6 +84,11 @@ export const sellerNavItems: NavSection[] = [
         icon: "Sliders",
       },
       {
+        title: "POS",
+        href: "/seller/dashboard/pos",
+        icon: "ShoppingCart",
+      },
+      {
         title: "Coupons",
         href: "/seller/dashboard/coupons",
         icon: "Ticket",
