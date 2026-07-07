@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag, Tag, Percent } from "lucide-react";
 import { updatePosCartItemQuantity, removePosCartItem, clearPosCart } from "@/services/pos.services";
 import { toast } from "sonner";
 import PosCheckoutModal from "./PosCheckoutModal";
@@ -11,7 +11,30 @@ export default function PosCartSidebar({ cartItems, refreshCart }: { cartItems: 
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
+  // Discount state
+  const [discountType, setDiscountType] = useState<"flat" | "percentage">("flat");
+  const [discountValue, setDiscountValue] = useState<number | "">("");
+
+  // VAT state
+  const [vatPercent, setVatPercent] = useState<number | "">("");
+
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+  // Calculate discount amount
+  const discountAmount = discountValue === "" ? 0
+    : discountType === "percentage"
+    ? (subtotal * Number(discountValue)) / 100
+    : Number(discountValue);
+
+  const discountCapped = Math.min(discountAmount, subtotal);
+  const afterDiscount = Math.max(0, subtotal - discountCapped);
+
+  // Calculate VAT on discounted amount
+  const vatAmount = vatPercent === "" ? 0 : (afterDiscount * Number(vatPercent)) / 100;
+
+  const total = afterDiscount + vatAmount;
+
+  const fmt = (v: number) => v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const handleUpdateQuantity = async (id: string, currentQty: number, delta: number) => {
     const newQty = currentQty + delta;
@@ -94,7 +117,7 @@ export default function PosCartSidebar({ cartItems, refreshCart }: { cartItems: 
                   )}
                 </div>
                 <div className="flex justify-between items-end mt-2">
-                  <span className="font-bold text-primary">${(item.price * item.quantity).toFixed(2)}</span>
+                  <span className="font-bold text-primary">৳{fmt(item.price * item.quantity)}</span>
 
                   {/* Qty Controls */}
                   <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-1 border border-gray-100">
@@ -131,41 +154,93 @@ export default function PosCartSidebar({ cartItems, refreshCart }: { cartItems: 
       </div>
 
       {/* Summary Footer */}
-      <div className="p-4 bg-gray-50 border-t border-gray-100 space-y-3">
-        <div className="flex justify-between text-sm text-gray-600">
-          <span>Subtotal</span>
-          <span className="font-medium text-gray-900">${subtotal.toFixed(2)}</span>
-        </div>
-        <div className="flex justify-between text-sm text-gray-600">
-          <span>Tax</span>
-          <span className="font-medium text-gray-900">$0.00</span>
-        </div>
-        <div className="flex justify-between text-sm text-gray-600">
-          <span>Discount</span>
-          <span className="font-medium text-green-600">-$0.00</span>
-        </div>
-        <div className="pt-3 border-t border-dashed border-gray-200 flex justify-between items-center">
-          <span className="font-bold text-gray-800">Total</span>
-          <span className="text-2xl font-black text-primary">${subtotal.toFixed(2)}</span>
-        </div>
+      {cartItems.length > 0 && (
+        <div className="p-4 bg-gray-50 border-t border-gray-100 space-y-3">
 
-        <button
-          onClick={() => setIsCheckoutOpen(true)}
-          disabled={cartItems.length === 0}
-          className="w-full py-3.5 mt-2 bg-primary text-white rounded-xl font-bold shadow-md shadow-primary/20 hover:bg-primary-dark hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none"
-        >
-          Proceed to Pay
-        </button>
-      </div>
+          {/* Discount Row */}
+          <div className="flex items-center gap-2">
+            <Tag className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <select
+              value={discountType}
+              onChange={(e) => setDiscountType(e.target.value as "flat" | "percentage")}
+              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-primary flex-shrink-0"
+            >
+              <option value="flat">৳ Fixed</option>
+              <option value="percentage">% Off</option>
+            </select>
+            <input
+              type="number"
+              min={0}
+              max={discountType === "percentage" ? 100 : subtotal}
+              value={discountValue}
+              onChange={(e) => setDiscountValue(e.target.value === "" ? "" : Number(e.target.value))}
+              placeholder="Discount"
+              className="flex-1 text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-primary w-0"
+            />
+          </div>
+
+          {/* VAT Row */}
+          <div className="flex items-center gap-2">
+            <Percent className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <span className="text-xs text-gray-500 flex-shrink-0">VAT %</span>
+            <input
+              type="number"
+              min={0}
+              max={100}
+              value={vatPercent}
+              onChange={(e) => setVatPercent(e.target.value === "" ? "" : Number(e.target.value))}
+              placeholder="e.g. 5"
+              className="flex-1 text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-primary w-0"
+            />
+          </div>
+
+          {/* Summary Lines */}
+          <div className="pt-2 space-y-1.5">
+            <div className="flex justify-between text-sm text-gray-600">
+              <span>Subtotal</span>
+              <span className="font-medium text-gray-900">৳{fmt(subtotal)}</span>
+            </div>
+            {discountCapped > 0 && (
+              <div className="flex justify-between text-sm text-green-600">
+                <span>Discount {discountType === "percentage" ? `(${discountValue}%)` : ""}</span>
+                <span className="font-medium">-৳{fmt(discountCapped)}</span>
+              </div>
+            )}
+            {vatAmount > 0 && (
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>VAT ({vatPercent}%)</span>
+                <span className="font-medium text-gray-900">+৳{fmt(vatAmount)}</span>
+              </div>
+            )}
+            <div className="pt-2 border-t border-dashed border-gray-200 flex justify-between items-center">
+              <span className="font-bold text-gray-800">Total</span>
+              <span className="text-2xl font-black text-primary">৳{fmt(total)}</span>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setIsCheckoutOpen(true)}
+            disabled={cartItems.length === 0}
+            className="w-full py-3.5 mt-1 bg-primary text-white rounded-xl font-bold shadow-md shadow-primary/20 hover:bg-primary-dark hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none"
+          >
+            Proceed to Pay
+          </button>
+        </div>
+      )}
 
       {/* Checkout Modal */}
       {isCheckoutOpen && (
         <PosCheckoutModal
           subtotal={subtotal}
+          discount={discountCapped}
+          vatAmount={vatAmount}
+          total={total}
           cartItems={cartItems}
           onClose={() => setIsCheckoutOpen(false)}
           onSuccess={() => {
             setIsCheckoutOpen(false);
+            setDiscountValue("");
+            setVatPercent("");
             refreshCart();
           }}
         />
