@@ -89,6 +89,11 @@ export const sellerNavItems: NavSection[] = [
         icon: "ShoppingCart",
       },
       {
+        title: "POS Orders",
+        href: "/seller/dashboard/pos-orders",
+        icon: "Receipt",
+      },
+      {
         title: "Coupons",
         href: "/seller/dashboard/coupons",
         icon: "Ticket",

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -34,12 +35,12 @@ export default function HeroCarousel() {
 
   if (slides.length === 0) {
     return (
-      <div className="relative h-[250px] w-full overflow-hidden rounded-2xl md:h-[400px] lg:h-[500px] bg-muted animate-pulse"></div>
+      <div className="relative h-62.5 w-full overflow-hidden rounded-2xl md:h-100 lg:h-125 bg-muted animate-pulse"></div>
     );
   }
 
   return (
-    <section className="relative w-full aspect-[2/1] md:aspect-[3/1] lg:aspect-[3.5/1] overflow-hidden rounded-2xl">
+    <section className="relative w-full aspect-2/1 md:aspect-3/1 lg:aspect-3.5/1 overflow-hidden rounded-2xl">
       <div
         className="flex h-full transition-transform duration-700"
         style={{ transform: `translateX(-${current * 100}%)` }}

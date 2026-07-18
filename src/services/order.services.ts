@@ -148,12 +148,13 @@ export async function deleteOrder(id: string) {
   }
 }
 
-export async function getVendorOrders() {
+export async function getVendorOrders(orderType?: "ONLINE" | "POS") {
   try {
     const headers = await getAuthHeaders();
     if (!headers) return { success: false, message: "Unauthorized" };
 
-    const res = await fetch(`${BASE_API_URL}/orders/vendor-orders`, {
+    const query = orderType ? `?orderType=${orderType}` : "";
+    const res = await fetch(`${BASE_API_URL}/orders/vendor-orders${query}`, {
       method: "GET",
       headers,
       next: { tags: ["orders"] },

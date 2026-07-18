@@ -12,7 +12,7 @@ import { sellerOrderColumns } from "./sellerOrderColumns";
 import UpdateItemStatusModal from "./UpdateItemStatusModal";
 import ViewOrderDialog from "../../Admin/Order/ViewOrderDialog";
 
-const SellerOrderTable = () => {
+const SellerOrderTable = ({ orderType }: { orderType: "ONLINE" | "POS" }) => {
   const searchParams = useSearchParams();
   const {
     viewingItem,
@@ -41,8 +41,8 @@ const SellerOrderTable = () => {
     isLoading,
     isFetching,
   } = useQuery({
-    queryKey: ["vendor-orders", searchTermFromUrl],
-    queryFn: () => getVendorOrders(),
+    queryKey: ["vendor-orders", orderType, searchTermFromUrl],
+    queryFn: () => getVendorOrders(orderType),
   });
 
   const orderItemList = orderResponse?.data ?? [];
@@ -62,7 +62,11 @@ const SellerOrderTable = () => {
         data={orderItemList}
         columns={sellerOrderColumns}
         isLoading={isLoading || isFetching}
-        emptyMessage="No orders found for your products."
+        emptyMessage={
+          orderType === "POS"
+            ? "No POS orders found yet."
+            : "No online orders found for your products."
+        }
         search={{
           initialValue: searchTermFromUrl,
           placeholder: "Search ordered products...",
