@@ -4,6 +4,7 @@
 import { updateProductAction } from "@/app/(dashboardLayout)/seller/dashboard/products/_action";
 import AppField from "@/components/shared/form/AppField";
 import AppSubmitButton from "@/components/shared/form/AppSubmitButton";
+import RichTextEditor from "@/components/shared/form/RichTextEditor";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,7 +25,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { getAllCategories } from "@/services/category.services";
@@ -417,25 +417,25 @@ export default function EditProductFormModal({
                 <div className="md:col-span-2">
                   <form.Field name="shortDescription">
                     {(field) => (
-                      <AppField field={field} label="Short Description *" placeholder="Brief summary of the product" />
+                      <RichTextEditor
+                        field={field}
+                        label="Short Description *"
+                        placeholder="Brief summary of the product"
+                        minHeight="90px"
+                      />
                     )}
                   </form.Field>
                 </div>
 
-                <div className="md:col-span-2 space-y-2">
+                <div className="md:col-span-2">
                   <form.Field name="description">
                     {(field) => (
-                      <>
-                        <Label htmlFor={field.name}>Full Description *</Label>
-                        <Textarea
-                          id={field.name}
-                          value={field.state.value}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          onBlur={field.handleBlur}
-                          placeholder="Detailed description of your product..."
-                          className="min-h-[120px] bg-background/50 focus-visible:ring-primary/20"
-                        />
-                      </>
+                      <RichTextEditor
+                        field={field}
+                        label="Full Description *"
+                        placeholder="Detailed description of your product..."
+                        minHeight="180px"
+                      />
                     )}
                   </form.Field>
                 </div>

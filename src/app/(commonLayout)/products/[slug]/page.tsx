@@ -1,5 +1,6 @@
 import ProductDetails from "@/components/modules/Product/ProductDetails";
 import { getProductBySlug } from "@/services/product.services";
+import { stripHtml } from "@/lib/utils";
 import { Metadata } from "next";
 
 interface Props {
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     return {
       title: `${product.name} | NextBazar`,
-      description: product.shortDescription,
+      description: stripHtml(product.shortDescription),
     };
   } catch (error) {
     return { title: "Product | NextBazar" };

@@ -10,7 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -31,6 +30,7 @@ import { getAllCategories } from "@/services/category.services";
 import { getMyShop } from "@/services/shop.services";
 import { createProductSchema } from "@/zod/product.validation";
 import AppField from "@/components/shared/form/AppField";
+import RichTextEditor from "@/components/shared/form/RichTextEditor";
 import { generateAIProductData } from "@/services/ai.services";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -444,30 +444,25 @@ export default function AddProductForm() {
             <div className="md:col-span-2">
               <form.Field name="shortDescription">
                 {(field) => (
-                  <AppField field={field} label="Short Description *" placeholder="Brief summary of the product" />
+                  <RichTextEditor
+                    field={field}
+                    label="Short Description *"
+                    placeholder="Brief summary of the product"
+                    minHeight="90px"
+                  />
                 )}
               </form.Field>
             </div>
 
-            <div className="md:col-span-2 space-y-2">
+            <div className="md:col-span-2">
               <form.Field name="description">
                 {(field) => (
-                  <>
-                    <Label htmlFor={field.name}>Full Description *</Label>
-                    <Textarea
-                      id={field.name}
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      onBlur={field.handleBlur}
-                      placeholder="Detailed description of your product..."
-                      className="min-h-[120px] bg-background/50 focus-visible:ring-primary/20"
-                    />
-                    {field.state.meta.errors && field.state.meta.isTouched && (
-                      <p className="text-sm text-destructive mt-1">
-                        {field.state.meta.errors.join(", ")}
-                      </p>
-                    )}
-                  </>
+                  <RichTextEditor
+                    field={field}
+                    label="Full Description *"
+                    placeholder="Detailed description of your product..."
+                    minHeight="180px"
+                  />
                 )}
               </form.Field>
             </div>

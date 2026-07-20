@@ -198,9 +198,11 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
               )}
             </div>
 
-            <p className="text-lg text-slate-600 mb-8 leading-relaxed">
-              {product.shortDescription}
-            </p>
+            <div
+              className="text-lg text-slate-600 mb-8 leading-relaxed [&>p]:mb-2 [&>ul]:list-disc [&>ul]:pl-5 [&>ol]:list-decimal [&>ol]:pl-5 [&>strong]:font-bold [&>a]:text-primary [&>a]:underline"
+              dangerouslySetInnerHTML={{ __html: product.shortDescription }}
+            />
+
 
             {/* Variable Product Options */}
             {product.type === "VARIABLE" && product.attributes && (

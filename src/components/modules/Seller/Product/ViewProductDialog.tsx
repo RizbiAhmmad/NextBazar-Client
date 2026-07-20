@@ -123,9 +123,14 @@ const ViewProductDialog = ({
                   
                   <div className="space-y-2">
                     <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Description</h3>
-                    <p className="text-sm text-foreground/80">
-                      {product.shortDescription || "No description provided."}
-                    </p>
+                    {product.shortDescription ? (
+                      <div
+                        className="text-sm text-foreground/80 [&>p]:mb-1 [&>ul]:list-disc [&>ul]:pl-5 [&>ol]:list-decimal [&>ol]:pl-5 [&>strong]:font-bold"
+                        dangerouslySetInnerHTML={{ __html: product.shortDescription }}
+                      />
+                    ) : (
+                      <p className="text-sm text-foreground/80">No description provided.</p>
+                    )}
                   </div>
 
                   <div className="space-y-2 pt-4 border-t">

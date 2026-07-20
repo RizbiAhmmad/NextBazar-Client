@@ -33,7 +33,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { cn } from "@/lib/utils";
+import { cn, stripHtml } from "@/lib/utils";
 import { UserInfo } from "@/types/user.types";
 import { getDefaultDashboardRoute, getProfileRoute } from "@/lib/authUtils";
 
@@ -170,7 +170,7 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
                             <div className="flex-1 flex flex-col justify-between">
                               <div>
                                 <h4 className="font-semibold text-sm line-clamp-2 cursor-pointer hover:text-primary" onClick={() => router.push(`/products/${item.slug}`)}>{item.name}</h4>
-                                <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{item.shortDescription}</p>
+                                <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{stripHtml(item.shortDescription)}</p>
                               </div>
                               <div className="flex items-center justify-between mt-2">
                                 <span className="font-bold text-primary">${item.sellPrice?.toFixed(2)}</span>

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Metadata } from "next";
 import Link from "next/link";
 import { Plus } from "lucide-react";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "My Products | Seller Dashboard",
@@ -45,7 +46,9 @@ export default async function SellerProductsPage({
       </div>
 
       <div className="h-full flex-1 flex-col space-y-8 md:flex mt-6">
-        <ProductTable initialQueryString={initialQueryString} />
+        <Suspense fallback={<div>Loading products...</div>}>
+          <ProductTable initialQueryString={initialQueryString} />
+        </Suspense>
       </div>
     </div>
   );
