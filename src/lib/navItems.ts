@@ -74,6 +74,11 @@ export const sellerNavItems: NavSection[] = [
         icon: "Package",
       },
       {
+        title: "Landing Pages",
+        href: "/seller/dashboard/landing-pages",
+        icon: "Rocket",
+      },
+      {
         title: "Orders",
         href: "/seller/dashboard/orders",
         icon: "ShoppingCart",

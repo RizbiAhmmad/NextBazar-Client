@@ -57,7 +57,7 @@ const Navbar = ({ userInfo, className, siteSettings }: NavbarProps) => {
   const { cartCount } = useCart();
   const { wishlistCount, wishlistItems, removeFromWishlist } = useWishlist();
   const siteName = siteSettings?.siteName || "NextBazar";
-  const tagline = siteSettings?.tagline || "E-commerce";
+  const tagline = siteSettings?.tagline;
   const logo = siteSettings?.logo;
 
   const dashboardRoute = userInfo
@@ -98,9 +98,11 @@ const Navbar = ({ userInfo, className, siteSettings }: NavbarProps) => {
                 <span className="text-xl font-black tracking-tight leading-none text-foreground">
                   {siteName}
                 </span>
-                <span className="text-[10px] font-medium tracking-[0.2em] uppercase text-muted-foreground">
-                  {tagline}
-                </span>
+                {tagline && (
+                  <span className="text-[10px] font-medium tracking-[0.2em] uppercase text-muted-foreground">
+                    {tagline}
+                  </span>
+                )}
               </div>
             </Link>
           </div>

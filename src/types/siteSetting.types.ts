@@ -1,7 +1,7 @@
 export interface ISiteSetting {
   id: string;
   siteName: string;
-  tagline: string;
+  tagline: string | null;
   description: string;
   logo: string | null;
   phone: string | null;
