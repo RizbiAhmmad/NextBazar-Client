@@ -117,6 +117,11 @@ export const adminNavItems: NavSection[] = [
     title: "Marketplace",
     items: [
       {
+        title: "Site Settings",
+        href: "/admin/dashboard/site-settings",
+        icon: "Building2",
+      },
+      {
         title: "Shipping Settings",
         href: "/admin/dashboard/shipping-settings",
         icon: "Settings",

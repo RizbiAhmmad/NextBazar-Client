@@ -1,15 +1,23 @@
 import { Mail, Phone, ArrowRight, Send, ShoppingBag } from "lucide-react";
 import {
   FaFacebook,
-  FaTwitter,
   FaInstagram,
   FaLinkedin,
+  FaYoutube,
+  FaTiktok,
+  FaWhatsapp,
   FaCcVisa,
   FaCcMastercard,
   FaCcPaypal,
   FaApplePay,
 } from "react-icons/fa";
 import Link from "next/link";
+import Image from "next/image";
+import { ISiteSetting } from "@/types/siteSetting.types";
+
+interface FooterProps {
+  siteSettings?: ISiteSetting | null;
+}
 
 const footerLinks = {
   shop: [
@@ -33,16 +41,52 @@ const footerLinks = {
   ],
 };
 
-const socialLinks = [
-  { icon: FaFacebook, href: "#", color: "hover:bg-[#1877F2]" },
-  { icon: FaTwitter, href: "#", color: "hover:bg-[#1DA1F2]" },
-  { icon: FaInstagram, href: "#", color: "hover:bg-[#E4405F]" },
-  { icon: FaLinkedin, href: "#", color: "hover:bg-[#0A66C2]" },
-];
-
 const paymentMethods = [FaCcVisa, FaCcMastercard, FaCcPaypal, FaApplePay];
 
-export default function Footer() {
+export default function Footer({ siteSettings }: FooterProps) {
+  const siteName = siteSettings?.siteName || "NextBazar";
+  const description =
+    siteSettings?.description ||
+    "Your ultimate multivendor marketplace. Discover premium products from verified sellers across the nation.";
+  const email = siteSettings?.email || "contact.rizbi123@gmail.com";
+  const phone = siteSettings?.phone || "+880 1700-000000";
+  const copyrightText = siteSettings?.copyrightText || "All rights reserved.";
+
+  const socialLinks = [
+    {
+      icon: FaFacebook,
+      href: siteSettings?.facebook,
+      color: "hover:bg-[#1877F2]",
+    },
+    {
+      icon: FaInstagram,
+      href: siteSettings?.instagram,
+      color: "hover:bg-[#E4405F]",
+    },
+    {
+      icon: FaYoutube,
+      href: siteSettings?.youtube,
+      color: "hover:bg-[#FF0000]",
+    },
+    {
+      icon: FaLinkedin,
+      href: siteSettings?.linkedin,
+      color: "hover:bg-[#0A66C2]",
+    },
+    {
+      icon: FaTiktok,
+      href: siteSettings?.tiktok,
+      color: "hover:bg-[#000000]",
+    },
+    {
+      icon: FaWhatsapp,
+      href: siteSettings?.whatsapp
+        ? `https://wa.me/${siteSettings.whatsapp.replace(/[^\d]/g, "")}`
+        : undefined,
+      color: "hover:bg-[#25D366]",
+    },
+  ].filter((social) => Boolean(social.href));
+
   return (
     <footer className="bg-[#0f172a] pt-16 pb-8 mt-10 rounded-t-[3.5rem] relative overflow-hidden border-t border-white/5">
       {/* Subtle Glow */}
@@ -53,16 +97,24 @@ export default function Footer() {
           {/* Brand & Newsletter */}
           <div className="lg:col-span-4 space-y-6">
             <Link href="/" className="flex items-center gap-2">
-              <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-                <ShoppingBag className="h-6 w-6 text-white" />
+              <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20 overflow-hidden relative">
+                {siteSettings?.logo ? (
+                  <Image
+                    src={siteSettings.logo}
+                    alt={siteName}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <ShoppingBag className="h-6 w-6 text-white" />
+                )}
               </div>
               <span className="text-xl font-black text-white tracking-tighter">
-                NextBazar
+                {siteName}
               </span>
             </Link>
             <p className="text-slate-400 text-sm font-medium leading-relaxed max-w-sm">
-              Your ultimate multivendor marketplace. Discover premium products
-              from verified sellers across the nation.
+              {description}
             </p>
             <div className="pt-2">
               <p className="text-white text-xs font-black uppercase tracking-widest mb-4">
@@ -160,10 +212,10 @@ export default function Footer() {
                     Email
                   </p>
                   <a
-                    href="mailto:contact.rizbi123@gmail.com"
+                    href={`mailto:${email}`}
                     className="text-slate-300 text-xs font-bold truncate block"
                   >
-                    contact.rizbi123@gmail.com
+                    {email}
                   </a>
                 </div>
               </div>
@@ -176,10 +228,10 @@ export default function Footer() {
                     Call Us
                   </p>
                   <a
-                    href="tel:+8801700000000"
+                    href={`tel:${phone.replace(/[^\d+]/g, "")}`}
                     className="text-slate-300 text-xs font-bold"
                   >
-                    +880 1700-000000
+                    {phone}
                   </a>
                 </div>
               </div>
@@ -188,7 +240,8 @@ export default function Footer() {
               {socialLinks.map((social, i) => (
                 <Link
                   key={i}
-                  href={social.href}
+                  href={social.href as string}
+                  target="_blank"
                   className={`w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:scale-110 transition-all duration-300 ${social.color}`}
                 >
                   <social.icon size={16} />
@@ -205,7 +258,7 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
           <div className="flex flex-col items-center md:items-start gap-1">
             <p className="text-slate-500 font-bold text-xs">
-              © {new Date().getFullYear()} Rizbi Ahmmad. All rights reserved.
+              © {new Date().getFullYear()} {siteName}. {copyrightText}
             </p>
             <p className="text-[10px] text-slate-600 font-medium">
               Built with Next.js 15 & Tailwind CSS

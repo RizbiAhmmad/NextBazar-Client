@@ -34,7 +34,7 @@ const DashboardMobileSidebar = ({
 
       {/* Navigation Area  */}
 
-      <ScrollArea className="flex-1 px-3 py-4">
+      <ScrollArea data-lenis-prevent className="flex-1 px-3 py-4">
         <nav className="space-y-1">
           {navItems.map((section, sectionId) => (
             <div key={sectionId}>

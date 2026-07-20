@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/sheet";
 import { cn, stripHtml } from "@/lib/utils";
 import { UserInfo } from "@/types/user.types";
+import { ISiteSetting } from "@/types/siteSetting.types";
 import { getDefaultDashboardRoute, getProfileRoute } from "@/lib/authUtils";
 
 import { ThemeToggle } from "./ThemeToggle";
@@ -47,13 +48,17 @@ import { CategoryMenu } from "./CategoryMenu";
 interface NavbarProps {
   className?: string;
   userInfo?: UserInfo | null;
+  siteSettings?: ISiteSetting | null;
 }
 
-const Navbar = ({ userInfo, className }: NavbarProps) => {
+const Navbar = ({ userInfo, className, siteSettings }: NavbarProps) => {
   const pathname = usePathname();
   const router = useRouter();
   const { cartCount } = useCart();
   const { wishlistCount, wishlistItems, removeFromWishlist } = useWishlist();
+  const siteName = siteSettings?.siteName || "NextBazar";
+  const tagline = siteSettings?.tagline || "E-commerce";
+  const logo = siteSettings?.logo;
 
   const dashboardRoute = userInfo
     ? getDefaultDashboardRoute(userInfo.role)
@@ -82,15 +87,19 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
           {/* Left: Logo */}
           <div className="flex items-center">
             <Link href="/" className="group flex items-center gap-2.5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20 transition-transform group-hover:scale-110">
-                <ShoppingBag className="h-6 w-6 text-primary-foreground" />
+              <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-primary shadow-lg shadow-primary/20 transition-transform group-hover:scale-110">
+                {logo ? (
+                  <Image src={logo} alt={siteName} fill className="object-cover" />
+                ) : (
+                  <ShoppingBag className="h-6 w-6 text-primary-foreground" />
+                )}
               </div>
               <div className="flex flex-col">
                 <span className="text-xl font-black tracking-tight leading-none text-foreground">
-                  Next<span className="text-primary">Bazar</span>
+                  {siteName}
                 </span>
                 <span className="text-[10px] font-medium tracking-[0.2em] uppercase text-muted-foreground">
-                  E-commerce
+                  {tagline}
                 </span>
               </div>
             </Link>
@@ -316,11 +325,15 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
         <div className="flex h-16 items-center justify-between lg:hidden">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <ShoppingBag className="h-5 w-5 text-primary-foreground" />
+            <div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-primary">
+              {logo ? (
+                <Image src={logo} alt={siteName} fill className="object-cover" />
+              ) : (
+                <ShoppingBag className="h-5 w-5 text-primary-foreground" />
+              )}
             </div>
             <span className="text-lg font-black tracking-tight">
-              Next<span className="text-primary">Bazar</span>
+              {siteName}
             </span>
           </Link>
 
@@ -349,11 +362,15 @@ const Navbar = ({ userInfo, className }: NavbarProps) => {
                     <div className="flex items-center justify-between">
                       <SheetTitle>
                         <Link href="/" className="flex items-center gap-2">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                            <ShoppingBag className="h-5 w-5 text-primary-foreground" />
+                          <div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-primary">
+                            {logo ? (
+                              <Image src={logo} alt={siteName} fill className="object-cover" />
+                            ) : (
+                              <ShoppingBag className="h-5 w-5 text-primary-foreground" />
+                            )}
                           </div>
                           <span className="text-xl font-black tracking-tight">
-                            Next<span className="text-primary">Bazar</span>
+                            {siteName}
                           </span>
                         </Link>
                       </SheetTitle>
