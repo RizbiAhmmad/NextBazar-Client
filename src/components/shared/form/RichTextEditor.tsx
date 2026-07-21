@@ -3,7 +3,7 @@
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import type { AnyFieldApi } from "@tanstack/react-form";
-import { EditorContent, useEditor } from "@tiptap/react";
+import { Editor, EditorContent, useEditor } from "@tiptap/react";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import StarterKit from "@tiptap/starter-kit";
 import {
@@ -63,32 +63,17 @@ const ToolbarButton = ({
   </button>
 );
 
-type RichTextEditorProps = {
-  field: AnyFieldApi;
-  label?: string;
-  placeholder?: string;
-  className?: string;
-  minHeight?: string;
-};
-
-/**
- * Drop-in Tiptap rich text field styled to match AppField.
- * Stores/emits content as an HTML string via field.handleChange.
- */
-export default function RichTextEditor({
-  field,
-  label,
+function useRichTextEditor({
+  value,
+  onChange,
+  onBlur,
   placeholder,
-  className,
-  minHeight = "160px",
-}: RichTextEditorProps) {
-  const firstError =
-    field.state.meta.isTouched && field.state.meta.errors.length > 0
-      ? getErrorMessage(field.state.meta.errors[0])
-      : null;
-
-  const hasError = firstError !== null;
-
+}: {
+  value: string;
+  onChange: (html: string) => void;
+  onBlur?: () => void;
+  placeholder?: string;
+}) {
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -102,7 +87,7 @@ export default function RichTextEditor({
       }),
       Placeholder.configure({ placeholder: placeholder || "Write something…" }),
     ],
-    content: field.state.value || "",
+    content: value || "",
     editorProps: {
       attributes: {
         class:
@@ -110,20 +95,40 @@ export default function RichTextEditor({
       },
     },
     onUpdate: ({ editor }) => {
-      field.handleChange(editor.isEmpty ? "" : editor.getHTML());
+      onChange(editor.isEmpty ? "" : editor.getHTML());
     },
-    onBlur: () => field.handleBlur(),
+    onBlur: () => onBlur?.(),
   });
 
-  // Keep the editor in sync when the field value changes from outside
+  // Keep the editor in sync when the value changes from outside
   // (e.g. form.reset() on edit, or the AI-generate button).
   useEffect(() => {
     if (!editor) return;
-    const incoming = field.state.value || "";
+    const incoming = value || "";
     if (incoming !== editor.getHTML()) {
       editor.commands.setContent(incoming, { emitUpdate: false });
     }
-  }, [field.state.value, editor]);
+  }, [value, editor]);
+
+  return editor;
+}
+
+function RichTextEditorShell({
+  editor,
+  label,
+  htmlFor,
+  error,
+  minHeight,
+  className,
+}: {
+  editor: Editor | null;
+  label?: string;
+  htmlFor: string;
+  error?: string | null;
+  minHeight: string;
+  className?: string;
+}) {
+  const hasError = !!error;
 
   const setLink = () => {
     if (!editor) return;
@@ -140,7 +145,7 @@ export default function RichTextEditor({
   return (
     <div className={cn("space-y-1.5", className)}>
       {label && (
-        <Label htmlFor={field.name} className={cn(hasError && "text-destructive")}>
+        <Label htmlFor={htmlFor} className={cn(hasError && "text-destructive")}>
           {label}
         </Label>
       )}
@@ -255,10 +260,89 @@ export default function RichTextEditor({
       </div>
 
       {hasError && (
-        <p id={`${field.name}-error`} role="alert" className="text-sm text-destructive">
-          {firstError}
+        <p id={`${htmlFor}-error`} role="alert" className="text-sm text-destructive">
+          {error}
         </p>
       )}
     </div>
+  );
+}
+
+type RichTextEditorProps = {
+  field: AnyFieldApi;
+  label?: string;
+  placeholder?: string;
+  className?: string;
+  minHeight?: string;
+};
+
+/**
+ * Drop-in Tiptap rich text field styled to match AppField.
+ * Stores/emits content as an HTML string via field.handleChange.
+ */
+export default function RichTextEditor({
+  field,
+  label,
+  placeholder,
+  className,
+  minHeight = "160px",
+}: RichTextEditorProps) {
+  const firstError =
+    field.state.meta.isTouched && field.state.meta.errors.length > 0
+      ? getErrorMessage(field.state.meta.errors[0])
+      : null;
+
+  const editor = useRichTextEditor({
+    value: field.state.value || "",
+    onChange: field.handleChange,
+    onBlur: field.handleBlur,
+    placeholder,
+  });
+
+  return (
+    <RichTextEditorShell
+      editor={editor}
+      label={label}
+      htmlFor={field.name}
+      error={firstError}
+      minHeight={minHeight}
+      className={className}
+    />
+  );
+}
+
+type SimpleRichTextEditorProps = {
+  id: string;
+  value: string;
+  onChange: (html: string) => void;
+  label?: string;
+  placeholder?: string;
+  className?: string;
+  minHeight?: string;
+};
+
+/**
+ * Same Tiptap editor as RichTextEditor, but for plain useState-based forms
+ * (no @tanstack/react-form field required) — takes value/onChange directly.
+ */
+export function SimpleRichTextEditor({
+  id,
+  value,
+  onChange,
+  label,
+  placeholder,
+  className,
+  minHeight = "160px",
+}: SimpleRichTextEditorProps) {
+  const editor = useRichTextEditor({ value, onChange, placeholder });
+
+  return (
+    <RichTextEditorShell
+      editor={editor}
+      label={label}
+      htmlFor={id}
+      minHeight={minHeight}
+      className={className}
+    />
   );
 }

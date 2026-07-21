@@ -8,8 +8,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { SimpleRichTextEditor } from "@/components/shared/form/RichTextEditor";
 import {
   Select,
   SelectContent,
@@ -41,6 +41,8 @@ const getInitialValues = (landingPage?: ILandingPage | null): LandingPageFormVal
   productId: landingPage?.productId || "",
   campaignTitle: landingPage?.campaignTitle || "",
   campaignShortDescription: landingPage?.campaignShortDescription || "",
+  regularPriceLabel: landingPage?.regularPriceLabel || "",
+  offerPriceLabel: landingPage?.offerPriceLabel || "",
   galleryHeading: landingPage?.galleryHeading || "",
   galleryDescription: landingPage?.galleryDescription || "",
   aboutHeading: landingPage?.aboutHeading || "",
@@ -235,17 +237,38 @@ export default function LandingPageForm({ mode, landingPage }: LandingPageFormPr
           </div>
         </div>
 
+        <SimpleRichTextEditor
+          id="campaignShortDescription"
+          label="Short Description"
+          value={values.campaignShortDescription}
+          onChange={(html) =>
+            setValues((prev) => ({ ...prev, campaignShortDescription: html }))
+          }
+          placeholder="A short hook shown right under the campaign title"
+          minHeight="60px"
+        />
+
         <div className="space-y-2">
-          <Label htmlFor="campaignShortDescription">Short Description</Label>
-          <Textarea
-            id="campaignShortDescription"
-            name="campaignShortDescription"
-            value={values.campaignShortDescription}
-            onChange={handleChange}
-            placeholder="A short hook shown right under the campaign title"
-            rows={2}
-            className="rounded-xl"
-          />
+          <Label>Price Highlight Labels (Optional)</Label>
+          <p className="text-xs text-muted-foreground">
+            Shown next to the prices in the offer section — leave blank to show just the price.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Input
+              name="regularPriceLabel"
+              value={values.regularPriceLabel}
+              onChange={handleChange}
+              placeholder="যেমন: পূর্বের মূল্য / Regular Price"
+              className="h-12 rounded-xl"
+            />
+            <Input
+              name="offerPriceLabel"
+              value={values.offerPriceLabel}
+              onChange={handleChange}
+              placeholder="যেমন: অফার মূল্য / Offer Price"
+              className="h-12 rounded-xl"
+            />
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -293,28 +316,23 @@ export default function LandingPageForm({ mode, landingPage }: LandingPageFormPr
           <Images className="h-5 w-5 text-primary" />
           <h4 className="font-semibold">Gallery (Optional)</h4>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="galleryHeading">Gallery Heading</Label>
-            <Input
-              id="galleryHeading"
-              name="galleryHeading"
-              value={values.galleryHeading}
-              onChange={handleChange}
-              className="h-12 rounded-xl"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="galleryDescription">Gallery Description</Label>
-            <Input
-              id="galleryDescription"
-              name="galleryDescription"
-              value={values.galleryDescription}
-              onChange={handleChange}
-              className="h-12 rounded-xl"
-            />
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="galleryHeading">Gallery Heading</Label>
+          <Input
+            id="galleryHeading"
+            name="galleryHeading"
+            value={values.galleryHeading}
+            onChange={handleChange}
+            className="h-12 rounded-xl"
+          />
         </div>
+        <SimpleRichTextEditor
+          id="galleryDescription"
+          label="Gallery Description"
+          value={values.galleryDescription}
+          onChange={(html) => setValues((prev) => ({ ...prev, galleryDescription: html }))}
+          minHeight="60px"
+        />
 
         <ImageBucket
           existing={galleryExisting}
@@ -346,17 +364,13 @@ export default function LandingPageForm({ mode, landingPage }: LandingPageFormPr
             className="h-12 rounded-xl"
           />
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="aboutDescription">About Description</Label>
-          <Textarea
-            id="aboutDescription"
-            name="aboutDescription"
-            value={values.aboutDescription}
-            onChange={handleChange}
-            rows={3}
-            className="rounded-xl"
-          />
-        </div>
+        <SimpleRichTextEditor
+          id="aboutDescription"
+          label="About Description"
+          value={values.aboutDescription}
+          onChange={(html) => setValues((prev) => ({ ...prev, aboutDescription: html }))}
+          minHeight="100px"
+        />
         <div className="space-y-2">
           <Label htmlFor="videoUrl">Video URL (YouTube or Facebook)</Label>
           <Input
@@ -386,17 +400,13 @@ export default function LandingPageForm({ mode, landingPage }: LandingPageFormPr
             className="h-12 rounded-xl"
           />
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
-          <Textarea
-            id="description"
-            name="description"
-            value={values.description}
-            onChange={handleChange}
-            rows={4}
-            className="rounded-xl"
-          />
-        </div>
+        <SimpleRichTextEditor
+          id="description"
+          label="Description"
+          value={values.description}
+          onChange={(html) => setValues((prev) => ({ ...prev, description: html }))}
+          minHeight="140px"
+        />
       </div>
 
       {/* Reviews */}

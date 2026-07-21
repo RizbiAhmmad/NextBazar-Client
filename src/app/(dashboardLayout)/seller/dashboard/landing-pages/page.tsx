@@ -104,6 +104,7 @@ export default function LandingPagesPage() {
                     src={lp.bannerImage}
                     alt={lp.campaignTitle}
                     fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="object-cover"
                   />
                 ) : (

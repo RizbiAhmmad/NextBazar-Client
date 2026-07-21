@@ -27,6 +27,11 @@ import { ISiteSetting } from "@/types/siteSetting.types";
 import { placeLandingPageOrder } from "@/services/landingPage.services";
 import { getShippingSettings } from "@/services/shippingSetting.services";
 import { DHAKA_DISTRICTS, BANGLADESH_DISTRICTS } from "@/lib/districts";
+import ImageSlider from "./ImageSlider";
+import PriceHighlight from "./PriceHighlight";
+
+const proseClass =
+  "[&>p]:mb-2 [&>ul]:list-disc [&>ul]:pl-5 [&>ol]:list-decimal [&>ol]:pl-5 [&>strong]:font-bold [&>a]:text-primary [&>a]:underline [&>h2]:text-xl [&>h2]:font-bold [&>h2]:mb-2 [&>h3]:text-lg [&>h3]:font-bold [&>h3]:mb-2 [&>blockquote]:border-l-2 [&>blockquote]:pl-3 [&>blockquote]:italic";
 
 interface LandingPageViewProps {
   landingPage: ILandingPage;
@@ -112,8 +117,6 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
   const sellPrice = currentVariant ? currentVariant.sellPrice : product?.sellPrice ?? 0;
   const regularPrice = currentVariant ? currentVariant.regularPrice : product?.regularPrice ?? 0;
   const stock = currentVariant ? currentVariant.quantity ?? 0 : product?.stock ?? 0;
-  const discount =
-    regularPrice > sellPrice ? Math.round(((regularPrice - sellPrice) / regularPrice) * 100) : 0;
 
   const isDhaka = DHAKA_DISTRICTS.includes(district);
   const shippingFee = product?.freeShipping ? 0 : isDhaka ? shippingRates.inside : shippingRates.outside;
@@ -225,11 +228,22 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
             {landingPage.campaignTitle}
           </h1>
           {landingPage.campaignShortDescription && (
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              {landingPage.campaignShortDescription}
-            </p>
+            <div
+              className={`text-muted-foreground text-lg max-w-2xl mx-auto ${proseClass}`}
+              dangerouslySetInnerHTML={{ __html: landingPage.campaignShortDescription }}
+            />
           )}
         </div>
+
+        {/* Price highlight — shown immediately so the offer is the first thing visitors see */}
+        <PriceHighlight
+          sellPrice={sellPrice}
+          regularPrice={regularPrice}
+          buttonText={landingPage.orderButtonText}
+          onOrderClick={scrollToOrder}
+          regularPriceLabel={landingPage.regularPriceLabel}
+          offerPriceLabel={landingPage.offerPriceLabel}
+        />
 
         {/* Banner */}
         {landingPage.bannerImage && (
@@ -254,13 +268,27 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
                   <h2 className="text-2xl md:text-3xl font-black">{landingPage.galleryHeading}</h2>
                 )}
                 {landingPage.galleryDescription && (
-                  <p className="text-muted-foreground">{landingPage.galleryDescription}</p>
+                  <div
+                    className={`text-muted-foreground ${proseClass}`}
+                    dangerouslySetInnerHTML={{ __html: landingPage.galleryDescription }}
+                  />
                 )}
               </div>
             )}
-            <ImageScroller images={landingPage.galleryImages} alt="Gallery" />
+            <ImageSlider images={landingPage.galleryImages} alt="Gallery" />
           </div>
         )}
+
+        {/* Mid-page CTA */}
+        <div className="flex justify-center">
+          <Button
+            size="lg"
+            onClick={scrollToOrder}
+            className="h-12 px-8 rounded-full font-bold shadow-md"
+          >
+            {landingPage.orderButtonText}
+          </Button>
+        </div>
 
         {/* About + Video */}
         {(landingPage.aboutHeading || landingPage.aboutDescription || landingPage.videoUrl) && (
@@ -272,11 +300,10 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
             )}
             <div className="flex flex-col md:flex-row items-center gap-8">
               {landingPage.aboutDescription && (
-                <div className={landingPage.videoUrl ? "md:w-1/2" : "w-full text-center"}>
-                  <p className="text-muted-foreground text-lg leading-relaxed whitespace-pre-line">
-                    {landingPage.aboutDescription}
-                  </p>
-                </div>
+                <div
+                  className={`${landingPage.videoUrl ? "md:w-1/2" : "w-full text-center"} text-muted-foreground text-lg leading-relaxed ${proseClass}`}
+                  dangerouslySetInnerHTML={{ __html: landingPage.aboutDescription }}
+                />
               )}
               {landingPage.videoUrl && (
                 <div className="md:w-1/2 w-full aspect-video rounded-2xl overflow-hidden shadow-xl">
@@ -301,35 +328,11 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
               </h2>
             )}
             {landingPage.description && (
-              <div className="bg-card border shadow-sm rounded-2xl p-6 md:p-8 text-left">
-                <p className="whitespace-pre-line text-muted-foreground leading-relaxed">
-                  {landingPage.description}
-                </p>
-              </div>
+              <div
+                className={`bg-card border shadow-sm rounded-2xl p-6 md:p-8 text-left text-muted-foreground leading-relaxed ${proseClass}`}
+                dangerouslySetInnerHTML={{ __html: landingPage.description }}
+              />
             )}
-          </div>
-        )}
-
-        {/* Price highlight */}
-        {discount > 0 && (
-          <div className="bg-primary/5 border border-primary/10 rounded-2xl py-10 px-6 text-center space-y-4">
-            <p className="text-lg">
-              নিয়মিত মূল্য{" "}
-              <span className="line-through text-muted-foreground font-semibold">
-                ৳{regularPrice.toFixed(0)}
-              </span>
-            </p>
-            <p className="text-4xl md:text-5xl font-black text-primary">
-              ৳{sellPrice.toFixed(0)}
-              <span className="text-base font-bold text-green-600 ml-2">{discount}% ছাড়</span>
-            </p>
-            <Button
-              size="lg"
-              onClick={scrollToOrder}
-              className="h-14 px-10 rounded-full text-lg font-bold shadow-lg"
-            >
-              {landingPage.orderButtonText}
-            </Button>
           </div>
         )}
 
@@ -341,7 +344,7 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
                 {landingPage.reviewHeading}
               </h2>
             )}
-            <ImageScroller images={landingPage.reviewImages} alt="Review" />
+            <ImageSlider images={landingPage.reviewImages} alt="Review" />
           </div>
         )}
 
@@ -527,21 +530,6 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
           {landingPage.orderButtonText}
         </Button>
       </div>
-    </div>
-  );
-}
-
-function ImageScroller({ images, alt }: { images: string[]; alt: string }) {
-  return (
-    <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-hide">
-      {images.map((img, i) => (
-        <div
-          key={i}
-          className="relative shrink-0 snap-center w-64 aspect-square rounded-xl overflow-hidden border shadow-sm"
-        >
-          <Image src={img} alt={`${alt} ${i + 1}`} fill sizes="256px" className="object-cover" />
-        </div>
-      ))}
     </div>
   );
 }

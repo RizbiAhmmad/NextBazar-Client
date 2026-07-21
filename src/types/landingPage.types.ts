@@ -13,6 +13,9 @@ export interface ILandingPage {
   campaignShortDescription: string | null;
   bannerImage: string | null;
 
+  regularPriceLabel: string | null;
+  offerPriceLabel: string | null;
+
   galleryHeading: string | null;
   galleryDescription: string | null;
   galleryImages: string[];
@@ -40,6 +43,8 @@ export interface LandingPageFormValues {
   productId: string;
   campaignTitle: string;
   campaignShortDescription: string;
+  regularPriceLabel: string;
+  offerPriceLabel: string;
   galleryHeading: string;
   galleryDescription: string;
   aboutHeading: string;
