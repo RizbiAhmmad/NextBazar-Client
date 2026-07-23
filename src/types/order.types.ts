@@ -2,6 +2,7 @@ import { IUser } from "./user.types";
 
 export type OrderStatus = "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
 export type PaymentStatus = "PENDING" | "PAID" | "FAILED" | "REFUNDED";
+export type OrderType = "ONLINE" | "POS" | "LANDING_PAGE";
 
 export interface IOrderItem {
   id: string;
@@ -25,6 +26,7 @@ export interface IOrderItem {
 export interface IOrder {
   id: string;
   userId: string;
+  orderType: OrderType;
   totalAmount: number;
   fullName: string;
   phone: string;

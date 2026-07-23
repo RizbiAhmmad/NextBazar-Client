@@ -84,6 +84,11 @@ export const sellerNavItems: NavSection[] = [
         icon: "ShoppingCart",
       },
       {
+        title: "Landing Page Orders",
+        href: "/seller/dashboard/landing-page-orders",
+        icon: "Rocket",
+      },
+      {
         title: "Attributes",
         href: "/seller/dashboard/attributes",
         icon: "Sliders",
@@ -152,9 +157,19 @@ export const adminNavItems: NavSection[] = [
         icon: "Package",
       },
       {
-        title: "Orders",
+        title: "Online Orders",
         href: "/admin/dashboard/orders",
         icon: "ShoppingCart",
+      },
+      {
+        title: "POS Orders",
+        href: "/admin/dashboard/pos-orders",
+        icon: "Receipt",
+      },
+      {
+        title: "Landing Page Orders",
+        href: "/admin/dashboard/landing-page-orders",
+        icon: "Rocket",
       },
       {
         title: "Attributes",

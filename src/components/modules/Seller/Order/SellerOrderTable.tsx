@@ -12,7 +12,11 @@ import { sellerOrderColumns } from "./sellerOrderColumns";
 import UpdateItemStatusModal from "./UpdateItemStatusModal";
 import ViewOrderDialog from "../../Admin/Order/ViewOrderDialog";
 
-const SellerOrderTable = ({ orderType }: { orderType: "ONLINE" | "POS" }) => {
+const SellerOrderTable = ({
+  orderType,
+}: {
+  orderType: "ONLINE" | "POS" | "LANDING_PAGE";
+}) => {
   const searchParams = useSearchParams();
   const {
     viewingItem,
@@ -65,7 +69,9 @@ const SellerOrderTable = ({ orderType }: { orderType: "ONLINE" | "POS" }) => {
         emptyMessage={
           orderType === "POS"
             ? "No POS orders found yet."
-            : "No online orders found for your products."
+            : orderType === "LANDING_PAGE"
+              ? "No landing page orders found yet."
+              : "No online orders found for your products."
         }
         search={{
           initialValue: searchTermFromUrl,

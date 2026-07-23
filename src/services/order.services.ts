@@ -148,7 +148,9 @@ export async function deleteOrder(id: string) {
   }
 }
 
-export async function getVendorOrders(orderType?: "ONLINE" | "POS") {
+export async function getVendorOrders(
+  orderType?: "ONLINE" | "POS" | "LANDING_PAGE",
+) {
   try {
     const headers = await getAuthHeaders();
     if (!headers) return { success: false, message: "Unauthorized" };

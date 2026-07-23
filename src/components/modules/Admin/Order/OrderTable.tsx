@@ -19,8 +19,14 @@ const DEFAULT_LIMIT = 10;
 
 const OrderTable = ({
   initialQueryString,
+  orderType,
+  emptyMessage,
+  searchPlaceholder,
 }: {
   initialQueryString: string;
+  orderType?: "ONLINE" | "POS" | "LANDING_PAGE";
+  emptyMessage?: string;
+  searchPlaceholder?: string;
 }) => {
   const searchParams = useSearchParams();
   const {
@@ -63,9 +69,10 @@ const OrderTable = ({
     isLoading,
     isFetching,
   } = useQuery({
-    queryKey: ["orders", queryString],
+    queryKey: ["orders", orderType, queryString],
     queryFn: () => {
       const params = Object.fromEntries(new URLSearchParams(queryString));
+      if (orderType) params.orderType = orderType;
       return getAllOrders(params);
     },
   });
@@ -79,7 +86,7 @@ const OrderTable = ({
         data={orderList}
         columns={orderColumns}
         isLoading={isLoading || isFetching || isRouteRefreshPending}
-        emptyMessage="No orders found."
+        emptyMessage={emptyMessage || "No orders found."}
         sorting={{
           state: optimisticSortingState,
           onSortingChange: handleSortingChange,
@@ -90,7 +97,7 @@ const OrderTable = ({
         }}
         search={{
           initialValue: searchTermFromUrl,
-          placeholder: "Search orders (ID, Name, Phone)...",
+          placeholder: searchPlaceholder || "Search orders (ID, Name, Phone)...",
           debounceMs: 700,
           onDebouncedChange: handleDebouncedSearchChange,
         }}
