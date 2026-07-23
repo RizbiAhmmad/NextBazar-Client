@@ -33,10 +33,10 @@ export const orderColumns: ColumnDef<IOrder>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "id",
-    header: "Order ID",
+    accessorKey: "orderNumber",
+    header: "Order No.",
     cell: ({ row }) => (
-      <div className="font-mono text-xs uppercase">{row.getValue("id")}</div>
+      <div className="font-mono text-xs font-bold">{row.getValue("orderNumber")}</div>
     ),
   },
   {

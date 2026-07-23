@@ -34,10 +34,10 @@ export const sellerOrderColumns: ColumnDef<any>[] = [
   },
   {
     accessorKey: "orderId",
-    header: "Order ID",
+    header: "Order No.",
     cell: ({ row }) => (
-      <div className="font-mono text-[10px] uppercase truncate w-20">
-        {row.original.orderId}
+      <div className="font-mono text-[10px] font-bold truncate w-24">
+        {row.original.order?.orderNumber || row.original.orderId}
       </div>
     ),
   },

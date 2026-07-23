@@ -46,7 +46,7 @@ const SellerOrderTable = ({
     isFetching,
   } = useQuery({
     queryKey: ["vendor-orders", orderType, searchTermFromUrl],
-    queryFn: () => getVendorOrders(orderType),
+    queryFn: () => getVendorOrders(orderType, searchTermFromUrl),
   });
 
   const orderItemList = orderResponse?.data ?? [];
@@ -75,7 +75,7 @@ const SellerOrderTable = ({
         }
         search={{
           initialValue: searchTermFromUrl,
-          placeholder: "Search ordered products...",
+          placeholder: "Search by order no, name, phone...",
           onDebouncedChange: handleDebouncedSearchChange,
         }}
         actions={tableActions}

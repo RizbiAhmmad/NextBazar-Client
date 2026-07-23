@@ -127,9 +127,8 @@ export default function PosCheckoutModal({
 
     if (res?.success) {
       toast.success("Order completed successfully!");
-      const orderId: string | undefined = res.data?.id;
       setReceipt({
-        invoiceNo: orderId ? `INV-${orderId.slice(-8).toUpperCase()}` : `INV-${Date.now()}`,
+        invoiceNo: res.data?.orderNumber || res.data?.id,
         createdAt: res.data?.createdAt || new Date().toISOString(),
         customer: payload.customer,
         payment: payload.payment,

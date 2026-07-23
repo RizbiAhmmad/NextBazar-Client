@@ -150,12 +150,16 @@ export async function deleteOrder(id: string) {
 
 export async function getVendorOrders(
   orderType?: "ONLINE" | "POS" | "LANDING_PAGE",
+  searchTerm?: string,
 ) {
   try {
     const headers = await getAuthHeaders();
     if (!headers) return { success: false, message: "Unauthorized" };
 
-    const query = orderType ? `?orderType=${orderType}` : "";
+    const params = new URLSearchParams();
+    if (orderType) params.set("orderType", orderType);
+    if (searchTerm) params.set("searchTerm", searchTerm);
+    const query = params.toString() ? `?${params.toString()}` : "";
     const res = await fetch(`${BASE_API_URL}/orders/vendor-orders${query}`, {
       method: "GET",
       headers,

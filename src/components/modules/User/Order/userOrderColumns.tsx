@@ -41,11 +41,11 @@ export const userOrderColumns: ColumnDef<IOrder>[] = [
     },
   },
   {
-    accessorKey: "id",
-    header: "Order ID",
+    accessorKey: "orderNumber",
+    header: "Order No.",
     cell: ({ row }) => (
-      <div className="font-mono text-[10px] uppercase text-muted-foreground">
-        #{(row.getValue("id") as string).slice(0, 8)}...
+      <div className="font-mono text-[10px] font-bold text-muted-foreground">
+        {row.getValue("orderNumber")}
       </div>
     ),
   },

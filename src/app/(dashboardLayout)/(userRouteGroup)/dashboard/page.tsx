@@ -162,7 +162,7 @@ export default function UserDashboardPage() {
                               ))}
                           </div>
                           <p className="font-bold text-slate-800 text-sm">
-                            Order #{order.id.slice(-6).toUpperCase()}
+                            Order #{order.orderNumber || order.id.slice(-6).toUpperCase()}
                           </p>
                         </div>
                       </td>

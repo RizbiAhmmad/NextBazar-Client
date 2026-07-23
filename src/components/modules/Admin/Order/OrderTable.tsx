@@ -97,7 +97,7 @@ const OrderTable = ({
         }}
         search={{
           initialValue: searchTermFromUrl,
-          placeholder: searchPlaceholder || "Search orders (ID, Name, Phone)...",
+          placeholder: searchPlaceholder || "Search orders (Order No, Name, Phone)...",
           debounceMs: 700,
           onDebouncedChange: handleDebouncedSearchChange,
         }}

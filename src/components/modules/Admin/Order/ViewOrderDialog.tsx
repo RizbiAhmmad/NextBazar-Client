@@ -51,7 +51,7 @@ export default function ViewOrderDialog({
             Order Details
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
-            Order ID: {order.id}
+            Order No: {order.orderNumber || order.id}
           </DialogDescription>
         </DialogHeader>
 
