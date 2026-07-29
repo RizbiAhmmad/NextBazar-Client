@@ -104,6 +104,11 @@ export const sellerNavItems: NavSection[] = [
         icon: "Receipt",
       },
       {
+        title: "Sales Report",
+        href: "/seller/dashboard/sales-report",
+        icon: "BarChart3",
+      },
+      {
         title: "Coupons",
         href: "/seller/dashboard/coupons",
         icon: "Ticket",

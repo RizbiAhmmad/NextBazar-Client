@@ -62,7 +62,7 @@ export const orderColumns: ColumnDef<IOrder>[] = [
   },
   {
     accessorKey: "orderStatus",
-    header: "Status",
+    header: "Order Status",
     cell: ({ row }) => {
       const status = row.getValue("orderStatus") as string;
       const variants: Record<string, string> = {

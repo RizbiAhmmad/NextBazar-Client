@@ -77,7 +77,7 @@ export const sellerOrderColumns: ColumnDef<any>[] = [
   },
   {
     accessorKey: "status",
-    header: "Fulfillment",
+    header: "Order Status",
     cell: ({ row }) => {
       const status = row.getValue("status") as string;
       const variants: Record<string, string> = {
