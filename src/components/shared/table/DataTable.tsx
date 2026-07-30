@@ -289,14 +289,12 @@ const DataTable = <TData,>({
           </TableBody>
         </Table>
 
-        {pagination && (
-          <DataTablePagination
-            table={table}
-            totalPages={meta?.totalPages}
-            totalRows={meta?.total}
-            isLoading={hydratedIsLoading}
-          />
-        )}
+        <DataTablePagination
+          table={table}
+          totalPages={meta?.totalPages}
+          totalRows={meta?.total ?? data.length}
+          isLoading={hydratedIsLoading}
+        />
       </div>
     </div>
   );

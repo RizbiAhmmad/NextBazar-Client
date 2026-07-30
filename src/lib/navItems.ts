@@ -113,6 +113,21 @@ export const sellerNavItems: NavSection[] = [
         href: "/seller/dashboard/coupons",
         icon: "Ticket",
       },
+      {
+        title: "Expense Categories",
+        href: "/seller/dashboard/expense-categories",
+        icon: "Tags",
+      },
+      {
+        title: "Expenses",
+        href: "/seller/dashboard/expenses",
+        icon: "Wallet",
+      },
+      {
+        title: "Expense Report",
+        href: "/seller/dashboard/expense-report",
+        icon: "PieChart",
+      },
     ],
   },
   {
