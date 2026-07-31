@@ -128,6 +128,11 @@ export const sellerNavItems: NavSection[] = [
         href: "/seller/dashboard/expense-report",
         icon: "PieChart",
       },
+      {
+        title: "Profit & Loss Report",
+        href: "/seller/dashboard/profit-loss-report",
+        icon: "TrendingUp",
+      },
     ],
   },
   {
