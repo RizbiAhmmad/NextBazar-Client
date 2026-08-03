@@ -217,6 +217,11 @@ export const adminNavItems: NavSection[] = [
     title: "System",
     items: [
       {
+        title: "Platform Report",
+        href: "/admin/dashboard/platform-report",
+        icon: "LineChart",
+      },
+      {
         title: "Analytics",
         href: "/admin/dashboard/analytics",
         icon: "BarChart3",
