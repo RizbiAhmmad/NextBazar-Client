@@ -5,6 +5,7 @@ export const createProductSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
   shortDescription: z.string().min(5, "Short description is required"),
   categoryId: z.string().optional(),
+  sku: z.string().optional(),
   
   // These are optional/defaulted for VARIABLE products
   stock: z.coerce.number().int().nonnegative("Stock cannot be negative").default(0),

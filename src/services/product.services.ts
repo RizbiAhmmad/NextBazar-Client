@@ -42,6 +42,40 @@ export async function createProduct(payload: FormData) {
   }
 }
 
+export async function generateProductSku() {
+  try {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("accessToken")?.value;
+    const sessionToken = cookieStore.get("better-auth.session_token")?.value;
+
+    if (!accessToken) {
+      return { success: false, message: "Unauthorized" };
+    }
+
+    const res = await fetch(`${BASE_API_URL}/products/generate-sku`, {
+      method: "GET",
+      headers: {
+        Cookie: `accessToken=${accessToken}; better-auth.session_token=${sessionToken}`,
+      },
+      cache: "no-store",
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      return {
+        success: false,
+        message: result.message || "Failed to generate SKU",
+      };
+    }
+
+    return { success: true, data: result.data, message: result.message };
+  } catch (error: unknown) {
+    console.error("Error generating SKU:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+}
+
 export async function getAllProducts(queryParams?: Record<string, string>) {
   try {
     const url = new URL(`${BASE_API_URL}/products`);

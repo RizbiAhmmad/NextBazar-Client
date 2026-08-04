@@ -12,6 +12,7 @@ export interface IProduct {
   slug: string;
   name: string;
   shortDescription: string;
+  sku?: string | null;
   stock: number;
   purchasePrice: number;
   regularPrice: number;

@@ -20,12 +20,12 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Upload, X, Loader2, Sparkles, Plus, Trash2, Check } from "lucide-react";
+import { Upload, X, Loader2, Sparkles, Plus, Trash2, Check, RefreshCw } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { createProduct } from "@/services/product.services";
+import { createProduct, generateProductSku } from "@/services/product.services";
 import { getAllCategories } from "@/services/category.services";
 import { getMyShop } from "@/services/shop.services";
 import { createProductSchema } from "@/zod/product.validation";
@@ -74,6 +74,8 @@ export default function AddProductForm() {
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isGeneratingSku, setIsGeneratingSku] = useState(false);
+  const [generatingVariantSkuIndex, setGeneratingVariantSkuIndex] = useState<number | null>(null);
 
   // Category State
   const [parentCategoryId, setParentCategoryId] = useState<string>("");
@@ -112,6 +114,7 @@ export default function AddProductForm() {
       name: "",
       shortDescription: "",
       description: "",
+      sku: "",
       stock: 0,
       purchasePrice: 0,
       regularPrice: 0,
@@ -174,9 +177,12 @@ export default function AddProductForm() {
           name,
           values
         }));
-        
+
+        // SKU lives per-variant for variable products
+        payloadData.sku = undefined;
         payloadData.variants = generatedVariants.map(v => ({
           combination: v.combination,
+          sku: v.sku ? v.sku.trim() : undefined,
           quantity: Number(v.quantity),
           purchasePrice: Number(v.purchasePrice),
           regularPrice: Number(v.regularPrice),
@@ -187,6 +193,7 @@ export default function AddProductForm() {
         payloadData.purchasePrice = Number(value.purchasePrice);
         payloadData.regularPrice = Number(value.regularPrice);
         payloadData.sellPrice = Number(value.sellPrice);
+        payloadData.sku = value.sku ? value.sku.trim() : undefined;
       }
 
       formData.append("data", JSON.stringify(payloadData));
@@ -290,6 +297,34 @@ export default function AddProductForm() {
     }
   };
 
+  const handleGenerateSku = async () => {
+    setIsGeneratingSku(true);
+    try {
+      const res = await generateProductSku();
+      if (res.success) {
+        form.setFieldValue("sku", res.data.sku);
+      } else {
+        toast.error(res.message || "Failed to generate SKU");
+      }
+    } finally {
+      setIsGeneratingSku(false);
+    }
+  };
+
+  const handleGenerateVariantSku = async (index: number) => {
+    setGeneratingVariantSkuIndex(index);
+    try {
+      const res = await generateProductSku();
+      if (res.success) {
+        updateVariant(index, "sku", res.data.sku);
+      } else {
+        toast.error(res.message || "Failed to generate SKU");
+      }
+    } finally {
+      setGeneratingVariantSkuIndex(null);
+    }
+  };
+
   const toggleAttributeValue = (attrName: string, value: string) => {
     setSelectedAttributes(prev => {
       const current = prev[attrName] || [];
@@ -319,6 +354,7 @@ export default function AddProductForm() {
     
     const newVariants = combos.map((combo: any) => ({
       combination: Array.isArray(combo) ? combo.join('-') : combo,
+      sku: "",
       quantity: 0,
       purchasePrice: form.getFieldValue("purchasePrice") || 0,
       regularPrice: form.getFieldValue("regularPrice") || 0,
@@ -590,10 +626,42 @@ export default function AddProductForm() {
 
                 <form.Subscribe selector={(state) => state.values.type}>
                   {(type) => type === "SIMPLE" ? (
-                    /* Simple Product - Quantity Only */
-                    <div className="max-w-[200px]">
+                    /* Simple Product - Quantity & SKU/Barcode */
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-xl">
                       <form.Field name="stock">
                         {(field) => <AppField field={field} type="number" label="Quantity" placeholder="0" />}
+                      </form.Field>
+                      <form.Field name="sku">
+                        {(field) => (
+                          <div className="space-y-1.5">
+                            <Label htmlFor={field.name}>SKU / Barcode</Label>
+                            <div className="flex gap-2">
+                              <Input
+                                id={field.name}
+                                name={field.name}
+                                value={field.state.value}
+                                placeholder="Type manually or generate"
+                                onBlur={field.handleBlur}
+                                onChange={(e) => field.handleChange(e.target.value)}
+                              />
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="secondary"
+                                className="shrink-0"
+                                disabled={isGeneratingSku}
+                                onClick={handleGenerateSku}
+                              >
+                                {isGeneratingSku ? (
+                                  <Loader2 className="size-3.5 animate-spin" />
+                                ) : (
+                                  <RefreshCw className="size-3.5" />
+                                )}
+                                Generate
+                              </Button>
+                            </div>
+                          </div>
+                        )}
                       </form.Field>
                     </div>
                   ) : (
@@ -656,6 +724,7 @@ export default function AddProductForm() {
                               <thead className="bg-muted/50 border-b">
                                 <tr>
                                   <th className="text-left p-2 font-medium">Variation</th>
+                                  <th className="text-left p-2 font-medium w-36">SKU / Barcode</th>
                                   <th className="text-left p-2 font-medium w-24">Quantity</th>
                                   <th className="text-left p-2 font-medium w-32">Purchase Price</th>
                                   <th className="text-left p-2 font-medium w-32">Regular Price</th>
@@ -668,6 +737,30 @@ export default function AddProductForm() {
                                 {generatedVariants.map((variant, index) => (
                                   <tr key={index} className="group hover:bg-muted/30">
                                     <td className="p-2 font-medium">{variant.combination}</td>
+                                    <td className="p-2">
+                                      <div className="flex items-center gap-1">
+                                        <Input
+                                          className="h-8"
+                                          placeholder="Manual or generate"
+                                          value={variant.sku || ""}
+                                          onChange={(e) => updateVariant(index, 'sku', e.target.value)}
+                                        />
+                                        <Button
+                                          type="button"
+                                          size="icon"
+                                          variant="secondary"
+                                          className="h-8 w-8 shrink-0"
+                                          disabled={generatingVariantSkuIndex === index}
+                                          onClick={() => handleGenerateVariantSku(index)}
+                                        >
+                                          {generatingVariantSkuIndex === index ? (
+                                            <Loader2 className="size-3 animate-spin" />
+                                          ) : (
+                                            <RefreshCw className="size-3" />
+                                          )}
+                                        </Button>
+                                      </div>
+                                    </td>
                                     <td className="p-2">
                                       <Input type="number" className="h-8" value={variant.quantity} onChange={(e) => updateVariant(index, 'quantity', e.target.value)} />
                                     </td>
