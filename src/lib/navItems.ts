@@ -56,7 +56,7 @@ export const userNavItems: NavSection[] = [
 
 export const sellerNavItems: NavSection[] = [
   {
-    title: "Store Management",
+    title: "Store",
     items: [
       {
         title: "My Shop",
@@ -69,6 +69,16 @@ export const sellerNavItems: NavSection[] = [
         icon: "Layers",
       },
       {
+        title: "Attributes",
+        href: "/seller/dashboard/attributes",
+        icon: "Sliders",
+      },
+    ],
+  },
+  {
+    title: "Products",
+    items: [
+      {
         title: "Products",
         href: "/seller/dashboard/products",
         icon: "Package",
@@ -78,6 +88,16 @@ export const sellerNavItems: NavSection[] = [
         href: "/seller/dashboard/landing-pages",
         icon: "Rocket",
       },
+      {
+        title: "Coupons",
+        href: "/seller/dashboard/coupons",
+        icon: "Ticket",
+      },
+    ],
+  },
+  {
+    title: "Orders",
+    items: [
       {
         title: "Orders",
         href: "/seller/dashboard/orders",
@@ -89,11 +109,6 @@ export const sellerNavItems: NavSection[] = [
         icon: "Rocket",
       },
       {
-        title: "Attributes",
-        href: "/seller/dashboard/attributes",
-        icon: "Sliders",
-      },
-      {
         title: "POS",
         href: "/seller/dashboard/pos",
         icon: "ShoppingCart",
@@ -103,16 +118,11 @@ export const sellerNavItems: NavSection[] = [
         href: "/seller/dashboard/pos-orders",
         icon: "Receipt",
       },
-      {
-        title: "Sales Report",
-        href: "/seller/dashboard/sales-report",
-        icon: "BarChart3",
-      },
-      {
-        title: "Coupons",
-        href: "/seller/dashboard/coupons",
-        icon: "Ticket",
-      },
+    ],
+  },
+  {
+    title: "Expenses",
+    items: [
       {
         title: "Expense Categories",
         href: "/seller/dashboard/expense-categories",
@@ -122,6 +132,16 @@ export const sellerNavItems: NavSection[] = [
         title: "Expenses",
         href: "/seller/dashboard/expenses",
         icon: "Wallet",
+      },
+    ],
+  },
+  {
+    title: "Reports",
+    items: [
+      {
+        title: "Sales Report",
+        href: "/seller/dashboard/sales-report",
+        icon: "BarChart3",
       },
       {
         title: "Expense Report",
@@ -152,25 +172,20 @@ export const adminNavItems: NavSection[] = [
     title: "Marketplace",
     items: [
       {
-        title: "Site Settings",
-        href: "/admin/dashboard/site-settings",
-        icon: "Building2",
-      },
-      {
-        title: "Shipping Settings",
-        href: "/admin/dashboard/shipping-settings",
-        icon: "Settings",
+        title: "Shops",
+        href: "/admin/dashboard/shops",
+        icon: "Store",
       },
       {
         title: "Hero Sliders",
         href: "/admin/dashboard/hero-sliders",
         icon: "Images",
       },
-      {
-        title: "Shops",
-        href: "/admin/dashboard/shops",
-        icon: "Store",
-      },
+    ],
+  },
+  {
+    title: "Products",
+    items: [
       {
         title: "Categories",
         href: "/admin/dashboard/categories",
@@ -181,6 +196,16 @@ export const adminNavItems: NavSection[] = [
         href: "/admin/dashboard/products",
         icon: "Package",
       },
+      {
+        title: "Attributes",
+        href: "/admin/dashboard/attributes",
+        icon: "Sliders",
+      },
+    ],
+  },
+  {
+    title: "Orders",
+    items: [
       {
         title: "Online Orders",
         href: "/admin/dashboard/orders",
@@ -196,11 +221,6 @@ export const adminNavItems: NavSection[] = [
         href: "/admin/dashboard/landing-page-orders",
         icon: "Rocket",
       },
-      {
-        title: "Attributes",
-        href: "/admin/dashboard/attributes",
-        icon: "Sliders",
-      },
     ],
   },
   {
@@ -214,7 +234,7 @@ export const adminNavItems: NavSection[] = [
     ],
   },
   {
-    title: "System",
+    title: "Reports",
     items: [
       {
         title: "Platform Report",
@@ -226,6 +246,26 @@ export const adminNavItems: NavSection[] = [
         href: "/admin/dashboard/analytics",
         icon: "BarChart3",
       },
+    ],
+  },
+  {
+    title: "Settings",
+    items: [
+      {
+        title: "Site Settings",
+        href: "/admin/dashboard/site-settings",
+        icon: "Building2",
+      },
+      {
+        title: "Shipping Settings",
+        href: "/admin/dashboard/shipping-settings",
+        icon: "Settings",
+      },
+    ],
+  },
+  {
+    title: "Account",
+    items: [
       {
         title: "Profile",
         href: "/admin/dashboard/my-profile",

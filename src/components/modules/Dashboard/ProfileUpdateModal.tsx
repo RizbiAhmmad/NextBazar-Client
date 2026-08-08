@@ -109,6 +109,7 @@ const ProfileUpdateModal = ({ user }: ProfileUpdateModalProps) => {
                     src={preview}
                     alt="Profile"
                     fill
+                    sizes="96px"
                     className="object-cover"
                   />
                 ) : (

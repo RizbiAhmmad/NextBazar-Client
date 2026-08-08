@@ -23,6 +23,7 @@ export const userOrderColumns: ColumnDef<IOrder>[] = [
               src={firstItem.product?.images?.[0] || "/placeholder.png"}
               alt={firstItem.product?.name || "Product"}
               fill
+              sizes="48px"
               className="object-cover"
             />
           </div>

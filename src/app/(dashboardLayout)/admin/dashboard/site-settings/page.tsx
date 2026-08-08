@@ -146,7 +146,7 @@ export default function SiteSettingsPage() {
         </p>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-6 max-w-3xl">
+      <form onSubmit={onSubmit} className="space-y-6 max-w-3xl mx-auto">
         {/* Branding */}
         <div className="bg-card border rounded-xl p-6 shadow-sm space-y-6">
           <div className="flex items-center gap-2">

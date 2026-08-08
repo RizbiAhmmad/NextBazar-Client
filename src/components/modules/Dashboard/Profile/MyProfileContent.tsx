@@ -32,6 +32,7 @@ const MyProfileContent = ({ user }: MyProfileContentProps) => {
                 src={user.image}
                 alt={user.name}
                 fill
+                sizes="128px"
                 className="object-cover"
               />
             ) : (

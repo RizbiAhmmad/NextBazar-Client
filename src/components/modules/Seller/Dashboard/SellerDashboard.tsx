@@ -116,6 +116,7 @@ export default function SellerDashboard() {
                 src={shop.logo || "/placeholder.png"}
                 alt={shop.name}
                 fill
+                sizes="128px"
                 className="object-cover"
               />
             </div>
@@ -240,6 +241,7 @@ export default function SellerDashboard() {
                               src={sale.product.images[0] || "/placeholder.png"}
                               alt={sale.product.name}
                               fill
+                              sizes="48px"
                               className="object-cover"
                             />
                           </div>

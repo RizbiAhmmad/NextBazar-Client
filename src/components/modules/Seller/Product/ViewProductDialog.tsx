@@ -57,6 +57,7 @@ const ViewProductDialog = ({
                         src={product.images[0]}
                         alt={product.name}
                         fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
                         className="object-cover"
                       />
                     ) : (
@@ -72,7 +73,7 @@ const ViewProductDialog = ({
                     <div className="flex gap-2 flex-wrap">
                       {product.images.slice(1).map((img, index) => (
                         <div key={index} className="relative aspect-square w-20 overflow-hidden rounded-lg border bg-muted shadow-sm">
-                          <Image src={img} alt={`${product.name} ${index + 1}`} fill className="object-cover" />
+                          <Image src={img} alt={`${product.name} ${index + 1}`} fill sizes="80px" className="object-cover" />
                         </div>
                       ))}
                     </div>

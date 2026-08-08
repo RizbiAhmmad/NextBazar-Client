@@ -11,78 +11,91 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  getMyNotifications,
+  markAllNotificationsRead,
+  markNotificationRead,
+} from "@/services/notification.services";
+import { UserRole } from "@/types/user.types";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
-import { Bell, ShoppingCart, Tag, UserCheck, Star } from "lucide-react";
+import { Bell, CreditCard, ShoppingCart, Truck } from "lucide-react";
+import { useRouter } from "next/navigation";
+
+type NotificationType =
+  | "ORDER_PLACED"
+  | "ORDER_STATUS_CHANGED"
+  | "PAYMENT_STATUS_CHANGED";
 
 interface Notification {
   id: string;
   title: string;
   message: string;
-  type: "order" | "promotion" | "system" | "review";
-  timestamp: Date;
-  read: boolean;
+  type: NotificationType;
+  orderId: string | null;
+  isRead: boolean;
+  createdAt: string;
 }
 
-const MOCK_NOTIFICATIONS: Notification[] = [
-  {
-    id: "1",
-    title: "New Order Received",
-    message:
-      "You have received a new order #ORD-7721 from John Doe. Process it now!",
-    type: "order",
-    timestamp: new Date(Date.now() - 1000 * 60 * 15), // 15 minutes ago
-    read: false,
-  },
-
-  {
-    id: "2",
-    title: "Price Drop Alert!",
-    message:
-      "The 'Wireless Noise Cancelling Headphones' in your wishlist is now 20% off.",
-    type: "promotion",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-    read: true,
-  },
-
-  {
-    id: "3",
-    title: "New Review Received",
-    message:
-      "A customer just left a 5-star review for your 'Organic Honey' product.",
-    type: "review",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
-    read: false,
-  },
-
-  {
-    id: "4",
-    title: "Security Update",
-    message: "A new login was detected from a new device in Dhaka, Bangladesh.",
-    type: "system",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48), // 2 days ago
-    read: true,
-  },
-];
-
-const getNotificationIcon = (type: Notification["type"]) => {
+const getNotificationIcon = (type: NotificationType) => {
   switch (type) {
-    case "order":
+    case "ORDER_PLACED":
       return <ShoppingCart className="h-4 w-4 text-blue-600" />;
-    case "promotion":
-      return <Tag className="h-4 w-4 text-emerald-500" />;
-    case "review":
-      return <Star className="h-4 w-4 text-amber-500" />;
-    case "system":
-      return <UserCheck className="h-4 w-4 text-purple-600" />;
+    case "ORDER_STATUS_CHANGED":
+      return <Truck className="h-4 w-4 text-emerald-500" />;
+    case "PAYMENT_STATUS_CHANGED":
+      return <CreditCard className="h-4 w-4 text-amber-500" />;
     default:
       return <Bell className="h-4 w-4 text-gray-600" />;
   }
 };
 
-const NotificationDropdown = () => {
-  const unreadCount = MOCK_NOTIFICATIONS.filter(
-    (notification) => !notification.read,
-  ).length;
+const getOrdersRouteForRole = (role: UserRole) => {
+  if (role === "ADMIN" || role === "SUPER_ADMIN") return "/admin/dashboard/orders";
+  if (role === "SELLER") return "/seller/dashboard/orders";
+  return "/dashboard/my-orders";
+};
+
+interface NotificationDropdownProps {
+  role: UserRole;
+}
+
+const NotificationDropdown = ({ role }: NotificationDropdownProps) => {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const ordersRoute = getOrdersRouteForRole(role);
+
+  const { data } = useQuery({
+    queryKey: ["notifications"],
+    queryFn: () => getMyNotifications(10),
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: true,
+  });
+
+  const notifications: Notification[] = data?.success ? data.data.notifications : [];
+  const unreadCount: number = data?.success ? data.data.unreadCount : 0;
+
+  const markReadMutation = useMutation({
+    mutationFn: (id: string) => markNotificationRead(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+
+  const markAllReadMutation = useMutation({
+    mutationFn: () => markAllNotificationsRead(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+
+  const handleNotificationClick = (notification: Notification) => {
+    if (!notification.isRead) {
+      markReadMutation.mutate(notification.id);
+    }
+    router.push(ordersRoute);
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -116,7 +129,11 @@ const NotificationDropdown = () => {
           {unreadCount > 0 && (
             <Badge
               variant={"secondary"}
-              className="bg-blue-50 text-blue-600 font-bold border-none px-3"
+              className="bg-blue-50 text-blue-600 font-bold border-none px-3 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                markAllReadMutation.mutate();
+              }}
             >
               {unreadCount} new
             </Badge>
@@ -126,10 +143,11 @@ const NotificationDropdown = () => {
         <DropdownMenuSeparator className="bg-slate-50 mx-2" />
 
         <ScrollArea className="h-80 my-2">
-          {MOCK_NOTIFICATIONS.length > 0 ? (
-            MOCK_NOTIFICATIONS.map((notification) => (
+          {notifications.length > 0 ? (
+            notifications.map((notification) => (
               <DropdownMenuItem
                 key={notification.id}
+                onClick={() => handleNotificationClick(notification)}
                 className="flex flex-col items-start gap-2 p-4 cursor-pointer rounded-2xl mx-1 focus:bg-slate-50 transition-colors"
               >
                 <div className="flex gap-4 w-full">
@@ -142,7 +160,7 @@ const NotificationDropdown = () => {
                       <p className="text-sm font-black text-slate-800 leading-tight">
                         {notification.title}
                       </p>
-                      {!notification.read && (
+                      {!notification.isRead && (
                         <div className="h-2 w-2 rounded-full bg-blue-600 flex-shrink-0 ml-2 shadow-[0_0_8px_rgba(37,99,235,0.5)]" />
                       )}
                     </div>
@@ -152,7 +170,7 @@ const NotificationDropdown = () => {
                     </p>
 
                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider pt-1">
-                      {formatDistanceToNow(notification.timestamp, {
+                      {formatDistanceToNow(new Date(notification.createdAt), {
                         addSuffix: true,
                       })}
                     </p>
@@ -174,7 +192,10 @@ const NotificationDropdown = () => {
 
         <DropdownMenuSeparator className="bg-slate-50 mx-2" />
 
-        <DropdownMenuItem className="text-center justify-center cursor-pointer font-black text-[10px] uppercase tracking-[0.2em] p-4 text-primary hover:bg-primary/5 rounded-2xl transition-all">
+        <DropdownMenuItem
+          onClick={() => router.push(ordersRoute)}
+          className="text-center justify-center cursor-pointer font-black text-[10px] uppercase tracking-[0.2em] p-4 text-primary hover:bg-primary/5 rounded-2xl transition-all"
+        >
           View All Notifications
         </DropdownMenuItem>
       </DropdownMenuContent>

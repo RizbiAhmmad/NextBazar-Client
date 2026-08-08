@@ -90,6 +90,7 @@ export const CategoryMenu = () => {
                           src={cat.image || cat.icon || ""} 
                           alt={cat.name} 
                           fill 
+                          sizes="24px"
                           className="object-contain" 
                         />
                       </div>

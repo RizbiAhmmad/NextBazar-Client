@@ -33,6 +33,12 @@ export interface ILandingPage {
   orderFormHeading: string;
   orderButtonText: string;
 
+  themeColor: string;
+  showGallerySection: boolean;
+  showAboutSection: boolean;
+  showDescriptionSection: boolean;
+  showReviewsSection: boolean;
+
   views: number;
 
   createdAt: string;
@@ -56,4 +62,10 @@ export interface LandingPageFormValues {
   orderFormHeading: string;
   orderButtonText: string;
   isActive: boolean;
+
+  themeColor: string;
+  showGallerySection: boolean;
+  showAboutSection: boolean;
+  showDescriptionSection: boolean;
+  showReviewsSection: boolean;
 }

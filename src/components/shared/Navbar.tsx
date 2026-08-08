@@ -89,7 +89,7 @@ const Navbar = ({ userInfo, className, siteSettings }: NavbarProps) => {
             <Link href="/" className="group flex items-center gap-2.5">
               <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-primary shadow-lg shadow-primary/20 transition-transform group-hover:scale-110">
                 {logo ? (
-                  <Image src={logo} alt={siteName} fill className="object-cover" />
+                  <Image src={logo} alt={siteName} fill sizes="40px" className="object-cover" />
                 ) : (
                   <ShoppingBag className="h-6 w-6 text-primary-foreground" />
                 )}
@@ -173,7 +173,7 @@ const Navbar = ({ userInfo, className, siteSettings }: NavbarProps) => {
                           <div key={item.id} className="flex gap-4 p-3 rounded-xl border bg-card hover:border-primary/30 transition-colors">
                             <div className="relative h-20 w-20 rounded-md overflow-hidden bg-muted flex-shrink-0 cursor-pointer" onClick={() => router.push(`/products/${item.slug}`)}>
                               {item.images?.[0] ? (
-                                <Image src={item.images[0]} alt={item.name} fill className="object-cover" />
+                                <Image src={item.images[0]} alt={item.name} fill sizes="80px" className="object-cover" />
                               ) : (
                                 <ShoppingBag className="h-8 w-8 m-auto opacity-20" />
                               )}
@@ -329,7 +329,7 @@ const Navbar = ({ userInfo, className, siteSettings }: NavbarProps) => {
           <Link href="/" className="flex items-center gap-2">
             <div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-primary">
               {logo ? (
-                <Image src={logo} alt={siteName} fill className="object-cover" />
+                <Image src={logo} alt={siteName} fill sizes="32px" className="object-cover" />
               ) : (
                 <ShoppingBag className="h-5 w-5 text-primary-foreground" />
               )}
@@ -366,7 +366,7 @@ const Navbar = ({ userInfo, className, siteSettings }: NavbarProps) => {
                         <Link href="/" className="flex items-center gap-2">
                           <div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-primary">
                             {logo ? (
-                              <Image src={logo} alt={siteName} fill className="object-cover" />
+                              <Image src={logo} alt={siteName} fill sizes="32px" className="object-cover" />
                             ) : (
                               <ShoppingBag className="h-5 w-5 text-primary-foreground" />
                             )}

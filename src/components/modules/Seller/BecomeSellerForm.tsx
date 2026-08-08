@@ -160,6 +160,7 @@ const BecomeSellerForm = () => {
                       src={logoPreview}
                       alt="Logo Preview"
                       fill
+                      sizes="100vw"
                       className="object-cover"
                     />
                     <Button
@@ -198,6 +199,7 @@ const BecomeSellerForm = () => {
                       src={bannerPreview}
                       alt="Banner Preview"
                       fill
+                      sizes="100vw"
                       className="object-cover"
                     />
                     <Button

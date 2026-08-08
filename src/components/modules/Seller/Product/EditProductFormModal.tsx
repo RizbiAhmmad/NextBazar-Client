@@ -806,7 +806,7 @@ export default function EditProductFormModal({
                     {/* Existing Images */}
                     {existingImages.map((url, index) => (
                       <div key={`existing-${index}`} className="relative aspect-square rounded-xl overflow-hidden border bg-muted group">
-                        <Image src={url} alt={`Existing ${index + 1}`} fill className="object-cover" />
+                        <Image src={url} alt={`Existing ${index + 1}`} fill sizes="(max-width: 768px) 50vw, 20vw" className="object-cover" />
                         <Button
                           type="button"
                           variant="destructive"
@@ -827,7 +827,7 @@ export default function EditProductFormModal({
                     {/* New Images */}
                     {previews.map((preview, index) => (
                       <div key={`new-${index}`} className="relative aspect-square rounded-xl overflow-hidden border bg-muted group">
-                        <Image src={preview} alt={`Preview ${index + 1}`} fill className="object-cover" />
+                        <Image src={preview} alt={`Preview ${index + 1}`} fill sizes="(max-width: 768px) 50vw, 20vw" className="object-cover" />
                         <Button
                           type="button"
                           variant="destructive"

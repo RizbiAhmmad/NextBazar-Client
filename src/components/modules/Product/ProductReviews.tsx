@@ -66,6 +66,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
                         src={review.user.image}
                         alt={review.user.name}
                         fill
+                        sizes="40px"
                         className="object-cover"
                       />
                     ) : (

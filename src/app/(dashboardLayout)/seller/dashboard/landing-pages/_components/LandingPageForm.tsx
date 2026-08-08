@@ -28,6 +28,7 @@ import {
   FileText,
   Star,
   ShoppingBag,
+  Palette,
 } from "lucide-react";
 import { getAllProducts } from "@/services/product.services";
 import { getMyShop } from "@/services/shop.services";
@@ -36,6 +37,11 @@ import {
   updateLandingPage,
 } from "@/services/landingPage.services";
 import { ILandingPage, LandingPageFormValues } from "@/types/landingPage.types";
+import {
+  DEFAULT_LANDING_PAGE_THEME,
+  LANDING_PAGE_THEMES,
+  LandingPageThemeKey,
+} from "@/lib/landingPageThemes";
 
 const getInitialValues = (landingPage?: ILandingPage | null): LandingPageFormValues => ({
   productId: landingPage?.productId || "",
@@ -54,6 +60,11 @@ const getInitialValues = (landingPage?: ILandingPage | null): LandingPageFormVal
   orderFormHeading: landingPage?.orderFormHeading || "Order Now",
   orderButtonText: landingPage?.orderButtonText || "অর্ডার করুন",
   isActive: landingPage?.isActive ?? true,
+  themeColor: landingPage?.themeColor || DEFAULT_LANDING_PAGE_THEME,
+  showGallerySection: landingPage?.showGallerySection ?? true,
+  showAboutSection: landingPage?.showAboutSection ?? true,
+  showDescriptionSection: landingPage?.showDescriptionSection ?? true,
+  showReviewsSection: landingPage?.showReviewsSection ?? true,
 });
 
 interface LandingPageFormProps {
@@ -170,6 +181,111 @@ export default function LandingPageForm({ mode, landingPage }: LandingPageFormPr
 
   return (
     <form onSubmit={onSubmit} className="space-y-6 max-w-4xl">
+      {/* Design */}
+      <div className="bg-card border rounded-xl p-6 shadow-sm space-y-6">
+        <div className="flex items-center gap-2">
+          <Palette className="h-5 w-5 text-primary" />
+          <h4 className="font-semibold">Design</h4>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Theme Color</Label>
+          <div className="flex flex-wrap gap-3">
+            {(Object.keys(LANDING_PAGE_THEMES) as LandingPageThemeKey[]).map((key) => {
+              const themeOption = LANDING_PAGE_THEMES[key];
+              const isSelected = values.themeColor === key;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setValues((prev) => ({ ...prev, themeColor: key }))}
+                  title={themeOption.label}
+                  className={`h-10 w-10 rounded-full border-2 transition-all ${
+                    isSelected
+                      ? "border-foreground scale-110 shadow-md"
+                      : "border-transparent hover:scale-105"
+                  }`}
+                  style={{ backgroundColor: themeOption.primary }}
+                >
+                  <span className="sr-only">{themeOption.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label>Gallery Section</Label>
+            <Select
+              value={values.showGallerySection ? "true" : "false"}
+              onValueChange={(val) =>
+                setValues((prev) => ({ ...prev, showGallerySection: val === "true" }))
+              }
+            >
+              <SelectTrigger className="h-12 rounded-xl">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="true">Show</SelectItem>
+                <SelectItem value="false">Hide</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>About & Video Section</Label>
+            <Select
+              value={values.showAboutSection ? "true" : "false"}
+              onValueChange={(val) =>
+                setValues((prev) => ({ ...prev, showAboutSection: val === "true" }))
+              }
+            >
+              <SelectTrigger className="h-12 rounded-xl">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="true">Show</SelectItem>
+                <SelectItem value="false">Hide</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Description Section</Label>
+            <Select
+              value={values.showDescriptionSection ? "true" : "false"}
+              onValueChange={(val) =>
+                setValues((prev) => ({ ...prev, showDescriptionSection: val === "true" }))
+              }
+            >
+              <SelectTrigger className="h-12 rounded-xl">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="true">Show</SelectItem>
+                <SelectItem value="false">Hide</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Reviews Section</Label>
+            <Select
+              value={values.showReviewsSection ? "true" : "false"}
+              onValueChange={(val) =>
+                setValues((prev) => ({ ...prev, showReviewsSection: val === "true" }))
+              }
+            >
+              <SelectTrigger className="h-12 rounded-xl">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="true">Show</SelectItem>
+                <SelectItem value="false">Hide</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+
       {/* Product + Campaign */}
       <div className="bg-card border rounded-xl p-6 shadow-sm space-y-6">
         <div className="flex items-center gap-2">

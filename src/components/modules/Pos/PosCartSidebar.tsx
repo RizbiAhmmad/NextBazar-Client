@@ -102,7 +102,7 @@ export default function PosCartSidebar({ cartItems, refreshCart }: { cartItems: 
               {/* Image */}
               <div className="w-16 h-16 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 relative">
                 {item.productImage ? (
-                  <Image src={item.productImage} alt={item.productName} fill className="object-cover" />
+                  <Image src={item.productImage} alt={item.productName} fill sizes="64px" className="object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-[10px] text-gray-400">No Img</div>
                 )}

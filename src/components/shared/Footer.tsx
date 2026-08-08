@@ -103,6 +103,7 @@ export default function Footer({ siteSettings }: FooterProps) {
                     src={siteSettings.logo}
                     alt={siteName}
                     fill
+                    sizes="40px"
                     className="object-cover"
                   />
                 ) : (

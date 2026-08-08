@@ -27,6 +27,11 @@ import { ISiteSetting } from "@/types/siteSetting.types";
 import { placeLandingPageOrder } from "@/services/landingPage.services";
 import { getShippingSettings } from "@/services/shippingSetting.services";
 import { DHAKA_DISTRICTS, BANGLADESH_DISTRICTS } from "@/lib/districts";
+import {
+  DEFAULT_LANDING_PAGE_THEME,
+  LANDING_PAGE_THEMES,
+  LandingPageThemeKey,
+} from "@/lib/landingPageThemes";
 import ImageSlider from "./ImageSlider";
 import PriceHighlight from "./PriceHighlight";
 
@@ -68,6 +73,14 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
 
   const siteName = siteSettings?.siteName || "NextBazar";
   const logo = siteSettings?.logo;
+
+  const theme =
+    LANDING_PAGE_THEMES[landingPage.themeColor as LandingPageThemeKey] ??
+    LANDING_PAGE_THEMES[DEFAULT_LANDING_PAGE_THEME];
+  const themeStyle = {
+    "--primary": theme.primary,
+    "--primary-foreground": theme.primaryForeground,
+  } as React.CSSProperties;
 
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [currentVariant, setCurrentVariant] = useState<any>(null);
@@ -184,7 +197,7 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
 
   if (orderPlaced) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-muted/20">
+      <div className="min-h-screen flex items-center justify-center px-4 bg-muted/20" style={themeStyle}>
         <div className="max-w-md w-full bg-card border rounded-3xl shadow-xl p-8 text-center space-y-5 animate-in fade-in zoom-in-95 duration-300">
           <div className="mx-auto h-16 w-16 rounded-full bg-green-100 flex items-center justify-center">
             <CheckCircle2 className="h-9 w-9 text-green-600" />
@@ -204,14 +217,14 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24 md:pb-10">
+    <div className="min-h-screen bg-background pb-24 md:pb-10" style={themeStyle}>
       {/* Minimal header — no site nav, keeps focus on the offer */}
       <header className="border-b bg-background/80 backdrop-blur sticky top-0 z-40">
         <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-center">
           <Link href="/" className="flex items-center gap-2">
             <div className="relative h-9 w-9 rounded-lg bg-primary flex items-center justify-center overflow-hidden">
               {logo ? (
-                <Image src={logo} alt={siteName} fill className="object-cover" />
+                <Image src={logo} alt={siteName} fill sizes="36px" className="object-cover" />
               ) : (
                 <ShoppingBag className="h-5 w-5 text-primary-foreground" />
               )}
@@ -260,7 +273,7 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
         )}
 
         {/* Gallery */}
-        {landingPage.galleryImages.length > 0 && (
+        {landingPage.showGallerySection && landingPage.galleryImages.length > 0 && (
           <div className="space-y-4">
             {(landingPage.galleryHeading || landingPage.galleryDescription) && (
               <div className="text-center space-y-1">
@@ -291,7 +304,8 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
         </div>
 
         {/* About + Video */}
-        {(landingPage.aboutHeading || landingPage.aboutDescription || landingPage.videoUrl) && (
+        {landingPage.showAboutSection &&
+          (landingPage.aboutHeading || landingPage.aboutDescription || landingPage.videoUrl) && (
           <div className="space-y-6">
             {landingPage.aboutHeading && (
               <h2 className="text-2xl md:text-3xl font-black text-center">
@@ -319,7 +333,8 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
         )}
 
         {/* Description block */}
-        {(landingPage.descriptionTitle || landingPage.description) && (
+        {landingPage.showDescriptionSection &&
+          (landingPage.descriptionTitle || landingPage.description) && (
           <div className="max-w-3xl mx-auto text-center space-y-6">
             {landingPage.descriptionTitle && (
               <h2 className="text-2xl md:text-3xl font-black relative inline-block">
@@ -337,7 +352,7 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
         )}
 
         {/* Reviews */}
-        {landingPage.reviewImages.length > 0 && (
+        {landingPage.showReviewsSection && landingPage.reviewImages.length > 0 && (
           <div className="space-y-4">
             {landingPage.reviewHeading && (
               <h2 className="text-2xl md:text-3xl font-black text-center">
@@ -365,7 +380,7 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
               <div className="flex items-start gap-4">
                 <div className="relative h-24 w-24 md:h-32 md:w-32 shrink-0 rounded-xl overflow-hidden border bg-muted">
                   {images[0] ? (
-                    <Image src={images[0]} alt={product?.name || ""} fill className="object-cover" />
+                    <Image src={images[0]} alt={product?.name || ""} fill sizes="(max-width: 768px) 96px, 128px" className="object-cover" />
                   ) : (
                     <div className="flex h-full items-center justify-center">
                       <Package className="h-8 w-8 text-muted-foreground/40" />

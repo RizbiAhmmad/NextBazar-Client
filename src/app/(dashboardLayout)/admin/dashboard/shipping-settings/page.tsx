@@ -82,7 +82,7 @@ export default function ShippingSettingsPage() {
         </p>
       </div>
 
-      <div className="max-w-2xl bg-card border rounded-xl p-6 shadow-sm">
+      <div className="max-w-2xl mx-auto bg-card border rounded-xl p-6 shadow-sm">
         <form onSubmit={onSubmit} className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
