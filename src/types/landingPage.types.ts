@@ -1,4 +1,5 @@
 import { IProduct } from "@/components/modules/Seller/Product/productColumns";
+import { LandingPageSectionKey } from "@/lib/landingPageSections";
 
 export interface ILandingPage {
   id: string;
@@ -38,6 +39,7 @@ export interface ILandingPage {
   showAboutSection: boolean;
   showDescriptionSection: boolean;
   showReviewsSection: boolean;
+  sectionOrder: LandingPageSectionKey[];
 
   views: number;
 
@@ -68,4 +70,5 @@ export interface LandingPageFormValues {
   showAboutSection: boolean;
   showDescriptionSection: boolean;
   showReviewsSection: boolean;
+  sectionOrder: LandingPageSectionKey[];
 }

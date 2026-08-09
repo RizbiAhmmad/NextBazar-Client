@@ -4,7 +4,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { HelpCircle } from "lucide-react";
+import SectionHeading from "@/components/shared/SectionHeading";
 
 const faqs = [
   {
@@ -36,21 +36,13 @@ const faqs = [
 
 export default function FaqSection() {
   return (
-    <section className="py-8 max-w-4xl mx-auto">
-      <div className="text-center mb-16">
-        <div className="inline-flex items-center gap-2 bg-primary/5 px-4 py-2 rounded-full mb-6">
-          <HelpCircle className="h-4 w-4 text-primary" />
-          <span className="text-primary font-bold text-xs uppercase tracking-widest">
-            Support Center
-          </span>
-        </div>
-        <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">
-          Frequently Asked Questions
-        </h2>
-        <p className="text-slate-500 font-medium">
-          Everything you need to know about shopping and selling on NextBazar.
-        </p>
-      </div>
+    <section className="py-10 max-w-4xl mx-auto">
+      <SectionHeading
+        eyebrow="Support Center"
+        title="Frequently Asked Questions"
+        subtitle="Everything you need to know about shopping and selling on NextBazar."
+        className="mb-16"
+      />
 
       <Accordion type="single" collapsible className="w-full space-y-4">
         {faqs.map((faq, i) => (

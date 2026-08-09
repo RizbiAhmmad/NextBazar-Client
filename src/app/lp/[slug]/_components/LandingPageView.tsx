@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -32,41 +32,21 @@ import {
   LANDING_PAGE_THEMES,
   LandingPageThemeKey,
 } from "@/lib/landingPageThemes";
-import ImageSlider from "./ImageSlider";
+import { LandingPageSectionKey, resolveSectionOrder } from "@/lib/landingPageSections";
 import PriceHighlight from "./PriceHighlight";
-
-const proseClass =
-  "[&>p]:mb-2 [&>ul]:list-disc [&>ul]:pl-5 [&>ol]:list-decimal [&>ol]:pl-5 [&>strong]:font-bold [&>a]:text-primary [&>a]:underline [&>h2]:text-xl [&>h2]:font-bold [&>h2]:mb-2 [&>h3]:text-lg [&>h3]:font-bold [&>h3]:mb-2 [&>blockquote]:border-l-2 [&>blockquote]:pl-3 [&>blockquote]:italic";
+import {
+  AboutSection,
+  DescriptionSection,
+  GallerySection,
+  proseClass,
+  ReviewsSection,
+  SectionDivider,
+} from "./LandingPageSections";
 
 interface LandingPageViewProps {
   landingPage: ILandingPage;
   siteSettings: ISiteSetting | null;
 }
-
-const getEmbedUrl = (url?: string | null) => {
-  if (!url) return "";
-
-  if (url.includes("youtube.com/shorts/")) {
-    const id = url.split("youtube.com/shorts/")[1]?.split("?")[0];
-    return `https://www.youtube.com/embed/${id}`;
-  }
-  if (url.includes("youtu.be/")) {
-    const id = url.split("youtu.be/")[1]?.split("?")[0];
-    return `https://www.youtube.com/embed/${id}`;
-  }
-  if (url.includes("youtube.com/watch")) {
-    try {
-      const id = new URL(url).searchParams.get("v");
-      return `https://www.youtube.com/embed/${id}`;
-    } catch {
-      return url;
-    }
-  }
-  if (url.includes("facebook.com")) {
-    return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=0`;
-  }
-  return url;
-};
 
 export default function LandingPageView({ landingPage, siteSettings }: LandingPageViewProps) {
   const product = landingPage.product as any;
@@ -147,6 +127,34 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
 
   const scrollToOrder = () => {
     document.getElementById("order-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const sectionOrder: LandingPageSectionKey[] = resolveSectionOrder(landingPage.sectionOrder);
+  const sectionVisibility: Record<LandingPageSectionKey, boolean> = {
+    price: true, // pricing is reorderable but always shown — it's the core conversion driver
+    gallery: landingPage.showGallerySection,
+    about: landingPage.showAboutSection,
+    description: landingPage.showDescriptionSection,
+    reviews: landingPage.showReviewsSection,
+  };
+  const sectionComponents: Record<LandingPageSectionKey, React.ReactNode> = {
+    price: (
+      <div className="space-y-8">
+        <SectionDivider />
+        <PriceHighlight
+          sellPrice={sellPrice}
+          regularPrice={regularPrice}
+          buttonText={landingPage.orderButtonText}
+          onOrderClick={scrollToOrder}
+          regularPriceLabel={landingPage.regularPriceLabel}
+          offerPriceLabel={landingPage.offerPriceLabel}
+        />
+      </div>
+    ),
+    gallery: <GallerySection landingPage={landingPage} />,
+    about: <AboutSection landingPage={landingPage} />,
+    description: <DescriptionSection landingPage={landingPage} />,
+    reviews: <ReviewsSection landingPage={landingPage} />,
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -237,7 +245,7 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
       <div className="max-w-5xl mx-auto px-4 py-8 space-y-14">
         {/* Title */}
         <div className="text-center space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-500">
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight">
+          <h1 className="text-3xl md:text-5xl font-bold tracking-tight font-serif">
             {landingPage.campaignTitle}
           </h1>
           {landingPage.campaignShortDescription && (
@@ -248,19 +256,9 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
           )}
         </div>
 
-        {/* Price highlight — shown immediately so the offer is the first thing visitors see */}
-        <PriceHighlight
-          sellPrice={sellPrice}
-          regularPrice={regularPrice}
-          buttonText={landingPage.orderButtonText}
-          onOrderClick={scrollToOrder}
-          regularPriceLabel={landingPage.regularPriceLabel}
-          offerPriceLabel={landingPage.offerPriceLabel}
-        />
-
         {/* Banner */}
         {landingPage.bannerImage && (
-          <div className="rounded-2xl overflow-hidden shadow-xl relative aspect-video w-full">
+          <div className="rounded-[2rem] overflow-hidden ring-1 ring-black/5 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.2)] relative aspect-video w-full">
             <Image
               src={landingPage.bannerImage}
               alt={landingPage.campaignTitle}
@@ -272,25 +270,12 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
           </div>
         )}
 
-        {/* Gallery */}
-        {landingPage.showGallerySection && landingPage.galleryImages.length > 0 && (
-          <div className="space-y-4">
-            {(landingPage.galleryHeading || landingPage.galleryDescription) && (
-              <div className="text-center space-y-1">
-                {landingPage.galleryHeading && (
-                  <h2 className="text-2xl md:text-3xl font-black">{landingPage.galleryHeading}</h2>
-                )}
-                {landingPage.galleryDescription && (
-                  <div
-                    className={`text-muted-foreground ${proseClass}`}
-                    dangerouslySetInnerHTML={{ __html: landingPage.galleryDescription }}
-                  />
-                )}
-              </div>
-            )}
-            <ImageSlider images={landingPage.galleryImages} alt="Gallery" />
-          </div>
-        )}
+        {/* Optional content sections — order and visibility are seller-configured */}
+        {sectionOrder
+          .filter((key) => sectionVisibility[key])
+          .map((key) => (
+            <Fragment key={key}>{sectionComponents[key]}</Fragment>
+          ))}
 
         {/* Mid-page CTA */}
         <div className="flex justify-center">
@@ -303,73 +288,13 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
           </Button>
         </div>
 
-        {/* About + Video */}
-        {landingPage.showAboutSection &&
-          (landingPage.aboutHeading || landingPage.aboutDescription || landingPage.videoUrl) && (
-          <div className="space-y-6">
-            {landingPage.aboutHeading && (
-              <h2 className="text-2xl md:text-3xl font-black text-center">
-                {landingPage.aboutHeading}
-              </h2>
-            )}
-            <div className="flex flex-col md:flex-row items-center gap-8">
-              {landingPage.aboutDescription && (
-                <div
-                  className={`${landingPage.videoUrl ? "md:w-1/2" : "w-full text-center"} text-muted-foreground text-lg leading-relaxed ${proseClass}`}
-                  dangerouslySetInnerHTML={{ __html: landingPage.aboutDescription }}
-                />
-              )}
-              {landingPage.videoUrl && (
-                <div className="md:w-1/2 w-full aspect-video rounded-2xl overflow-hidden shadow-xl">
-                  <iframe
-                    src={getEmbedUrl(landingPage.videoUrl)}
-                    className="w-full h-full"
-                    allowFullScreen
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Description block */}
-        {landingPage.showDescriptionSection &&
-          (landingPage.descriptionTitle || landingPage.description) && (
-          <div className="max-w-3xl mx-auto text-center space-y-6">
-            {landingPage.descriptionTitle && (
-              <h2 className="text-2xl md:text-3xl font-black relative inline-block">
-                {landingPage.descriptionTitle}
-                <span className="block w-16 h-1 bg-primary mx-auto mt-2 rounded-full" />
-              </h2>
-            )}
-            {landingPage.description && (
-              <div
-                className={`bg-card border shadow-sm rounded-2xl p-6 md:p-8 text-left text-muted-foreground leading-relaxed ${proseClass}`}
-                dangerouslySetInnerHTML={{ __html: landingPage.description }}
-              />
-            )}
-          </div>
-        )}
-
-        {/* Reviews */}
-        {landingPage.showReviewsSection && landingPage.reviewImages.length > 0 && (
-          <div className="space-y-4">
-            {landingPage.reviewHeading && (
-              <h2 className="text-2xl md:text-3xl font-black text-center">
-                {landingPage.reviewHeading}
-              </h2>
-            )}
-            <ImageSlider images={landingPage.reviewImages} alt="Review" />
-          </div>
-        )}
-
         {/* Order form */}
         <div
           id="order-form"
-          className="scroll-mt-20 bg-card border rounded-3xl shadow-xl p-6 md:p-8 space-y-8"
+          className="scroll-mt-20 bg-card ring-1 ring-black/5 rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] p-6 md:p-8 space-y-8"
         >
           <div className="text-center space-y-1">
-            <h2 className="text-2xl md:text-3xl font-black">
+            <h2 className="text-2xl md:text-3xl font-bold font-serif">
               {landingPage.orderFormHeading}
             </h2>
           </div>

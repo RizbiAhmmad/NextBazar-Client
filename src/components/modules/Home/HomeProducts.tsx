@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import SectionHeading from "@/components/shared/SectionHeading";
 
 export default function HomeProducts() {
   const { data, isLoading } = useQuery({
@@ -19,17 +20,15 @@ export default function HomeProducts() {
   const products: IProduct[] = data?.data || [];
 
   return (
-    <section className="py-8">
-      <div className="flex items-end justify-between mb-10">
-        <div>
-          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 mb-2">
-            Trending Products
-          </h2>
-          <p className="text-muted-foreground text-lg">
-            Discover the most popular items across our marketplace.
-          </p>
-        </div>
-        <Link href="/products" className="hidden sm:block">
+    <section className="py-10">
+      <div className="flex items-end justify-between gap-4 mb-10">
+        <SectionHeading
+          align="left"
+          eyebrow="Trending Now"
+          title="Trending Products"
+          subtitle="Discover the most popular items across our marketplace."
+        />
+        <Link href="/products" className="hidden sm:block shrink-0">
           <Button
             variant="ghost"
             className="font-semibold text-primary hover:bg-primary/5"

@@ -5,6 +5,21 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,6 +44,8 @@ import {
   Star,
   ShoppingBag,
   Palette,
+  GripVertical,
+  Lock,
 } from "lucide-react";
 import { getAllProducts } from "@/services/product.services";
 import { getMyShop } from "@/services/shop.services";
@@ -42,6 +59,72 @@ import {
   LANDING_PAGE_THEMES,
   LandingPageThemeKey,
 } from "@/lib/landingPageThemes";
+import {
+  LANDING_PAGE_SECTION_LABELS,
+  LandingPageSectionKey,
+  resolveSectionOrder,
+} from "@/lib/landingPageSections";
+
+// "price" has no show/hide field — it's always visible, only reorderable.
+const SECTION_VISIBILITY_FIELD: Partial<Record<LandingPageSectionKey, keyof LandingPageFormValues>> = {
+  gallery: "showGallerySection",
+  about: "showAboutSection",
+  description: "showDescriptionSection",
+  reviews: "showReviewsSection",
+};
+
+function SortableSectionRow({
+  id,
+  visible,
+  onToggleVisible,
+}: {
+  id: LandingPageSectionKey;
+  visible: boolean | null;
+  onToggleVisible: (value: boolean) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center gap-3 rounded-xl border bg-background px-4 py-3 ${
+        isDragging ? "opacity-60 shadow-lg" : ""
+      }`}
+    >
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        className="cursor-grab touch-none text-muted-foreground hover:text-foreground active:cursor-grabbing"
+      >
+        <GripVertical className="h-5 w-5" />
+      </button>
+      <span className="flex-1 text-sm font-medium">{LANDING_PAGE_SECTION_LABELS[id]}</span>
+      {visible === null ? (
+        <span className="flex items-center gap-1.5 text-xs text-muted-foreground w-28 justify-end pr-1">
+          <Lock className="h-3.5 w-3.5" /> Always on
+        </span>
+      ) : (
+        <Select value={visible ? "true" : "false"} onValueChange={(val) => onToggleVisible(val === "true")}>
+          <SelectTrigger className="h-9 w-28 rounded-lg">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="true">Show</SelectItem>
+            <SelectItem value="false">Hide</SelectItem>
+          </SelectContent>
+        </Select>
+      )}
+    </div>
+  );
+}
 
 const getInitialValues = (landingPage?: ILandingPage | null): LandingPageFormValues => ({
   productId: landingPage?.productId || "",
@@ -65,6 +148,7 @@ const getInitialValues = (landingPage?: ILandingPage | null): LandingPageFormVal
   showAboutSection: landingPage?.showAboutSection ?? true,
   showDescriptionSection: landingPage?.showDescriptionSection ?? true,
   showReviewsSection: landingPage?.showReviewsSection ?? true,
+  sectionOrder: resolveSectionOrder(landingPage?.sectionOrder),
 });
 
 interface LandingPageFormProps {
@@ -102,6 +186,18 @@ export default function LandingPageForm({ mode, landingPage }: LandingPageFormPr
     enabled: !!myShop?.id,
   });
   const products = productResponse?.data ?? [];
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+
+  const handleSectionDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setValues((prev) => {
+      const oldIndex = prev.sectionOrder.indexOf(active.id as LandingPageSectionKey);
+      const newIndex = prev.sectionOrder.indexOf(over.id as LandingPageSectionKey);
+      return { ...prev, sectionOrder: arrayMove(prev.sectionOrder, oldIndex, newIndex) };
+    });
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -214,75 +310,35 @@ export default function LandingPageForm({ mode, landingPage }: LandingPageFormPr
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label>Gallery Section</Label>
-            <Select
-              value={values.showGallerySection ? "true" : "false"}
-              onValueChange={(val) =>
-                setValues((prev) => ({ ...prev, showGallerySection: val === "true" }))
-              }
-            >
-              <SelectTrigger className="h-12 rounded-xl">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="true">Show</SelectItem>
-                <SelectItem value="false">Hide</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label>About & Video Section</Label>
-            <Select
-              value={values.showAboutSection ? "true" : "false"}
-              onValueChange={(val) =>
-                setValues((prev) => ({ ...prev, showAboutSection: val === "true" }))
-              }
-            >
-              <SelectTrigger className="h-12 rounded-xl">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="true">Show</SelectItem>
-                <SelectItem value="false">Hide</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label>Description Section</Label>
-            <Select
-              value={values.showDescriptionSection ? "true" : "false"}
-              onValueChange={(val) =>
-                setValues((prev) => ({ ...prev, showDescriptionSection: val === "true" }))
-              }
-            >
-              <SelectTrigger className="h-12 rounded-xl">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="true">Show</SelectItem>
-                <SelectItem value="false">Hide</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label>Reviews Section</Label>
-            <Select
-              value={values.showReviewsSection ? "true" : "false"}
-              onValueChange={(val) =>
-                setValues((prev) => ({ ...prev, showReviewsSection: val === "true" }))
-              }
-            >
-              <SelectTrigger className="h-12 rounded-xl">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="true">Show</SelectItem>
-                <SelectItem value="false">Hide</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="space-y-2">
+          <Label>Section Order</Label>
+          <p className="text-xs text-muted-foreground">
+            Drag to reorder. These sections appear between the banner and the order form.
+          </p>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleSectionDragEnd}
+          >
+            <SortableContext items={values.sectionOrder} strategy={verticalListSortingStrategy}>
+              <div className="space-y-2">
+                {values.sectionOrder.map((key) => {
+                  const visibilityField = SECTION_VISIBILITY_FIELD[key];
+                  return (
+                    <SortableSectionRow
+                      key={key}
+                      id={key}
+                      visible={visibilityField ? (values[visibilityField] as boolean) : null}
+                      onToggleVisible={(value) =>
+                        visibilityField &&
+                        setValues((prev) => ({ ...prev, [visibilityField]: value }))
+                      }
+                    />
+                  );
+                })}
+              </div>
+            </SortableContext>
+          </DndContext>
         </div>
       </div>
 

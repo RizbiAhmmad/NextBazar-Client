@@ -39,7 +39,7 @@
   --sidebar-ring: oklch(0.6056 0.2189 292.7172);
   
   --font-sans: var(--font-geist-sans), Roboto, sans-serif;
-  --font-serif: Playfair Display, serif;
+  --font-serif: var(--font-playfair-display), serif;
   --font-mono: var(--font-geist-mono), Fira Code, monospace;
   
   --radius: 0.625rem;

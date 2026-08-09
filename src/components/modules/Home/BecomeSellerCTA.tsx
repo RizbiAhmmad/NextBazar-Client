@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Store, ArrowRight, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import SectionHeading from "@/components/shared/SectionHeading";
 
 const benefits = [
   "Reach millions of customers",
@@ -12,28 +13,20 @@ const benefits = [
 export default function BecomeSellerCTA() {
   return (
     <section className="py-8">
-      <div className="relative rounded-[4rem] bg-primary overflow-hidden p-8 md:p-16 lg:p-24 shadow-2xl shadow-primary/30">
+      <div className="relative rounded-[2.5rem] bg-primary overflow-hidden p-8 md:p-16 lg:p-24 shadow-2xl shadow-primary/30">
         {/* Background shapes */}
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
 
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div className="space-y-8">
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/10">
-              <Store className="h-5 w-5 text-white" />
-              <span className="text-white font-black text-xs uppercase tracking-widest">
-                Partner with us
-              </span>
-            </div>
-
-            <h2 className="text-4xl md:text-6xl font-black text-white leading-[1.1] tracking-tight">
-              Start Your Online Business Today
-            </h2>
-
-            <p className="text-primary-foreground/80 text-xl font-medium leading-relaxed max-w-xl">
-              Join thousands of successful sellers who have grown their brands
-              with NextBazar. We provide the tools, you provide the products.
-            </p>
+            <SectionHeading
+              light
+              align="left"
+              eyebrow="Partner With Us"
+              title="Start Your Online Business Today"
+              subtitle="Join thousands of successful sellers who have grown their brands with NextBazar. We provide the tools, you provide the products."
+            />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {benefits.map((benefit, i) => (
@@ -61,8 +54,9 @@ export default function BecomeSellerCTA() {
                 size="lg"
                 variant="outline"
                 className="bg-transparent border-white/20 text-white hover:bg-white/10 rounded-2xl h-16 px-10 text-lg font-black"
+                asChild
               >
-                Seller Guide
+                <Link href="/seller-guide">Seller Guide</Link>
               </Button>
             </div>
           </div>

@@ -35,12 +35,12 @@ export default function HeroCarousel() {
 
   if (slides.length === 0) {
     return (
-      <div className="relative h-62.5 w-full overflow-hidden rounded-2xl md:h-100 lg:h-125 bg-muted animate-pulse"></div>
+      <div className="relative w-full aspect-2/1 md:aspect-3/1 lg:aspect-3.5/1 overflow-hidden rounded-[2.5rem] bg-muted animate-pulse"></div>
     );
   }
 
   return (
-    <section className="relative w-full aspect-2/1 md:aspect-3/1 lg:aspect-3.5/1 overflow-hidden rounded-2xl">
+    <section className="relative w-full aspect-2/1 md:aspect-3/1 lg:aspect-3.5/1 overflow-hidden rounded-[2.5rem]">
       <div
         className="flex h-full transition-transform duration-700"
         style={{ transform: `translateX(-${current * 100}%)` }}
@@ -64,26 +64,29 @@ export default function HeroCarousel() {
         onClick={() =>
           setCurrent((current - 1 + slides.length) % slides.length)
         }
-        className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/70 p-2 rounded-full"
+        aria-label="Previous slide"
+        className="absolute left-6 top-1/2 -translate-y-1/2 bg-background/70 backdrop-blur-sm ring-1 ring-black/5 shadow-md p-2.5 rounded-full text-foreground hover:bg-background hover:scale-105 transition-all"
       >
         <ChevronLeft />
       </button>
 
       <button
         onClick={() => setCurrent((current + 1) % slides.length)}
-        className="absolute right-6 top-1/2 -translate-y-1/2 bg-white/70 p-2 rounded-full"
+        aria-label="Next slide"
+        className="absolute right-6 top-1/2 -translate-y-1/2 bg-background/70 backdrop-blur-sm ring-1 ring-black/5 shadow-md p-2.5 rounded-full text-foreground hover:bg-background hover:scale-105 transition-all"
       >
         <ChevronRight />
       </button>
 
       {/* Dots */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5">
         {slides.map((_, i) => (
           <button
             key={i}
             onClick={() => setCurrent(i)}
-            className={`h-3 w-3 rounded-full transition ${
-              current === i ? "bg-white" : "bg-white/40"
+            aria-label={`Go to slide ${i + 1}`}
+            className={`h-1.5 rounded-full transition-all ${
+              current === i ? "w-6 bg-white" : "w-1.5 bg-white/40 hover:bg-white/60"
             }`}
           />
         ))}

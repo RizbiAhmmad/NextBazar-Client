@@ -1,4 +1,5 @@
 import { ShieldCheck, Zap, CreditCard, Headphones } from "lucide-react";
+import SectionHeading from "@/components/shared/SectionHeading";
 
 const features = [
   {
@@ -35,12 +36,17 @@ const features = [
 
 export default function Features() {
   return (
-    <section className="py-8">
+    <section className="py-10">
+      <SectionHeading
+        eyebrow="Why NextBazar"
+        title="Built For A Better Shopping Experience"
+        className="mb-10"
+      />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {features.map((feature, i) => (
           <div
             key={i}
-            className="group p-8 rounded-[2.5rem] bg-white border border-slate-100 hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300"
+            className="group p-8 rounded-2xl bg-white border border-slate-100 hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300"
           >
             <div
               className={`${feature.bg} w-14 h-14 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}

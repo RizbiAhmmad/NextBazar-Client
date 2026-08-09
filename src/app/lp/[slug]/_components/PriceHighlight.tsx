@@ -26,8 +26,16 @@ export default function PriceHighlight({
   const hasDiscount = regularPrice > sellPrice;
 
   return (
-    <section className="bg-card border border-primary/10 rounded-2xl py-10 px-6">
+    <section className="relative overflow-hidden bg-card ring-1 ring-black/5 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] rounded-[2rem] py-12 px-6">
+      <div className="pointer-events-none absolute -top-16 left-1/2 -translate-x-1/2 h-48 w-72 rounded-full bg-primary/10 blur-3xl" />
       <div className="max-w-lg mx-auto text-center relative">
+        <div className="flex items-center justify-center gap-3 mb-3">
+          <span className="h-px w-6 bg-primary/60" />
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">
+            Limited Offer
+          </span>
+          <span className="h-px w-6 bg-primary/60" />
+        </div>
         {hasDiscount && (
           <p className="text-lg md:text-2xl text-muted-foreground animate-in fade-in slide-in-from-top-2 duration-700">
             {regularPriceLabel && <span className="mr-1">{regularPriceLabel}</span>}
