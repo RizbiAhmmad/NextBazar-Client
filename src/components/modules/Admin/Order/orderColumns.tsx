@@ -52,6 +52,37 @@ export const orderColumns: ColumnDef<IOrder>[] = [
     ),
   },
   {
+    id: "store",
+    header: "Store",
+    cell: ({ row }) => {
+      const order = row.original;
+      const storeNames = order.shop
+        ? [order.shop.name]
+        : Array.from(
+            new Set(
+              (order.items ?? [])
+                .map((item) => item.shop?.name)
+                .filter((name): name is string => Boolean(name)),
+            ),
+          );
+
+      if (storeNames.length === 0) {
+        return <span className="text-xs text-muted-foreground">-</span>;
+      }
+
+      return (
+        <div className="flex flex-col">
+          <span className="font-medium">{storeNames[0]}</span>
+          {storeNames.length > 1 && (
+            <span className="text-xs text-muted-foreground">
+              +{storeNames.length - 1} more
+            </span>
+          )}
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: "totalAmount",
     header: "Total",
     cell: ({ row }) => (

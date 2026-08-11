@@ -12,6 +12,10 @@ export interface IOrderItem {
   quantity: number;
   price: number;
   shopId: string;
+  shop?: {
+    id: string;
+    name: string;
+  };
   product: {
     id: string;
     name: string;
@@ -43,4 +47,8 @@ export interface IOrder {
   updatedAt: string;
   items: IOrderItem[];
   user: IUser;
+  shop?: {
+    id: string;
+    name: string;
+  } | null;
 }
