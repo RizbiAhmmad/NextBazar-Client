@@ -136,6 +136,16 @@ export const sellerNavItems: NavSection[] = [
     ],
   },
   {
+    title: "Wallet",
+    items: [
+      {
+        title: "Withdrawals",
+        href: "/seller/dashboard/withdrawals",
+        icon: "Landmark",
+      },
+    ],
+  },
+  {
     title: "Reports",
     items: [
       {
@@ -230,6 +240,16 @@ export const adminNavItems: NavSection[] = [
         title: "Users",
         href: "/admin/dashboard/users",
         icon: "Users",
+      },
+    ],
+  },
+  {
+    title: "Finance",
+    items: [
+      {
+        title: "Withdrawals",
+        href: "/admin/dashboard/withdrawals",
+        icon: "Landmark",
       },
     ],
   },

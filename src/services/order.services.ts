@@ -192,3 +192,31 @@ export async function updateOrderItemStatus(itemId: string, status: string) {
     return { success: false, message: "Something went wrong" };
   }
 }
+
+export async function updateOrderItem(
+  itemId: string,
+  payload: {
+    status?: string;
+    productId?: string;
+    productVariantId?: string | null;
+    quantity?: number;
+  },
+) {
+  try {
+    const headers = await getAuthHeaders();
+    if (!headers) return { success: false, message: "Unauthorized" };
+
+    const res = await fetch(`${BASE_API_URL}/orders/items/${itemId}`, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify(payload),
+    });
+
+    const result = await res.json();
+    if (res.ok) revalidateTag("orders", "max");
+    return result;
+  } catch (error) {
+    console.error("Error updating order item:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+}

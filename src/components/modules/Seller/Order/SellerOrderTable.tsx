@@ -9,7 +9,7 @@ import { getMyOrders, getOrderById, getVendorOrders } from "@/services/order.ser
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { sellerOrderColumns } from "./sellerOrderColumns";
-import UpdateItemStatusModal from "./UpdateItemStatusModal";
+import EditOrderItemModal from "./EditOrderItemModal";
 import ViewOrderDialog from "../../Admin/Order/ViewOrderDialog";
 
 const SellerOrderTable = ({
@@ -88,7 +88,8 @@ const SellerOrderTable = ({
         order={fullOrder || viewingItem?.order || null}
       />
 
-      <UpdateItemStatusModal
+      <EditOrderItemModal
+        key={editingItem?.id ?? "none"}
         open={isEditModalOpen}
         onOpenChange={onEditOpenChange}
         item={editingItem}

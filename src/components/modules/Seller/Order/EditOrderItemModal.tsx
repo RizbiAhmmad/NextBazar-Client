@@ -1,0 +1,227 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { getPosProducts } from "@/services/pos.services";
+import { updateOrderItem } from "@/services/order.services";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+
+interface EditOrderItemModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  item: any | null;
+}
+
+const STATUS_OPTIONS = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
+const LOCKED_STATUSES = ["SHIPPED", "DELIVERED", "CANCELLED"];
+
+export default function EditOrderItemModal({
+  open,
+  onOpenChange,
+  item,
+}: EditOrderItemModalProps) {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  const [statusValue, setStatusValue] = useState<string>(item?.status || "PENDING");
+  const [productId, setProductId] = useState<string>(item?.productId || "");
+  const [productVariantId, setProductVariantId] = useState<string | null>(
+    item?.productVariantId || null,
+  );
+  const [quantity, setQuantity] = useState<number>(item?.quantity || 1);
+  const [loading, setLoading] = useState(false);
+
+  const { data: productsResponse } = useQuery({
+    queryKey: ["pos-products", "for-order-edit"],
+    queryFn: () => getPosProducts(),
+    enabled: open,
+  });
+
+  const products: any[] = productsResponse?.data ?? [];
+
+  const isPOS = item?.order?.orderType === "POS";
+  const isLocked = !isPOS && item && !["PENDING", "PROCESSING"].includes(item.status);
+
+  const selectedProduct =
+    products.find((p) => p.id === productId) || (item?.product ? { ...item.product, id: item.productId, variants: [] } : null);
+
+  const handleProductChange = (value: string) => {
+    setProductId(value);
+    const product = products.find((p) => p.id === value);
+    if (product?.type === "VARIABLE" && product.variants?.length > 0) {
+      setProductVariantId(product.variants[0].id);
+    } else {
+      setProductVariantId(null);
+    }
+  };
+
+  const handleUpdate = async () => {
+    if (!item) return;
+
+    const payload: Record<string, unknown> = {};
+
+    if (statusValue !== item.status) {
+      payload.status = statusValue;
+    }
+
+    if (!isLocked) {
+      if (productId !== item.productId) payload.productId = productId;
+      if (productVariantId !== (item.productVariantId || null)) {
+        payload.productVariantId = productVariantId;
+      }
+      if (quantity !== item.quantity) payload.quantity = quantity;
+    }
+
+    if (Object.keys(payload).length === 0) {
+      onOpenChange(false);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await updateOrderItem(item.id, payload);
+      if (res.success) {
+        toast.success("Order item updated successfully");
+        void queryClient.invalidateQueries({ queryKey: ["vendor-orders"] });
+        router.refresh();
+        onOpenChange(false);
+      } else {
+        toast.error(res.message || "Failed to update item");
+      }
+    } catch {
+      toast.error("An unexpected error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!item) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[440px]">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-black">Edit Order Item</DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
+            {item.product?.name}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-5 py-2">
+          <div className="space-y-2">
+            <Label>Fulfillment Status</Label>
+            <Select value={statusValue} onValueChange={setStatusValue}>
+              <SelectTrigger className="h-11 rounded-xl">
+                <SelectValue placeholder="Select Status" />
+              </SelectTrigger>
+              <SelectContent>
+                {STATUS_OPTIONS.map((opt) => (
+                  <SelectItem key={opt} value={opt}>
+                    {opt}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {isLocked && (
+            <p className="text-xs text-muted-foreground">
+              Product/quantity is locked because this item is already{" "}
+              {LOCKED_STATUSES.includes(item.status) ? item.status.toLowerCase() : "reviewed"}.
+            </p>
+          )}
+
+          <div className="space-y-2">
+            <Label>Product</Label>
+            <Select value={productId} onValueChange={handleProductChange} disabled={isLocked}>
+              <SelectTrigger className="h-11 rounded-xl">
+                <SelectValue placeholder="Select Product">
+                  {selectedProduct?.name}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {products.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>
+                    {p.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {selectedProduct?.type === "VARIABLE" && selectedProduct.variants?.length > 0 && (
+            <div className="space-y-2">
+              <Label>Variant</Label>
+              <Select
+                value={productVariantId || ""}
+                onValueChange={(value) => setProductVariantId(value)}
+                disabled={isLocked}
+              >
+                <SelectTrigger className="h-11 rounded-xl">
+                  <SelectValue placeholder="Select Variant" />
+                </SelectTrigger>
+                <SelectContent>
+                  {selectedProduct.variants.map((v: any) => (
+                    <SelectItem key={v.id} value={v.id}>
+                      {v.combination}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <Label>Quantity</Label>
+            <Input
+              type="number"
+              min="1"
+              step="1"
+              value={quantity}
+              onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
+              disabled={isLocked}
+              className="h-11 rounded-xl"
+            />
+          </div>
+        </div>
+
+        <DialogFooter className="gap-3 pt-2">
+          <Button
+            variant="outline"
+            className="flex-1 h-11 rounded-xl font-bold"
+            onClick={() => onOpenChange(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            className="flex-1 h-11 rounded-xl font-bold"
+            onClick={handleUpdate}
+            disabled={loading}
+          >
+            {loading ? "Saving..." : "Save Changes"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
