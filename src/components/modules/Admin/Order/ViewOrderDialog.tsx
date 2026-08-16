@@ -16,6 +16,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import ReviewModal from "../../User/Review/ReviewModal";
 import { Star } from "lucide-react";
+import CourierFraudReport from "./CourierFraudReport";
 
 interface ViewOrderDialogProps {
   open: boolean;
@@ -98,6 +99,9 @@ export default function ViewOrderDialog({
               )}
             </div>
           </div>
+
+          {/* Courier Fraud Check */}
+          <CourierFraudReport orderId={order.id} open={open} />
 
           {/* Items */}
           <div className="space-y-4">

@@ -109,6 +109,24 @@ export async function getOrderById(id: string) {
   }
 }
 
+export async function getOrderFraudCheck(id: string) {
+  try {
+    const headers = await getAuthHeaders();
+    if (!headers) return { success: false, message: "Unauthorized" };
+
+    const res = await fetch(`${BASE_API_URL}/orders/${id}/fraud-check`, {
+      method: "GET",
+      headers,
+      cache: "no-store",
+    });
+
+    return res.json();
+  } catch (error) {
+    console.error("Error fetching courier fraud check:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+}
+
 export async function updateOrderStatus(id: string, status: string) {
   try {
     const headers = await getAuthHeaders();
