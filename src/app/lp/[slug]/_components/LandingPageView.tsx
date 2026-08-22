@@ -3,6 +3,7 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +16,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  CheckCircle2,
   ShoppingBag,
   Loader2,
   Minus,
@@ -49,6 +49,7 @@ interface LandingPageViewProps {
 }
 
 export default function LandingPageView({ landingPage, siteSettings }: LandingPageViewProps) {
+  const router = useRouter();
   const product = landingPage.product as any;
 
   const siteName = siteSettings?.siteName || "NextBazar";
@@ -72,7 +73,6 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
   const [district, setDistrict] = useState("");
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [orderPlaced, setOrderPlaced] = useState(false);
 
   const [shippingRates, setShippingRates] = useState({ inside: 70, outside: 130 });
 
@@ -191,38 +191,16 @@ export default function LandingPageView({ landingPage, siteSettings }: LandingPa
       });
 
       if (res.success) {
-        setOrderPlaced(true);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        router.push(`/order-confirmation/${res.data.id}`);
       } else {
         toast.error(res.message || "Failed to place order");
+        setIsSubmitting(false);
       }
     } catch (error: any) {
       toast.error(error.message || "Something went wrong. Please try again.");
-    } finally {
       setIsSubmitting(false);
     }
   };
-
-  if (orderPlaced) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-muted/20" style={themeStyle}>
-        <div className="max-w-md w-full bg-card border rounded-3xl shadow-xl p-8 text-center space-y-5 animate-in fade-in zoom-in-95 duration-300">
-          <div className="mx-auto h-16 w-16 rounded-full bg-green-100 flex items-center justify-center">
-            <CheckCircle2 className="h-9 w-9 text-green-600" />
-          </div>
-          <h1 className="text-2xl font-black">অর্ডার সফলভাবে সম্পন্ন হয়েছে!</h1>
-          <p className="text-muted-foreground">
-            ধন্যবাদ, {fullName}! আপনার অর্ডারটি আমরা পেয়েছি এবং শীঘ্রই যোগাযোগ করা হবে।
-          </p>
-          <div className="bg-muted rounded-xl p-4 text-sm text-left space-y-1">
-            <p><span className="text-muted-foreground">Product:</span> {product?.name}</p>
-            <p><span className="text-muted-foreground">Quantity:</span> {quantity}</p>
-            <p><span className="text-muted-foreground">Total:</span> ৳{total.toFixed(2)}</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background pb-24 md:pb-10" style={themeStyle}>

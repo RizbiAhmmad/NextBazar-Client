@@ -69,7 +69,7 @@ export default function PosSystem() {
         </div>
 
         {/* Product Grid */}
-        <div className="flex-1 overflow-y-auto p-4 bg-gray-50/50">
+        <div className="flex-1 overflow-y-auto p-4 bg-gray-50/50" data-lenis-prevent>
           {isLoadingProducts ? (
             <div className="flex justify-center items-center h-full">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />

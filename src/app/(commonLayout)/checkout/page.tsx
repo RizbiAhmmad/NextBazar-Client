@@ -22,12 +22,12 @@ import { createOrder } from "@/services/order.services";
 import { validateCouponCode } from "@/services/coupon.services";
 import { getShippingSettings } from "@/services/shippingSetting.services";
 import {
-  CheckCircle2,
   ArrowRight,
   Loader2,
   Tag,
   X,
   Ticket,
+  MapPin,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -45,7 +45,6 @@ function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
   const [selectedDistrict, setSelectedDistrict] = useState<string>("");
   const [shippingRates, setShippingRates] = useState({
     inside_dhaka: 70,
@@ -229,41 +228,22 @@ function CheckoutContent() {
     try {
       const res = await createOrder(payload);
       if (res.success) {
-        toast.success("Order placed successfully!");
         if (!isDirectBuy && !isFromCartSelection) {
           clearCart();
         } else {
           // Refresh client-side cart provider since selected/direct items are now deleted from database
           refreshCart?.();
         }
-        setIsSuccess(true);
+        router.push(`/order-confirmation/${res.data.id}`);
       } else {
         toast.error(res.message || "Failed to place order");
+        setIsLoading(false);
       }
     } catch (error) {
       toast.error("An unexpected error occurred");
-    } finally {
       setIsLoading(false);
     }
   };
-
-  if (isSuccess) {
-    return (
-      <div className="container mx-auto px-4 py-24 flex flex-col items-center justify-center min-h-[60vh]">
-        <div className="bg-primary/10 p-4 rounded-full mb-6">
-          <CheckCircle2 className="h-20 w-20 text-primary" />
-        </div>
-        <h1 className="text-3xl font-black mb-4">Order Confirmed!</h1>
-        <p className="text-muted-foreground mb-8 text-center max-w-md">
-          Thank you for shopping with NextBazar. Your order has been placed and
-          is being processed.
-        </p>
-        <Button asChild size="lg" className="rounded-full h-12 px-8 font-bold">
-          <Link href="/products">Continue Shopping</Link>
-        </Button>
-      </div>
-    );
-  }
 
   if (checkoutItems.length === 0) {
     return (
@@ -280,12 +260,12 @@ function CheckoutContent() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12 lg:py-16">
-      <h1 className="text-3xl lg:text-4xl font-black mb-10 tracking-tight">
+    <div className="container mx-auto px-4 py-6 lg:py-8">
+      <h1 className="text-3xl lg:text-4xl font-black mb-6 tracking-tight">
         Checkout
       </h1>
 
-      <div className="flex flex-col lg:flex-row gap-10">
+      <div className="flex flex-col lg:flex-row gap-8">
         {/* Checkout Form */}
         <div className="flex-1">
           <div className="bg-card rounded-3xl p-6 md:p-8 shadow-sm border">
@@ -320,14 +300,24 @@ function CheckoutContent() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="district">District</Label>
+                <Label htmlFor="district" className="flex items-center gap-1.5">
+                  <MapPin className="h-4 w-4 text-primary" />
+                  District <span className="text-destructive">*</span>
+                </Label>
                 <Select
                   value={selectedDistrict}
                   onValueChange={handleDistrictChange}
                   required
                 >
-                  <SelectTrigger id="district" className="h-12 rounded-xl">
-                    <SelectValue placeholder="Select your district" />
+                  <SelectTrigger
+                    id="district"
+                    className={`h-12 w-full rounded-xl font-semibold transition-all ${
+                      selectedDistrict
+                        ? "border-input"
+                        : "border-2 border-primary/60 bg-primary/5 ring-4 ring-primary/10 hover:border-primary"
+                    }`}
+                  >
+                    <SelectValue placeholder="👉 Select your district" />
                   </SelectTrigger>
                   <SelectContent className="max-h-64">
                     {BANGLADESH_DISTRICTS.map((district) => (
@@ -337,6 +327,11 @@ function CheckoutContent() {
                     ))}
                   </SelectContent>
                 </Select>
+                {!selectedDistrict && (
+                  <p className="text-xs font-medium text-primary">
+                    Please select a district to calculate shipping
+                  </p>
+                )}
               </div>
 
               {/* Shipping Zone Selector */}
@@ -402,12 +397,15 @@ function CheckoutContent() {
 
         {/* Order Summary & Payment */}
         <div className="w-full lg:w-[420px] lg:flex-shrink-0">
-          <div className="bg-card rounded-3xl shadow-sm border lg:sticky lg:top-22 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
-            <div className="p-8 space-y-6">
+          <div
+            className="bg-card rounded-3xl shadow-sm border lg:sticky lg:top-22 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto"
+            data-lenis-prevent
+          >
+            <div className="p-6 space-y-4">
               <h2 className="text-xl font-black">Your Order</h2>
 
               {/* Product List with images */}
-              <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+              <div className="space-y-2 max-h-[260px] overflow-y-auto pr-1">
                 {checkoutItems.map((item) => {
                   const img = item.images?.[0] ?? item.image ?? null;
                   const price = (item.variant?.sellPrice || item.sellPrice) * item.cartQuantity;
@@ -509,7 +507,7 @@ function CheckoutContent() {
               <Separator />
 
               {/* Price Summary */}
-              <div className="space-y-3 text-sm">
+              <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground font-medium">Subtotal</span>
                   <span className="font-bold">৳{subtotal.toFixed(2)}</span>
@@ -546,14 +544,14 @@ function CheckoutContent() {
                 </Badge>
               )}
 
-              <div className="bg-muted p-4 rounded-xl text-sm text-center font-medium">
+              <div className="bg-muted p-3 rounded-xl text-sm text-center font-medium">
                 Payment Method: Cash on Delivery
               </div>
 
               <Button
                 type="submit"
                 form="checkout-form"
-                className="w-full h-14 rounded-full text-lg font-bold group"
+                className="w-full h-12 rounded-full text-lg font-bold group"
                 disabled={isLoading}
               >
                 {isLoading ? "Processing..." : "Place Order"}

@@ -71,7 +71,7 @@ export const CategoryMenu = () => {
         <div className="absolute left-0 top-full pt-2">
           <div className="flex min-h-[400px] w-[600px] rounded-b-md rounded-tr-md border bg-background shadow-2xl overflow-hidden">
             {/* Left Panel */}
-            <div className="w-[260px] border-r py-2 overflow-y-auto max-h-[500px] bg-muted/20">
+            <div className="w-[260px] border-r py-2 overflow-y-auto max-h-[500px] bg-muted/20" data-lenis-prevent>
               {categories.map((cat, idx) => (
                 <Link
                   key={cat.id || idx}

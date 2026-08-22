@@ -59,7 +59,7 @@ const FilterSidebar = ({
         <h3 className="text-lg font-black uppercase tracking-tight mb-4 dark:text-white">
           Categories
         </h3>
-        <div className="space-y-3 max-h-[350px] overflow-y-auto pr-2 scrollbar-hide">
+        <div className="space-y-3 max-h-[350px] overflow-y-auto pr-2 scrollbar-hide" data-lenis-prevent>
           {categories.map((cat: any) => (
             <div key={cat.id} className="flex items-center space-x-3 group">
               <Checkbox

@@ -118,6 +118,11 @@ export const sellerNavItems: NavSection[] = [
         href: "/seller/dashboard/pos-orders",
         icon: "Receipt",
       },
+      {
+        title: "Order Returns",
+        href: "/seller/dashboard/order-returns",
+        icon: "Undo2",
+      },
     ],
   },
   {
@@ -230,6 +235,11 @@ export const adminNavItems: NavSection[] = [
         title: "Landing Page Orders",
         href: "/admin/dashboard/landing-page-orders",
         icon: "Rocket",
+      },
+      {
+        title: "Order Returns",
+        href: "/admin/dashboard/order-returns",
+        icon: "Undo2",
       },
     ],
   },

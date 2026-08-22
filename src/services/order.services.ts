@@ -109,6 +109,38 @@ export async function getOrderById(id: string) {
   }
 }
 
+// Public — powers the guest-safe order-confirmation ("Thank You") page, no auth required
+export async function getPublicOrder(id: string) {
+  try {
+    const res = await fetch(`${BASE_API_URL}/orders/${id}/public`, {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    return res.json();
+  } catch (error) {
+    console.error("Error fetching public order details:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+}
+
+// Public — order tracking by orderNumber + phone, no auth required
+export async function trackOrder(payload: { orderNumber: string; phone: string }) {
+  try {
+    const res = await fetch(`${BASE_API_URL}/orders/track`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      cache: "no-store",
+    });
+
+    return res.json();
+  } catch (error) {
+    console.error("Error tracking order:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+}
+
 export async function getOrderFraudCheck(id: string) {
   try {
     const headers = await getAuthHeaders();

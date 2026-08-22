@@ -187,7 +187,7 @@ export default function FloatingChatbot() {
         </div>
 
         {/* Messages */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-5 bg-slate-50/30 scrollbar-hide" style={{ minHeight: "300px" }}>
+        <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-5 bg-slate-50/30 scrollbar-hide" style={{ minHeight: "300px" }} data-lenis-prevent>
           {messages.map((msg) => (
             <MessageBubble key={msg.id} message={msg} onRetry={handleSend} />
           ))}

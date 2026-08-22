@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   Menu,
   ShoppingBag,
@@ -11,6 +12,7 @@ import {
   Store,
   User,
   Trash2,
+  PackageSearch,
 } from "lucide-react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
@@ -33,6 +35,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn, stripHtml } from "@/lib/utils";
 import { UserInfo } from "@/types/user.types";
 import { ISiteSetting } from "@/types/siteSetting.types";
@@ -56,6 +63,20 @@ const Navbar = ({ userInfo, className, siteSettings }: NavbarProps) => {
   const router = useRouter();
   const { cartCount } = useCart();
   const { wishlistCount, wishlistItems, removeFromWishlist } = useWishlist();
+  const [trackOrderNumber, setTrackOrderNumber] = useState("");
+  const [trackPhone, setTrackPhone] = useState("");
+  const [isTrackPopoverOpen, setIsTrackPopoverOpen] = useState(false);
+
+  const handleTrackOrder = () => {
+    const orderNumber = trackOrderNumber.trim();
+    const phone = trackPhone.trim();
+    if (!orderNumber || !phone) return;
+
+    setIsTrackPopoverOpen(false);
+    router.push(
+      `/track-order?orderNumber=${encodeURIComponent(orderNumber)}&phone=${encodeURIComponent(phone)}`,
+    );
+  };
   const siteName = siteSettings?.siteName || "NextBazar";
   const tagline = siteSettings?.tagline;
   const logo = siteSettings?.logo;
@@ -130,6 +151,60 @@ const Navbar = ({ userInfo, className, siteSettings }: NavbarProps) => {
           {/* Right: Actions */}
           <div className="flex items-center gap-2">
             <div className="flex items-center border-r pr-4 mr-2 gap-2">
+              <Popover open={isTrackPopoverOpen} onOpenChange={setIsTrackPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full text-muted-foreground hover:text-primary transition-colors"
+                    title="Track Order"
+                  >
+                    <PackageSearch className="h-5 w-5" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-80">
+                  <div className="space-y-3">
+                    <div>
+                      <p className="font-bold text-sm">Track Your Order</p>
+                      <p className="text-xs text-muted-foreground">
+                        Enter your order number and phone number
+                      </p>
+                    </div>
+                    <Input
+                      value={trackOrderNumber}
+                      onChange={(e) => setTrackOrderNumber(e.target.value)}
+                      placeholder="Order Number (e.g. ONL-000123)"
+                      className="h-10 rounded-lg font-mono text-sm"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleTrackOrder();
+                        }
+                      }}
+                    />
+                    <Input
+                      value={trackPhone}
+                      onChange={(e) => setTrackPhone(e.target.value)}
+                      placeholder="Phone Number"
+                      className="h-10 rounded-lg text-sm"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleTrackOrder();
+                        }
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      onClick={handleTrackOrder}
+                      disabled={!trackOrderNumber.trim() || !trackPhone.trim()}
+                      className="w-full h-10 rounded-lg font-bold"
+                    >
+                      Track Order
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
               <Sheet>
                 <SheetTrigger asChild>
                   <Button
@@ -382,7 +457,16 @@ const Navbar = ({ userInfo, className, siteSettings }: NavbarProps) => {
                     </SheetDescription>
                   </SheetHeader>
 
-                  <div className="flex-1 overflow-y-auto py-6">
+                  <div className="flex-1 overflow-y-auto py-6 px-6">
+                    <SheetTrigger asChild>
+                      <Link
+                        href="/track-order"
+                        className="flex items-center gap-3 h-12 rounded-xl border px-4 font-semibold text-sm hover:border-primary/40 hover:text-primary transition-colors"
+                      >
+                        <PackageSearch className="size-5 text-primary" />
+                        Track Order
+                      </Link>
+                    </SheetTrigger>
                   </div>
 
                   <div className="p-6 border-t bg-muted/30">

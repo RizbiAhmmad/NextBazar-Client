@@ -88,7 +88,7 @@ export default function PosCartSidebar({ cartItems, refreshCart }: { cartItems: 
       </div>
 
       {/* Cart Items List */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-white">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-white" data-lenis-prevent>
         {cartItems.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-4">
             <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center">

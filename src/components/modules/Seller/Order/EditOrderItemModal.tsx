@@ -19,8 +19,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { getPosProducts } from "@/services/pos.services";
 import { updateOrderItem } from "@/services/order.services";
+import { processOrderReturn } from "@/services/orderReturn.services";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -50,6 +52,9 @@ export default function EditOrderItemModal({
   );
   const [quantity, setQuantity] = useState<number>(item?.quantity || 1);
   const [loading, setLoading] = useState(false);
+
+  const [returnQty, setReturnQty] = useState<number>(0);
+  const [returnLoading, setReturnLoading] = useState(false);
 
   const { data: productsResponse } = useQuery({
     queryKey: ["pos-products", "for-order-edit"],
@@ -112,6 +117,33 @@ export default function EditOrderItemModal({
       toast.error("An unexpected error occurred");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const currentReturnableQty = item ? item.quantity - (item.returnedQuantity || 0) : 0;
+  const canReturn = item?.status === "DELIVERED" && currentReturnableQty > 0;
+
+  const handleProcessReturn = async () => {
+    if (!item || returnQty <= 0) return;
+    setReturnLoading(true);
+    try {
+      const res = await processOrderReturn({
+        orderId: item.orderId,
+        items: [{ orderItemId: item.id, quantity: returnQty }],
+      });
+      if (res.success) {
+        toast.success("Return processed successfully");
+        void queryClient.invalidateQueries({ queryKey: ["vendor-orders"] });
+        router.refresh();
+        setReturnQty(0);
+        onOpenChange(false);
+      } else {
+        toast.error(res.message || "Failed to process return");
+      }
+    } catch {
+      toast.error("An unexpected error occurred");
+    } finally {
+      setReturnLoading(false);
     }
   };
 
@@ -203,6 +235,40 @@ export default function EditOrderItemModal({
               className="h-11 rounded-xl"
             />
           </div>
+
+          {canReturn && (
+            <>
+              <Separator />
+              <div className="space-y-2">
+                <Label>Process Return</Label>
+                <p className="text-xs text-muted-foreground">
+                  Remaining returnable quantity: {currentReturnableQty}
+                </p>
+                <div className="flex gap-2">
+                  <Input
+                    type="number"
+                    min={0}
+                    max={currentReturnableQty}
+                    value={returnQty}
+                    onChange={(e) =>
+                      setReturnQty(
+                        Math.max(0, Math.min(currentReturnableQty, Number(e.target.value) || 0)),
+                      )
+                    }
+                    className="h-11 rounded-xl"
+                  />
+                  <Button
+                    variant="destructive"
+                    className="h-11 rounded-xl font-bold shrink-0"
+                    onClick={handleProcessReturn}
+                    disabled={returnLoading || returnQty <= 0}
+                  >
+                    {returnLoading ? "Processing..." : "Process Return"}
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         <DialogFooter className="gap-3 pt-2">

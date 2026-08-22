@@ -10,6 +10,7 @@ export interface IOrderItem {
   productId: string;
   productVariantId?: string | null;
   quantity: number;
+  returnedQuantity: number;
   price: number;
   shopId: string;
   shop?: {
@@ -51,4 +52,42 @@ export interface IOrder {
     id: string;
     name: string;
   } | null;
+}
+
+// Subset of IOrder returned by the public, unauthenticated order-confirmation endpoint
+// (GET /orders/:id/public) — no userId/user/shop/couponId, no vendor-facing item fields.
+export interface IPublicOrderItem {
+  id: string;
+  quantity: number;
+  returnedQuantity: number;
+  price: number;
+  status: OrderStatus;
+  product: {
+    id: string;
+    name: string;
+    images: string[];
+  };
+  productVariant?: {
+    id: string;
+    combination: string;
+  } | null;
+}
+
+export interface IPublicOrder {
+  id: string;
+  orderNumber: string;
+  orderType: OrderType;
+  orderStatus: OrderStatus;
+  paymentStatus: PaymentStatus;
+  paymentMethod?: string | null;
+  totalAmount: number;
+  discountAmount: number;
+  shippingFee: number;
+  fullName: string;
+  phone: string;
+  address: string;
+  district: string;
+  notes?: string | null;
+  createdAt: string;
+  items: IPublicOrderItem[];
 }

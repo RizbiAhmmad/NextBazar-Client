@@ -17,6 +17,9 @@ import { Button } from "@/components/ui/button";
 import ReviewModal from "../../User/Review/ReviewModal";
 import { Star } from "lucide-react";
 import CourierFraudReport from "./CourierFraudReport";
+import { getReturnsByOrder } from "@/services/orderReturn.services";
+import { IOrderReturn } from "@/types/orderReturn.types";
+import { useQuery } from "@tanstack/react-query";
 
 interface ViewOrderDialogProps {
   open: boolean;
@@ -36,6 +39,13 @@ export default function ViewOrderDialog({
     name: string;
   } | null>(null);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+
+  const { data: returnsResponse } = useQuery({
+    queryKey: ["order-returns", order?.id],
+    queryFn: () => getReturnsByOrder(order!.id),
+    enabled: open && !!order,
+  });
+  const orderReturns: IOrderReturn[] = returnsResponse?.data ?? [];
 
   if (!order) return null;
 
@@ -128,6 +138,12 @@ export default function ViewOrderDialog({
                     </p>
                     <p className="text-xs text-muted-foreground">
                       Quantity: {item.quantity}
+                      {item.returnedQuantity > 0 && (
+                        <span className="text-destructive font-semibold">
+                          {" "}
+                          ({item.returnedQuantity} returned)
+                        </span>
+                      )}
                     </p>
                     {item.productVariant?.combination && (
                       <div className="flex flex-wrap gap-1 mt-1">
@@ -180,7 +196,11 @@ export default function ViewOrderDialog({
               <span className="font-bold">
                 ৳
                 {order.items
-                  ?.reduce((acc, item) => acc + item.price * item.quantity, 0)
+                  ?.reduce(
+                    (acc, item) =>
+                      acc + item.price * (item.quantity - item.returnedQuantity),
+                    0,
+                  )
                   .toFixed(2)}
               </span>
             </div>
@@ -203,6 +223,45 @@ export default function ViewOrderDialog({
               </span>
             </div>
           </div>
+
+          {/* Returned Items */}
+          {orderReturns.length > 0 && (
+            <div className="space-y-2">
+              <h3 className="font-black text-lg text-destructive">Returned Items</h3>
+              <div className="rounded-lg border overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b bg-muted/50">
+                      <th className="text-left p-2 font-bold">Product</th>
+                      <th className="text-left p-2 font-bold">Variant</th>
+                      <th className="text-left p-2 font-bold">Returned Qty</th>
+                      <th className="text-left p-2 font-bold">Price</th>
+                      <th className="text-left p-2 font-bold">Returned At</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orderReturns.flatMap((orderReturn) =>
+                      orderReturn.items.map((returnItem) => (
+                        <tr key={returnItem.id} className="border-b last:border-0">
+                          <td className="p-2">{returnItem.product?.name}</td>
+                          <td className="p-2 text-muted-foreground">
+                            {returnItem.productVariant?.combination || "-"}
+                          </td>
+                          <td className="p-2 font-bold text-destructive">
+                            {returnItem.quantity}
+                          </td>
+                          <td className="p-2">৳{returnItem.price.toFixed(2)}</td>
+                          <td className="p-2 text-muted-foreground">
+                            {format(new Date(orderReturn.createdAt), "d MMM, yyyy h:mm a")}
+                          </td>
+                        </tr>
+                      )),
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       </DialogContent>
 

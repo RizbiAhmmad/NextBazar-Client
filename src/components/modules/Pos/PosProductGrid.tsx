@@ -190,7 +190,7 @@ function VariantModal({ product, onClose, onAdded }: { product: any, onClose: ()
           </div>
 
           {/* Right: variant list */}
-          <div className="flex-1 max-h-72 overflow-y-auto p-3 space-y-2">
+          <div className="flex-1 max-h-72 overflow-y-auto p-3 space-y-2" data-lenis-prevent>
             {product.variants.map((variant: any) => {
               const isSelected = selectedVariant?.id === variant.id;
               const variantImg = variant.image || product.images?.[0];
